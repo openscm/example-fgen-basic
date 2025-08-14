@@ -35,7 +35,7 @@ def get_wavelength_plain(frequency: float) -> float:
     :
         Wavelength of light for given `frequency`
     """
-    res = m_get_wavelength_w.get_wavelength(frequency)
+    res: float = m_get_wavelength_w.get_wavelength(frequency)
 
     return res
 

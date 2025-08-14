@@ -28,8 +28,8 @@ help:  ## print short description of each target
 
 .PHONY: checks
 checks:  ## run all the linting checks of the codebase
-	@echo "=== pre-commit ==="; uv run pre-commit run --all-files || echo "--- pre-commit failed ---" >&2; \
-		echo "=== mypy ==="; MYPYPATH=stubs uv run mypy src || echo "--- mypy failed ---" >&2; \
+	@echo "=== pre-commit ==="; uv run --no-sync pre-commit run --all-files || echo "--- pre-commit failed ---" >&2; \
+		echo "=== mypy ==="; MYPYPATH=stubs uv run --no-sync mypy src || echo "--- mypy failed ---" >&2; \
 		echo "======"
 
 .PHONY: ruff-fixes

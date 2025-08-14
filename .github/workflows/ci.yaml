@@ -23,7 +23,7 @@ jobs:
           uv-dependency-install-flags: "--all-extras --group dev"
       - name: mypy
         run: |
-          MYPYPATH=stubs uv run mypy src
+          MYPYPATH=stubs uv run --no-sync mypy src
 
   docs:
     if: ${{ !github.event.pull_request.draft }}
@@ -41,7 +41,7 @@ jobs:
           uv-dependency-install-flags: "--all-extras --group docs"
       - name: docs
         run: |
-          uv run mkdocs build --strict
+          uv run --no-sync mkdocs build --strict
       - uses: ./.github/actions/setup
         with:
           python-version: "3.11"
@@ -49,8 +49,8 @@ jobs:
       - name: docs-with-changelog
         run: |
           # Check CHANGELOG will build too
-          uv run towncrier build --yes
-          uv run mkdocs build --strict
+          uv run --no-sync towncrier build --yes
+          uv run --no-sync mkdocs build --strict
           # Just in case, undo the staged changes
           git restore --staged . && git restore .
 
@@ -230,7 +230,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Build package
         run: |
-          uv run python scripts/add-locked-targets-to-pyproject-toml.py
+          uv run --no-sync python scripts/add-locked-targets-to-pyproject-toml.py
           cat pyproject.toml
           uv build
           # Just in case, undo the changes to `pyproject.toml`
@@ -258,5 +258,5 @@ jobs:
         run: |
           TEMP_FILE=$(mktemp)
           uv export --no-dev > $TEMP_FILE
-          uv run liccheck -r $TEMP_FILE -R licence-check.txt
+          uv run --no-sync liccheck -r $TEMP_FILE -R licence-check.txt
           cat licence-check.txt
