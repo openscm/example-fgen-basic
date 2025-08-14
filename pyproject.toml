@@ -91,6 +91,7 @@ dev = [
     "rich==13.9.4",
     "shellingham==1.5.4",
     "fprettify>=0.3.7",
+    "pint>=0.24.4",
 ]
 docs = [
     # Key dependencies
