@@ -5,6 +5,7 @@ ci:
   autoupdate_branch: pre-commit-autoupdate
   # Currently network access isn't supported in the pre-commit CI product.
   skip: [
+    inject-srcs-into-meson-build,
     propagate-pyproject-metadata,
     uv-sync,
     uv-lock,
