@@ -1,6 +1,7 @@
 name: Release
 
 on:
+  pull_request:
   push:
     tags: ['v*']
 
@@ -21,12 +22,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Setup uv
-        id: setup-uv
-        uses: astral-sh/setup-uv@v4
+      - uses: ./.github/actions/setup
         with:
-          version: "0.8.8"
           python-version: ${{ matrix.python-version }}
+          uv-dependency-install-flags: "--all-extras --group dev"
       - name: Add version to environment
         run: |
           PROJECT_VERSION=`sed -ne 's/^version = "\([0-9\.]*\)"/\1/p' pyproject.toml`
@@ -42,7 +41,6 @@ jobs:
           echo "" >> ".github/release_template.md"
           echo "## Changelog" >> ".github/release_template.md"
           echo "" >> ".github/release_template.md"
-          uv add --no-sync typer
           uv run --no-sync python scripts/changelog-to-release-template.py >> ".github/release_template.md"
           echo "" >> ".github/release_template.md"
           echo "## Changes" >> ".github/release_template.md"
