@@ -39,8 +39,8 @@ ruff-fixes:  ## fix the code using ruff
 	uv run ruff format src tests scripts docs
 
 .PHONY: test
-test:  ## run the tests
-	uv run pytest src tests -r a -v --doctest-modules --doctest-report ndiff --cov=src
+test:  ## run the tests (re-installs the package every time so you might want to run by hand if you're certain that step isn't needed)
+	uv run --no-editable --reinstall-package example-fgen-basic pytest tests src tests -r a -v --doctest-modules --doctest-report ndiff --cov=src
 
 # Note on code coverage and testing:
 # You must specify cov=src.
