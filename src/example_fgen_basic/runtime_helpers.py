@@ -9,10 +9,11 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
 from functools import wraps
-from typing import Any, Callable, Concatenate, ParamSpec, TypeVar
+from typing import Any, Callable, TypeVar
 
 import attrs
 from attrs import define, field
+from typing_extensions import Concatenate, ParamSpec
 
 from example_fgen_basic.exceptions import NotInitialisedError, UnallocatedMemoryError
 

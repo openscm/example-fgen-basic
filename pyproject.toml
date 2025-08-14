@@ -11,6 +11,7 @@ dependencies = [
     "attrs>=24.3.0",
     "numpy>=1.26.0; python_version < '3.13'",
     "numpy>=2.1.0; python_version >= '3.13'",
+    "typing-extensions>=4.12.2",
 ]
 readme = "README.md"
 classifiers = [
