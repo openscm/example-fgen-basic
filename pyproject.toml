@@ -90,6 +90,7 @@ dev = [
     "pygments==2.19.1",
     "rich==13.9.4",
     "shellingham==1.5.4",
+    "fprettify>=0.3.7",
 ]
 docs = [
     # Key dependencies

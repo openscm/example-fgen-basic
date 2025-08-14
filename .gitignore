@@ -1,15 +1,28 @@
+# Local install dir
+install-example
+
+# Cloned dependencies
+subprojects/test-drive
+
 # Notebooks
 *.ipynb
 
 # Auto-generated docs and helper files
 docs/api/*
 !docs/api/.gitkeep
-
-# pdm stuff
-.pdm-python
+docs/fgen/api/*
+!docs/fgen/api/.gitkeep
+docs/fgen-runtime/api/*
+!docs/fgen-runtime/api/.gitkeep
 
 # Databases
 *.db
+
+# Downloaded wheels
+*.whl
+
+# cmake
+cmake-build-*
 
 # Jupyter cache
 .jupyter_cache

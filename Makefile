@@ -4,6 +4,8 @@
 # Will likely fail on Windows, but Makefiles are in general not Windows
 # compatible so we're not too worried
 TEMP_FILE := $(shell mktemp)
+# Directory in which to build the Fortran when using a standalone build
+BUILD_DIR := build
 
 # A helper script to get short descriptions of each target in the Makefile
 define PRINT_HELP_PYSCRIPT
@@ -81,3 +83,28 @@ licence-check:  ## Check that licences of the dependencies are suitable
 virtual-environment:  ## update virtual environment, create a new one if it doesn't already exist
 	uv sync --all-extras --group all-dev
 	uv run pre-commit install
+
+.PHONY: format-fortran
+format-fortran:  ## format the Fortran files
+	uv run fprettify -r src -c .fprettify.rc
+
+$(BUILD_DIR):  # setup the standlone Fortran build directory
+	uv run meson setup $(BUILD_DIR)
+
+.PHONY: build-fortran
+build-fortran: | $(BUILD_DIR)  ## build/compile the Fortran (including the extension module)
+	uv run meson compile -C build -v
+
+.PHONY: test-fortran
+test-fortran: build-fortran  ## run the Fortran tests
+	uv run meson test -C build -v
+
+.PHONY: install-fortran
+install-fortran: build-fortran  ## install the Fortran (including the extension module)
+	uv run meson install -C build -v
+	# # Can also do this to see where things go without making a mess
+	# uv run meson install -C build --destdir ../install-example
+
+.PHONY: clean
+clean:  ## clean all build artefacts
+	rm -rf $(BUILD_DIR)
