@@ -50,7 +50,7 @@ jobs:
           echo "Bumping from version $BASE_VERSION"
 
           # Bump
-          uv version --bump ${{ github.event.inputs.bump_rule }}
+          uv version --no-sync --bump ${{ github.event.inputs.bump_rule }}
 
           NEW_VERSION=`sed -ne 's/^version = "\([0-9\.]*\)"/\1/p' pyproject.toml`
           echo "Bumping to version $NEW_VERSION"
@@ -68,7 +68,7 @@ jobs:
           BASE_VERSION=`sed -ne 's/^version = "\([0-9\.]*\)"/\1/p' pyproject.toml`
 
           # Bump to pre-release of next version
-          uv version --bump post
+          uv version --no-sync --bump post
 
           NEW_VERSION=`sed -ne 's/^version = "\([0-9\.post]*\)"/\1/p' pyproject.toml`
           echo "Bumping version $BASE_VERSION > $NEW_VERSION"
