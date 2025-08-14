@@ -1,5 +1,5 @@
 project(
-  'example',  # injected with scripts/make-version-consistent.py, don't edit by hand
+  'example-fgen-basic',  # injected with scripts/make-version-consistent.py, don't edit by hand
   ['c', 'fortran'],  # C as f2py creates C files so we need a C compiler
   # Dev version (i.e. anything that isn't a release) will be 0.0.0
   # because meson doesn't support pre-release identifiers like `.a`, `.post`
@@ -28,7 +28,7 @@ endif
 
 if pyprojectwheelbuild_enabled
   ## Python wrapper
-  python_project_name = 'example'  # injected with scripts/make-version-consistent.py, don't edit by hand
+  python_project_name = 'example_fgen_basic'  # injected with scripts/make-version-consistent.py, don't edit by hand
   extension_module_name = '_lib'  # Doesn't need to be more specific I don't think (?)
 
   if get_option('verbose') > 0
@@ -213,7 +213,7 @@ else
     pkg = import('pkgconfig')
     pkg.generate(
       example_lib,
-      description: 'Example of wrapping Fortran so it can be called from Python. This is the standalone Fortran library.',  # injected with scripts/make-version-consistent.py, do not edit by hand
+      description: 'Basic example of using fgen. This is the standalone Fortran library.',  # injected with scripts/make-version-consistent.py, do not edit by hand
       subdirs: ['', module_id],
     )
 

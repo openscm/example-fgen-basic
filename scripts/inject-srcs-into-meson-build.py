@@ -13,14 +13,46 @@ from pathlib import Path
 
 
 def get_src_pattern(meson_variable: str) -> str:
-    return f"{meson_variable} = files\(\s*('[a-z\/_\.0-9]*',\s*)*\)"
+    """
+    Get the pattern to use to find the source files in `meson.build`
+
+    Parameters
+    ----------
+    meson_variable
+        Meson variable to set
+
+    Returns
+    -------
+    :
+        Pattern to use to grep for the meson variable
+    """
+    return rf"{meson_variable} = files\(\s*('[a-z\/_\.0-9]*',\s*)*\)"
 
 
 def get_src_substitution(
     meson_variable: str, srcs: Iterable[Path], rel_to: Path
 ) -> str:
+    """
+    Get the value to substitute for the meson variable
+
+    Parameters
+    ----------
+    meson_variable
+        Meson variable to set
+
+    srcs
+        Sources to use for this meson variable
+
+    rel_to
+        Path the sources should be relative to when setting `meson_variable`
+
+    Returns
+    -------
+    :
+        Value to use to set the meson variable
+    """
     inner = textwrap.indent(
-        ",\n".join((f"'{v.relative_to(rel_to).as_posix()}'" for v in srcs)),
+        ",\n".join(f"'{v.relative_to(rel_to).as_posix()}'" for v in srcs),
         prefix=" " * 4,
     )
 
@@ -29,9 +61,14 @@ def get_src_substitution(
 
 
 def main():
+    """
+    Inject sources into `meson.build`
+
+    Nicer than typing by hand
+    """
     REPO_ROOT = Path(__file__).parents[1]
     SRC_DIR = REPO_ROOT / "src"
-    print(f"Source={SRC_DIR}")
+
     srcs = []
     srcs_ancillary_lib = []
     for ffile in SRC_DIR.rglob("*.f90"):

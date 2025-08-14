@@ -11,11 +11,15 @@ import tomllib
 
 
 def main():
+    """
+    Propogate information from `pyproject.toml` to the rest of the project files
+    """
     REPO_ROOT = Path(__file__).parents[1]
     with open(REPO_ROOT / "pyproject.toml", "rb") as fh:
         pyproject_toml = tomllib.load(fh)
 
     project_name = pyproject_toml["project"]["name"]
+    project_name_python = project_name.replace("-", "_")
     version = pyproject_toml["project"]["version"]
     if re.match(".*[a-z].*", version):
         # Can't use pre-releases in meson.build, switch to dev version
@@ -28,12 +32,12 @@ def main():
 
     meson_build_out = meson_build_in
     for pattern, substitution in (
-        ("version\: '[0-9a-z\.]*'", f"version: '{version}'"),
+        (r"version\: '[0-9a-z\.]*'", f"version: '{version}'"),
         (
-            "python_project_name = '[a-z\-_]*'",
-            f"python_project_name = '{project_name}'",
+            r"python_project_name = '[a-z\-_]*'",
+            f"python_project_name = '{project_name_python}'",
         ),
-        ("project\(\s*'[a-z\-_]*'", f"project(\n  '{project_name}'"),
+        (r"project\(\s*'[a-z\-_]*'", f"project(\n  '{project_name}'"),
         (
             "description: '.*'",
             f"description: '{description}. This is the standalone Fortran library.'",
