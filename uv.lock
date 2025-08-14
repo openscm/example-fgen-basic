@@ -739,6 +739,9 @@ wheels = [
 name = "example-fgen-basic"
 version = "0.1.0a1"
 source = { editable = "." }
+dependencies = [
+    { name = "attrs" },
+]
 
 [package.optional-dependencies]
 full = [
@@ -822,6 +825,7 @@ tests-min = [
 
 [package.metadata]
 requires-dist = [
+    { name = "attrs", specifier = ">=25.3.0" },
     { name = "example-fgen-basic", extras = ["plots"], marker = "extra == 'full'" },
     { name = "matplotlib", marker = "extra == 'plots'", specifier = ">=3.7.1" },
 ]
