@@ -26,4 +26,4 @@ runs:
       shell: bash
       if: ${{ (inputs.run-uv-install == 'true') }}
       run: |
-        uv sync ${{ inputs.uv-dependency-install-flags }}
+        uv sync --no-editable ${{ inputs.uv-dependency-install-flags }}
