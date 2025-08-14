@@ -21,6 +21,13 @@ from the examples given in that link.
 
 <!-- towncrier release notes start -->
 
+## Example fgen - basic v0.1.6 (2025-08-14)
+
+### 🔧 Trivial/Internal Changes
+
+- [#8](https://github.com/openscm/example-fgen-basic/pull/8)
+
+
 ## Example fgen - basic v0.1.5 (2025-08-14)
 
 ### 🔧 Trivial/Internal Changes
