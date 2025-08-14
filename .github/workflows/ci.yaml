@@ -65,7 +65,8 @@ jobs:
         with:
           # Exclude local links
           # and the template link in pyproject.toml
-          args: "--exclude 'file://' --exclude '^https://github\\.com/openscm/example-fgen-basic/pull/\\{issue\\}$' ."
+          # Don't check for conda-forge while we haven't released there
+          args: "--exclude 'file://' --exclude '^https://github\\.com/openscm/example-fgen-basic/pull/\\{issue\\}$' --exclude '^https://github.com/conda-forge/example-fgen-basic-feedstock$' ."
 
   tests:
     strategy:
