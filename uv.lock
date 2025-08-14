@@ -741,7 +741,7 @@ wheels = [
 
 [[package]]
 name = "example-fgen-basic"
-version = "0.1.3"
+version = "0.1.3.post1"
 source = { editable = "." }
 dependencies = [
     { name = "attrs" },

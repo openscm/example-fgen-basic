@@ -1,6 +1,6 @@
 [project]
 name = "example-fgen-basic"
-version = "0.1.3"
+version = "0.1.3.post1"
 description = "Basic example of using fgen"
 authors = [
     { name = "Zebedee Nicholls", email = "zebedee.nicholls@climate-energy-college.org" },
