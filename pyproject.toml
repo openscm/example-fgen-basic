@@ -5,7 +5,7 @@ description = "Basic example of using fgen"
 authors = [
     { name = "Zebedee Nicholls", email = "zebedee.nicholls@climate-energy-college.org" },
 ]
-license = { text = "placeholder" }
+license = { text = "3-Clause BSD License" }
 requires-python = ">=3.9"
 dependencies = [
     "attrs>=24.3.0",
