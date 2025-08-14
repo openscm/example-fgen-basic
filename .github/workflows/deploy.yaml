@@ -35,7 +35,9 @@ jobs:
       - name: Publish to PyPI
         run: |
           uv run --no-sync python scripts/add-locked-targets-to-pyproject-toml.py
-          uv build
+          # TODO: move to using cibuildwheel so we have wheels for multiple platforms and python versions
+          # starting docs: https://cibuildwheel.pypa.io/en/stable/
+          uv build --sdist
           uv publish
           # Just in case, undo the changes to `pyproject.toml`
           git restore --staged . && git restore .
