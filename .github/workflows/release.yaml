@@ -42,7 +42,7 @@ jobs:
           echo "" >> ".github/release_template.md"
           echo "## Changelog" >> ".github/release_template.md"
           echo "" >> ".github/release_template.md"
-          uv add typer
+          uv add --no-sync typer
           uv run --no-sync python scripts/changelog-to-release-template.py >> ".github/release_template.md"
           echo "" >> ".github/release_template.md"
           echo "## Changes" >> ".github/release_template.md"
