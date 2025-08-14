@@ -40,7 +40,7 @@ ruff-fixes:  ## fix the code using ruff
 
 .PHONY: test
 test:  ## run the tests (re-installs the package every time so you might want to run by hand if you're certain that step isn't needed)
-	uv run --no-editable --reinstall-package example-fgen-basic pytest tests src tests -r a -v --doctest-modules --doctest-report ndiff --cov=src
+	uv run --no-editable --reinstall-package example-fgen-basic pytest -r a -v -tests src -doctest-modules --doctest-report ndiff --cov=src
 
 # Note on code coverage and testing:
 # You must specify cov=src.

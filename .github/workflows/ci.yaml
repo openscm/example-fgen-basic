@@ -100,17 +100,17 @@ jobs:
           ls .venv/lib/python3.11/site-packages/example_fgen_basic
       - name: Run tests
         run: |
-          # uv run --no-sync pytest -r a -v src tests --doctest-modules --cov=src --cov-report=term-missing --cov-report=xml
-          uv run --no-editable --reinstall-package example-fgen-basic python -c 'import example_fgen_basic;print(example_fgen_basic.__file__)'
-          cd .venv/lib/python3.11/site-packages/example_fgen_basic
-          ls
-          ../../../../bin/python -c 'import exceptions; print("Found exceptions here")'
-          ../../../../bin/python -c 'import _lib; print("Found _lib here")'
-          cd ../../../../../
-          ls
-          .venv/bin/pytest -r a -v src tests --doctest-modules --cov=src --cov-report=term-missing --cov-report=xml
-          uv run which pytest
-          uv run --no-editable --reinstall-package example-fgen-basic pytest -r a -v src tests --doctest-modules --cov=src --cov-report=term-missing --cov-report=xml
+          uv run --no-sync pytest -r a -v tests src --doctest-modules --doctest-report ndiff --cov=src --cov-report=term-missing --cov-report=xml
+          # uv run --no-editable --reinstall-package example-fgen-basic python -c 'import example_fgen_basic;print(example_fgen_basic.__file__)'
+          # cd .venv/lib/python3.11/site-packages/example_fgen_basic
+          # ls
+          # ../../../../bin/python -c 'import exceptions; print("Found exceptions here")'
+          # ../../../../bin/python -c 'import _lib; print("Found _lib here")'
+          # cd ../../../../../
+          # ls
+          # .venv/bin/pytest -r a -v src tests --doctest-modules --cov=src --cov-report=term-missing --cov-report=xml
+          # uv run which pytest
+          # uv run --no-editable --reinstall-package example-fgen-basic pytest -r a -v src tests --doctest-modules --cov=src --cov-report=term-missing --cov-report=xml
           uv run --no-sync coverage report
       - name: Upload coverage reports to Codecov with GitHub Action
         uses: codecov/codecov-action@v4.2.0
