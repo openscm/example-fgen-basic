@@ -95,23 +95,15 @@ jobs:
           # we should add a CI step that runs the tests without optional dependencies too.
           # We don't have that right now, because we're not sure this pain point exists.
           uv-dependency-install-flags: "--all-extras --group tests"
-      - name: Show installed tree
-        run: |
-          ls .venv/lib/python3.11/site-packages/example_fgen_basic
       - name: Run tests
         run: |
+          rm -r src/example_fgen_basic
+          ln -s .venv/lib/python3.11/site-packages/example_fgen_basic src/example_fgen_basic
           uv run --no-sync pytest -r a -v tests src --doctest-modules --doctest-report ndiff --cov=src --cov-report=term-missing --cov-report=xml
-          # uv run --no-editable --reinstall-package example-fgen-basic python -c 'import example_fgen_basic;print(example_fgen_basic.__file__)'
-          # cd .venv/lib/python3.11/site-packages/example_fgen_basic
-          # ls
-          # ../../../../bin/python -c 'import exceptions; print("Found exceptions here")'
-          # ../../../../bin/python -c 'import _lib; print("Found _lib here")'
-          # cd ../../../../../
-          # ls
-          # .venv/bin/pytest -r a -v src tests --doctest-modules --cov=src --cov-report=term-missing --cov-report=xml
-          # uv run which pytest
-          # uv run --no-editable --reinstall-package example-fgen-basic pytest -r a -v src tests --doctest-modules --cov=src --cov-report=term-missing --cov-report=xml
           uv run --no-sync coverage report
+          # Just in case, undo the changes to `src`
+          rm -r src/example_fgen_basic
+          git restore --staged . && git restore .
       - name: Upload coverage reports to Codecov with GitHub Action
         uses: codecov/codecov-action@v4.2.0
         env:

@@ -40,6 +40,15 @@ ruff-fixes:  ## fix the code using ruff
 
 .PHONY: test
 test:  ## run the tests (re-installs the package every time so you might want to run by hand if you're certain that step isn't needed)
+	# Note: passing `src` to pytest causes the `src` directory to be imported
+	# if the package has not already been installed.
+	# This is a problem, as the package is not importable from `src` by itself because the extension module is not available.
+	# As a result, you have to pass `pytest tests src` rather than `pytest src tests`
+	# to ensure that the package is imported from the venv and not `src`.
+	# The issue with this is that code coverage then doesn't work,
+	# because it is looking for lines in `src` to be run,
+	# but they're not because lines in `.venv` are run instead.
+	# We don't have a solution to this yet.
 	uv run --no-editable --reinstall-package example-fgen-basic pytest -r a -v -tests src -doctest-modules --doctest-report ndiff --cov=src
 
 # Note on code coverage and testing:
