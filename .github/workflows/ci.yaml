@@ -95,6 +95,9 @@ jobs:
           # we should add a CI step that runs the tests without optional dependencies too.
           # We don't have that right now, because we're not sure this pain point exists.
           uv-dependency-install-flags: "--all-extras --group tests"
+      - name: Show installed tree
+        run: |
+          ls .venv/lib/python3.11/site-packages/example_fgen_basic
       - name: Run tests
         run: |
           uv run --no-sync pytest -r a -v src tests --doctest-modules --cov=src --cov-report=term-missing --cov-report=xml
