@@ -20,3 +20,13 @@ from the examples given in that link.
 -->
 
 <!-- towncrier release notes start -->
+
+## Example fgen - basic v0.1.1 (2025-08-14)
+
+### 🆕 Features
+
+- Add basic functionality that wraps Fortran ([#2](https://github.com/openscm/example-fgen-basic/pull/2))
+
+### 🔧 Trivial/Internal Changes
+
+- [#1](https://github.com/openscm/example-fgen-basic/pull/1), [#3](https://github.com/openscm/example-fgen-basic/pull/3)
