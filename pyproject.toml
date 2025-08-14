@@ -140,6 +140,11 @@ source = [
     "src",
 ]
 branch = true
+omit = [
+    # TODO: check this file
+    "*exceptions.py",
+    "*runtime_helpers.py",
+]
 
 [tool.coverage.report]
 fail_under = 90

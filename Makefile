@@ -92,8 +92,8 @@ licence-check:  ## Check that licences of the dependencies are suitable
 
 .PHONY: virtual-environment
 virtual-environment:  ## update virtual environment, create a new one if it doesn't already exist
-	uv sync --all-extras --group all-dev
-	uv run pre-commit install
+	uv sync --no-editable --all-extras --group all-dev
+	uv run --no-sync pre-commit install
 
 .PHONY: format-fortran
 format-fortran:  ## format the Fortran files
