@@ -4,7 +4,12 @@ ci:
   autoupdate_schedule: quarterly
   autoupdate_branch: pre-commit-autoupdate
   # Currently network access isn't supported in the pre-commit CI product.
-  skip: [uv-sync, uv-lock, uv-export]
+  skip: [
+    propagate-pyproject-metadata,
+    uv-sync,
+    uv-lock,
+    uv-export,
+  ]
 
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
@@ -63,3 +68,24 @@ repos:
         args: ["-o", "requirements-only-tests-locked.txt", "--no-hashes", "--no-dev", "--no-emit-project", "--only-group", "tests"]
       # # Not released yet
       # - id: uv-sync
+  - repo: local
+    hooks:
+      - id: propagate-pyproject-metadata
+        name: propagate-pyproject-metadata
+        entry: uv run --no-sync python scripts/propogate-pyproject-metadata.py
+        files: |
+            (?x)^(
+                meson.build|
+                scripts/propogate-pyproject-metadata.py|
+                pyproject.toml
+            )$
+        language: system
+        require_serial: true
+        pass_filenames: false
+      - id: inject-srcs-into-meson-build
+        name: inject-srcs-into-meson-build
+        entry: uv run --no-sync python scripts/inject-srcs-into-meson-build.py
+        files: \.(py|f90|build)$
+        language: system
+        require_serial: true
+        pass_filenames: false

@@ -4,6 +4,10 @@
 # Will likely fail on Windows, but Makefiles are in general not Windows
 # compatible so we're not too worried
 TEMP_FILE := $(shell mktemp)
+# Directory in which to build the Fortran when using a standalone build
+BUILD_DIR := build
+# Coverage directory - needed to trick code cov to look in the right place
+COV_DIR := $(shell uv run --no-sync python -c 'from pathlib import  Path; import example_fgen_basic; print(Path(example_fgen_basic.__file__).parent)')
 
 # A helper script to get short descriptions of each target in the Makefile
 define PRINT_HELP_PYSCRIPT
@@ -24,8 +28,8 @@ help:  ## print short description of each target
 
 .PHONY: checks
 checks:  ## run all the linting checks of the codebase
-	@echo "=== pre-commit ==="; uv run pre-commit run --all-files || echo "--- pre-commit failed ---" >&2; \
-		echo "=== mypy ==="; MYPYPATH=stubs uv run mypy src || echo "--- mypy failed ---" >&2; \
+	@echo "=== pre-commit ==="; uv run --no-sync pre-commit run --all-files || echo "--- pre-commit failed ---" >&2; \
+		echo "=== mypy ==="; MYPYPATH=stubs uv run --no-sync mypy src || echo "--- mypy failed ---" >&2; \
 		echo "======"
 
 .PHONY: ruff-fixes
@@ -37,8 +41,17 @@ ruff-fixes:  ## fix the code using ruff
 	uv run ruff format src tests scripts docs
 
 .PHONY: test
-test:  ## run the tests
-	uv run pytest src tests -r a -v --doctest-modules --doctest-report ndiff --cov=src
+test:  ## run the tests (re-installs the package every time so you might want to run by hand if you're certain that step isn't needed)
+	# Note: passing `src` to pytest causes the `src` directory to be imported
+	# if the package has not already been installed.
+	# This is a problem, as the package is not importable from `src` by itself because the extension module is not available.
+	# As a result, you have to pass `pytest tests src` rather than `pytest src tests`
+	# to ensure that the package is imported from the venv and not `src`.
+	# The issue with this is that code coverage then doesn't work,
+	# because it is looking for lines in `src` to be run,
+	# but they're not because lines in `.venv` are run instead.
+	# We don't have a solution to this yet.
+	uv run --no-editable --reinstall-package example-fgen-basic pytest -r a -v tests src --doctest-modules --doctest-report ndiff --cov=$(COV_DIR)
 
 # Note on code coverage and testing:
 # You must specify cov=src.
@@ -55,15 +68,15 @@ test:  ## run the tests
 
 .PHONY: docs
 docs:  ## build the docs
-	uv run mkdocs build
+	uv run --no-sync mkdocs build
 
 .PHONY: docs-strict
 docs-strict:  ## build the docs strictly (e.g. raise an error on warnings, this most closely mirrors what we do in the CI)
-	uv run mkdocs build --strict
+	uv run --no-sync mkdocs build --strict
 
 .PHONY: docs-serve
 docs-serve:  ## serve the docs locally
-	uv run mkdocs serve
+	uv run --no-sync mkdocs serve
 
 .PHONY: changelog-draft
 changelog-draft:  ## compile a draft of the next changelog
@@ -79,5 +92,30 @@ licence-check:  ## Check that licences of the dependencies are suitable
 
 .PHONY: virtual-environment
 virtual-environment:  ## update virtual environment, create a new one if it doesn't already exist
-	uv sync --all-extras --group all-dev
-	uv run pre-commit install
+	uv sync --no-editable --all-extras --group all-dev
+	uv run --no-sync pre-commit install
+
+.PHONY: format-fortran
+format-fortran:  ## format the Fortran files
+	uv run fprettify -r src -c .fprettify.rc
+
+$(BUILD_DIR):  # setup the standlone Fortran build directory
+	uv run meson setup $(BUILD_DIR)
+
+.PHONY: build-fortran
+build-fortran: | $(BUILD_DIR)  ## build/compile the Fortran (including the extension module)
+	uv run meson compile -C build -v
+
+.PHONY: test-fortran
+test-fortran: build-fortran  ## run the Fortran tests
+	uv run meson test -C build -v
+
+.PHONY: install-fortran
+install-fortran: build-fortran  ## install the Fortran (including the extension module)
+	uv run meson install -C build -v
+	# # Can also do this to see where things go without making a mess
+	# uv run meson install -C build --destdir ../install-example
+
+.PHONY: clean
+clean:  ## clean all build artefacts
+	rm -rf $(BUILD_DIR)

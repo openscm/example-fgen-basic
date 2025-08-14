@@ -48,6 +48,9 @@ def write_subpackage_pages(subpackage: object) -> tuple[PackageInfo, ...]:
     for _, name, is_pkg in pkgutil.walk_packages(subpackage.__path__):
         subpackage_full_name = subpackage.__name__ + "." + name
         sub_package_info = write_package_page(subpackage_full_name)
+        if sub_package_info is None:
+            continue
+
         sub_sub_packages.append(sub_package_info)
 
     return tuple(sub_sub_packages)
@@ -66,7 +69,7 @@ def get_write_file(package_full_name: str) -> Path:
 
 def write_package_page(
     package_full_name: str,
-) -> PackageInfo:
+) -> PackageInfo | None:
     """
     Write the docs pages for a package (or sub-package)
     """
@@ -76,6 +79,8 @@ def write_package_page(
         write_subpackage_pages(package)
 
     package_name = package_full_name.split(".")[-1]
+    if package_name == "_lib":
+        return None
 
     write_file = get_write_file(package_full_name)
 
