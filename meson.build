@@ -48,23 +48,24 @@ if pyprojectwheelbuild_enabled
   # These are the src with which Python interacts.
   # Injected with `script/inject-srcs-into-meson-build.py`
   srcs = files(
-    'src/example/get_wavelength_wrapper.f90',
+    'src/example_fgen_basic/get_wavelength_wrapper.f90',
   )
 
   # Specify all the other source Fortran files (original files and managers)
   # Injected with `script/inject-srcs-into-meson-build.py`
   srcs_ancillary_lib = files(
-    'src/example/get_wavelength.f90',
-    'src/example/kind_parameters.f90',
+    'src/example_fgen_basic/get_wavelength.f90',
+    'src/example_fgen_basic/kind_parameters.f90',
   )
 
   # All Python files (wrappers and otherwise)
   # Injected with `script/inject-srcs-into-meson-build.py`
   python_srcs = files(
-    'src/example/__init__.py',
-    'src/example/exceptions.py',
-    'src/example/get_wavelength.py',
-    'src/example/runtime_helpers.py',
+    'src/example_fgen_basic/__init__.py',
+    'src/example_fgen_basic/exceptions.py',
+    'src/example_fgen_basic/get_wavelength.py',
+    'src/example_fgen_basic/operations.py',
+    'src/example_fgen_basic/runtime_helpers.py',
   )
 
   # The ancillary library,

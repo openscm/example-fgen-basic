@@ -262,13 +262,20 @@ all-dev = [
 
 # Start here, replace with whate we have in our example
 [build-system]
-requires = ["uv_build>=0.8.7,<0.9.0"]
-build-backend = "uv_build"
+build-backend = "mesonpy"
+requires = [
+  "meson-python>=0.15.0",
+  "numpy",
+]
 
-[tool.uv.build-backend]
-source-include = [
-    "src/example_fgen_basic",
-    "LICENCE",
+# https://mesonbuild.com/meson-python/how-to-guides/meson-args.html
+[tool.meson-python.args]
+setup = [
+  '--default-library=static',
+  '-Dpyprojectwheelbuild=enabled',
+  ]
+install = [
+'--skip-subprojects',
 ]
 
 [tool.coverage.run]
