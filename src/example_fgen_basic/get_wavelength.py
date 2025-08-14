@@ -10,17 +10,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from example.exceptions import (
-    CompiledExtensionNotFoundError,
-)
+from example_fgen_basic.exceptions import CompiledExtensionNotFoundError
 
 if TYPE_CHECKING:
     import pint
 
 try:
-    from example._lib import m_get_wavelength_w  # type: ignore
+    from example_fgen_basic._lib import m_get_wavelength_w  # type: ignore
 except (ModuleNotFoundError, ImportError) as exc:
-    raise CompiledExtensionNotFoundError("example._lib") from exc
+    raise CompiledExtensionNotFoundError("example_fgen_basic._lib") from exc
 
 
 def get_wavelength_plain(frequency: float) -> float:

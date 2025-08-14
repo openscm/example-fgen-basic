@@ -260,6 +260,7 @@ all-dev = [
     {include-group = "tests"},
 ]
 
+# Start here, replace with whate we have in our example
 [build-system]
 requires = ["uv_build>=0.8.7,<0.9.0"]
 build-backend = "uv_build"

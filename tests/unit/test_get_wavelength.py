@@ -5,7 +5,8 @@ Dummy tests
 import numpy as np
 import pint
 import pint.testing
-from example.get_wavelength import get_wavelength, get_wavelength_plain
+
+from example_fgen_basic.get_wavelength import get_wavelength, get_wavelength_plain
 
 
 def test_plain():

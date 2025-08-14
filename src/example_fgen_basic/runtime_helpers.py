@@ -13,7 +13,8 @@ from typing import Any, Callable, Concatenate, ParamSpec, TypeVar
 
 import attrs
 from attrs import define, field
-from example.exceptions import NotInitialisedError, UnallocatedMemoryError
+
+from example_fgen_basic.exceptions import NotInitialisedError, UnallocatedMemoryError
 
 # Might be needed for Python 3.9
 # from typing_extensions import Concatenate, ParamSpec
