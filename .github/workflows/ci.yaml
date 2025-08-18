@@ -235,10 +235,19 @@ jobs:
           uv build
           # Just in case, undo the changes to `pyproject.toml`
           git restore --staged . && git restore .
-      - name: Check build
+      - name: Check included files in source distribution
         run: |
           tar -tvf dist/example_fgen_basic-*.tar.gz --wildcards '*example_fgen_basic/py.typed'
           tar -tvf dist/example_fgen_basic-*.tar.gz --wildcards 'example_fgen_basic-*/LICENCE'
+      - name: Check source distribution can be used for installation
+        run: |
+          cd dist
+          ls
+          python3 -m venv venv
+          # TODO: alter for windows
+          source venv/bin/activate
+          pip install example_fgen_basic*
+          python -c 'from example_fgen_basic.get_wavelength import get_wavelength_plain; print(get_wavelength_plain(23.4))'
 
   check-dependency-licences:
     strategy:
