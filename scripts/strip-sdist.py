@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Script file to strip unwanted files from dist tarball
 
