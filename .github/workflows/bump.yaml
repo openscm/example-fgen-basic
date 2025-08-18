@@ -67,7 +67,9 @@ jobs:
           # Lock everything again
           git add .
           uv run --no-sync pre-commit run --all-files
+          uv sync --no-editable --all-extras --group all-dev
           git add .
+          uv run --no-sync pre-commit run --all-files
 
           # Commit, tag and push
           git commit -a -m "bump: version $BASE_VERSION -> $NEW_VERSION"
@@ -82,6 +84,8 @@ jobs:
           mv pyproject-dev.toml pyproject.toml
           # Bump to pre-release of next version
           uv version --no-sync --bump post
+          # Propogate dev version back to meson.build
+          uv run --no-sync python scripts/propogate-pyproject-metadata.py
 
           NEW_VERSION=`sed -ne 's/^version = "\([0-9\.post]*\)"/\1/p' pyproject.toml`
           echo "Bumping version $BASE_VERSION > $NEW_VERSION"
