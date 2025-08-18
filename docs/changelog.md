@@ -21,11 +21,6 @@ from the examples given in that link.
 
 <!-- towncrier release notes start -->
 
-## Example fgen - basic v0.1.7 (2025-08-18)
-
-No significant changes.
-
-
 ## Example fgen - basic v0.1.6 (2025-08-14)
 
 ### 🔧 Trivial/Internal Changes
