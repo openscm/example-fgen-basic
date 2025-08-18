@@ -232,7 +232,7 @@ jobs:
         run: |
           uv run --no-sync python scripts/add-locked-targets-to-pyproject-toml.py
           cat pyproject.toml
-          uv build
+          uv build --sdist
           # Just in case, undo the changes to `pyproject.toml`
           git restore --staged . && git restore .
       - name: Check included files in source distribution
