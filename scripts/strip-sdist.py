@@ -15,6 +15,7 @@ def main():
 
     # Files/Folders to strip from the *.tar.gz
     exclude = [
+        "meson.build",
         ".github",
         "docs",
         "tests",
