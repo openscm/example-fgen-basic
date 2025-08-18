@@ -31,7 +31,6 @@ jobs:
           echo "PROJECT_VERSION=$PROJECT_VERSION" >> $GITHUB_ENV
       - name: Build package for PyPI
         run: |
-          uv run --no-sync python scripts/add-locked-targets-to-pyproject-toml.py
           uv build
           # Just in case, undo the changes to `pyproject.toml`
           git restore --staged . && git restore .
