@@ -57,6 +57,10 @@ jobs:
 
           # Build CHANGELOG
           uv run --no-sync towncrier build --yes --version v$NEW_VERSION
+          # Add locked targets to pyproject.toml
+          uv run --no-sync python scripts/add-locked-targets-to-pyproject-toml.py
+          # Propogate new version to meson.build
+          uv run --no-sync python scripts/propogate-pyproject-metadata.py
 
           # Commit, tag and push
           git commit -a -m "bump: version $BASE_VERSION -> $NEW_VERSION"
