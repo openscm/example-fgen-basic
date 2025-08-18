@@ -227,3 +227,5 @@ else
   endif
 
 endif
+# dist - script to reduce the *tar.gz
+meson.add_dist_script('scripts/strip-sdist.py')
