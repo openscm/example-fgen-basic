@@ -1,3 +1,6 @@
+# Dev copy of pyproject.toml used in CI
+pyproject-dev.toml
+
 # Local install dir
 install-example
 
