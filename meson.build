@@ -3,7 +3,7 @@ project(
   ['c', 'fortran'],  # C as f2py creates C files so we need a C compiler
   # Dev version (i.e. anything that isn't a release) will be 0.0.0
   # because meson doesn't support pre-release identifiers like `.a`, `.post`
-  version: '0.0.0',  # injected with scripts/make-version-consistent.py, don't edit by hand
+  version: '0.1.7',  # injected with scripts/make-version-consistent.py, don't edit by hand
   license: 'BSD-3-Clause',
   meson_version: '>=1.3.0',
   default_options: [
