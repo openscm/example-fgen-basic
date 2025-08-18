@@ -143,7 +143,7 @@ if pyprojectwheelbuild_enabled
   endforeach
 
   # dist - script to reduce the *tar.gz
-  meson.add_dist_script(py, files('scripts'/'strip-sdist.py'))
+  meson.add_dist_script(py, files('scripts' / 'strip-sdist.py'))
 
 else
   ## Fortran library standalone compilation
