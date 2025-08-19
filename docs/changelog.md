@@ -21,6 +21,22 @@ from the examples given in that link.
 
 <!-- towncrier release notes start -->
 
+## Example fgen - basic v0.1.8 (2025-08-19)
+
+### 🐛 Bug Fixes
+
+- Fixed building:
+
+  - now include the `locked` targets in releases
+  - stripped out all superfluous files from the source distribution and check that the package can be installed from the source distribution alone
+
+  ([#13](https://github.com/openscm/example-fgen-basic/pull/13))
+
+### 🔧 Trivial/Internal Changes
+
+- [#14](https://github.com/openscm/example-fgen-basic/pull/14)
+
+
 ## Example fgen - basic v0.1.7 (2025-08-18)
 
 No significant changes.
