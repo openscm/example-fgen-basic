@@ -29,7 +29,10 @@ jobs:
         # TODO: consider adding other compilers to our matrix
         # (see https://github.com/fortran-lang/setup-fortran)
         toolchain:
-          - {compiler: gcc, version: 15}
+          - {compiler: gcc, version: 13}
+          # # Only seems to be available on Mac for some reason,
+          # # maybe it will be available when latest images are updated.
+          # - {compiler: gcc, version: 15}
     runs-on: "${{ matrix.os }}"
     steps:
     - name: Set up Python "${{ matrix.python-version }}"
