@@ -36,10 +36,14 @@ jobs:
     - name: Install
       run: |
         pip install --upgrade pip wheel
-        pip install "${{ matrix.install-target }}" 2>stderr.txt
+        pip install "${{ matrix.install-target }}"
     - name: Check no warnings
       if: matrix.os != 'windows-latest'
       run: |
+        # Install and save stderr to file so we can check for missing target errors
+        # (re-install is a bit stupid,
+        # but it doesn't actually do anything except emit the warning in practice)
+        pip install "${{ matrix.install-target }}" 2>stderr.txt
         if grep -q "WARN" stderr.txt; then echo "Warnings in pip install output" && cat stderr.txt && exit 1; else exit 0; fi
     - name: Get version non-windows
       if: matrix.os != 'windows-latest'
