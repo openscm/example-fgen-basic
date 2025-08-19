@@ -17,29 +17,75 @@ on:
 
 jobs:
   test-pypi-install:
-    name: Test PyPI install ${{ matrix.install-target }} (${{ matrix.python-version }}, ${{ matrix.os }})
+    name: Test PyPI install ${{ matrix.install-target }} ${{ matrix.pip-install-flags }} (${{ matrix.os }}, ${{ matrix.python-version }}, ${{ matrix.compiler }}-${{ matrix.compiler-version }})
+    runs-on: "${{ matrix.os }}"
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-latest", "macos-latest", "windows-latest"]
+        os: [ "ubuntu-latest", "macos-latest", "windows-latest" ]
         # Test against all security and bugfix versions: https://devguide.python.org/versions/
         python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
         # Check both 'library' install and the 'application' (i.e. locked) install
-        install-target: ["example-fgen-basic", "example-fgen-basic[locked]"]
-    runs-on: "${{ matrix.os }}"
+        install-target: [ "example-fgen-basic", "example-fgen-basic[locked]" ]
+        pip-install-flags: [ "--only-binary example-fgen-basic" ]
+        toolchain: [ "no-toolchain" ]
+        compiler: [ "no-compiler-needed" ]
+        compiler-version: [ "na" ]
+        include:
+          # Source installs on all OS for a stable Python version
+          # (no need to do more than the combinations below)
+          # (duplicated the config as I can't see how to write this more succintly
+          # using gitlab's matrix logic)
+          - os: "ubuntu-latest"
+            python-version: "3.11"
+            install-target: "example-fgen-basic"
+            pip-install-flags: "--no-binary example-fgen-basic"
+            # TODO: consider adding other compilers
+            # (see https://github.com/fortran-lang/setup-fortran)
+            compiler: "gcc"
+            compiler-version: "13"
+          - os: "macos-latest"
+            python-version: "3.11"
+            install-target: "example-fgen-basic"
+            pip-install-flags: "--no-binary example-fgen-basic"
+            # TODO: consider adding other compilers
+            # (see https://github.com/fortran-lang/setup-fortran)
+            compiler: "gcc"
+            compiler-version: "13"
+          - os: "windows-latest"
+            python-version: "3.11"
+            install-target: "example-fgen-basic"
+            pip-install-flags: "--no-binary example-fgen-basic"
+            # TODO: consider adding other compilers
+            # (see https://github.com/fortran-lang/setup-fortran)
+            compiler: "gcc"
+            compiler-version: "13"
+
     steps:
     - name: Set up Python "${{ matrix.python-version }}"
       id: setup-python
       uses: actions/setup-python@v4
       with:
         python-version: "${{ matrix.python-version }}"
+    - name: Install Fortran compiler
+      # When building from source, ensure we have a Fortran compiler
+      if: matrix.pip-install-flags == '--no-binary example-fgen-basic'
+      uses: fortran-lang/setup-fortran@v1
+      id: setup-fortran
+      with:
+        compiler: ${{ matrix.compiler }}
+        version: ${{ matrix.compiler-version }}
     - name: Install
       run: |
         pip install --upgrade pip wheel
-        pip install "${{ matrix.install-target }}" 2>stderr.txt
+        pip install "${{ matrix.install-target }}" ${{ matrix.pip-install-flags }}
     - name: Check no warnings
       if: matrix.os != 'windows-latest'
       run: |
+        # Install and save stderr to file so we can check for missing target errors
+        # (re-install is a bit stupid,
+        # but it doesn't actually do anything except emit the warning in practice)
+        pip install "${{ matrix.install-target }}" 2>stderr.txt
         if grep -q "WARN" stderr.txt; then echo "Warnings in pip install output" && cat stderr.txt && exit 1; else exit 0; fi
     - name: Get version non-windows
       if: matrix.os != 'windows-latest'
