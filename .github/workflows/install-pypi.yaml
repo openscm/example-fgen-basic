@@ -17,7 +17,7 @@ on:
 
 jobs:
   test-pypi-install:
-    name: Test PyPI install ${{ matrix.install-target }} ${{ matrix.pip-install-flags }} (${{ matrix.os }}, ${{ matrix.python-version }}, ${{ matrix.toolchain }})
+    name: Test PyPI install ${{ matrix.install-target }} ${{ matrix.pip-install-flags }} (${{ matrix.os }}, ${{ matrix.python-version }}, ${{ matrix.compiler }}-${{ matrix.compiler-version }})
     runs-on: "${{ matrix.os }}"
     strategy:
       fail-fast: false
@@ -29,31 +29,37 @@ jobs:
         install-target: [ "example-fgen-basic", "example-fgen-basic[locked]" ]
         pip-install-flags: [ "--only-binary example-fgen-basic" ]
         toolchain: [ "no-toolchain" ]
+        compiler: [ "no-compiler-needed" ]
+        compiler-version: [ "na" ]
         include:
           # Source installs on all OS for a stable Python version
-          # (no need to do more than this)
-          # (duplicated as I can't see how to write this more succintly)
+          # (no need to do more than the combinations below)
+          # (duplicated the config as I can't see how to write this more succintly
+          # using gitlab's matrix logic)
           - os: "ubuntu-latest"
             python-version: "3.11"
             install-target: "example-fgen-basic"
             pip-install-flags: "--no-binary example-fgen-basic"
             # TODO: consider adding other compilers
             # (see https://github.com/fortran-lang/setup-fortran)
-            toolchain: { compiler: gcc, version: 13 }
+            compiler: "gcc"
+            compiler-version: "13"
           - os: "macos-latest"
             python-version: "3.11"
             install-target: "example-fgen-basic"
             pip-install-flags: "--no-binary example-fgen-basic"
             # TODO: consider adding other compilers
             # (see https://github.com/fortran-lang/setup-fortran)
-            toolchain: { compiler: gcc, version: 13 }
+            compiler: "gcc"
+            compiler-version: "13"
           - os: "windows-latest"
             python-version: "3.11"
             install-target: "example-fgen-basic"
             pip-install-flags: "--no-binary example-fgen-basic"
             # TODO: consider adding other compilers
             # (see https://github.com/fortran-lang/setup-fortran)
-            toolchain: { compiler: gcc, version: 13 }
+            compiler: "gcc"
+            compiler-version: "13"
 
     steps:
     - name: Set up Python "${{ matrix.python-version }}"
@@ -67,8 +73,8 @@ jobs:
       uses: fortran-lang/setup-fortran@v1
       id: setup-fortran
       with:
-        compiler: ${{ matrix.toolchain.compiler }}
-        version: ${{ matrix.toolchain.version }}
+        compiler: ${{ matrix.compiler }}
+        version: ${{ matrix.compiler-version }}
     - name: Install
       run: |
         pip install --upgrade pip wheel
