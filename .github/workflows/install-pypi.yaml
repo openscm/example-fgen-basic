@@ -35,11 +35,11 @@ jobs:
           # # maybe it will be available when latest images are updated.
           # - {compiler: gcc, version: 15}
         pip-install-flags: ["--only-binary example-fgen-basic"]
-        include:
-          # Source installs on all OS for a stable Python version
-          # (no need to do more than this)
-          - pip-install-flags: "--no-binary example-fgen-basic"
-            python-version: "3.11"
+        # include:
+        #   # Source installs on all OS for a stable Python version
+        #   # (no need to do more than this)
+        #   - pip-install-flags: "--no-binary example-fgen-basic"
+        #     python-version: "3.11"
 
     steps:
     - name: Set up Python "${{ matrix.python-version }}"
