@@ -22,27 +22,38 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-latest", "macos-latest", "windows-latest"]
+        os: [ "ubuntu-latest", "macos-latest", "windows-latest" ]
         # Test against all security and bugfix versions: https://devguide.python.org/versions/
         python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
         # Check both 'library' install and the 'application' (i.e. locked) install
-        install-target: ["example-fgen-basic", "example-fgen-basic[locked]"]
-        pip-install-flags: ["--only-binary example-fgen-basic"]
-        toolchain: [ "not_used" ]
+        install-target: [ "example-fgen-basic", "example-fgen-basic[locked]" ]
+        pip-install-flags: [ "--only-binary example-fgen-basic" ]
+        toolchain: "no-toolchain"
         include:
           # Source installs on all OS for a stable Python version
           # (no need to do more than this)
-          - os: ["ubuntu-latest", "macos-latest", "windows-latest"]
+          # (duplicated as I can't see how to write this more succintly)
+          - os: "ubuntu-latest"
             python-version: "3.11"
-            install-target: ["example-fgen-basic", "example-fgen-basic[locked]"]
+            install-target: "example-fgen-basic"
             pip-install-flags: "--no-binary example-fgen-basic"
-            toolchain:
-              # TODO: consider adding other compilers to our matrix
-              # (see https://github.com/fortran-lang/setup-fortran)
-              - {compiler: gcc, version: 13}
-              # # Only seems to be available on Mac for some reason,
-              # # maybe it will be available when latest images are updated.
-              # - {compiler: gcc, version: 15}
+            # TODO: consider adding other compilers
+            # (see https://github.com/fortran-lang/setup-fortran)
+            toolchain: { compiler: gcc, version: 13 }
+          - os: "macos-latest"
+            python-version: "3.11"
+            install-target: "example-fgen-basic"
+            pip-install-flags: "--no-binary example-fgen-basic"
+            # TODO: consider adding other compilers
+            # (see https://github.com/fortran-lang/setup-fortran)
+            toolchain: { compiler: gcc, version: 13 }
+          - os: "windows-latest"
+            python-version: "3.11"
+            install-target: "example-fgen-basic"
+            pip-install-flags: "--no-binary example-fgen-basic"
+            # TODO: consider adding other compilers
+            # (see https://github.com/fortran-lang/setup-fortran)
+            toolchain: { compiler: gcc, version: 13 }
 
     steps:
     - name: Set up Python "${{ matrix.python-version }}"
