@@ -26,6 +26,10 @@ jobs:
         python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
         # Check both 'library' install and the 'application' (i.e. locked) install
         install-target: ["example-fgen-basic", "example-fgen-basic[locked]"]
+        # TODO: consider adding other compilers to our matrix
+        # (see https://github.com/fortran-lang/setup-fortran)
+        toolchain:
+          - {compiler: gcc, version: 15}
     runs-on: "${{ matrix.os }}"
     steps:
     - name: Set up Python "${{ matrix.python-version }}"
@@ -33,6 +37,13 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: "${{ matrix.python-version }}"
+    # While building from source, ensure we have a Fortran compiler
+    - name: Install Fortran compiler
+      uses: fortran-lang/setup-fortran@v1
+      id: setup-fortran
+      with:
+        compiler: ${{ matrix.toolchain.compiler }}
+        version: ${{ matrix.toolchain.version }}
     - name: Install
       run: |
         pip install --upgrade pip wheel
