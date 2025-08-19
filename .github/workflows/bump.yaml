@@ -64,11 +64,11 @@ jobs:
           # Propogate new version to meson.build
           uv run --no-sync python scripts/propogate-pyproject-metadata.py
 
-          # Lock everything again
+           # Update all the lock files
           git add .
-          uv run --no-sync pre-commit run --all-files
           uv sync --no-editable --all-extras --group all-dev
-          git add .
+          uv run --no-sync pre-commit run --all-files || git add .
+          # Make sure that we're now in a 'good' state
           uv run --no-sync pre-commit run --all-files
 
           # Commit, tag and push
