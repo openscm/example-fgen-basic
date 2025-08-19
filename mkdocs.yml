@@ -35,6 +35,7 @@ plugins:
   - gen-files:
       scripts:
         - docs/gen_doc_stubs.py
+        - docs/gen_fortran_api.py
   # Make the navigation easier to handle/auto-generate if we wish
   # https://oprypin.github.io/mkdocs-literate-nav/
   - literate-nav:
