@@ -17,7 +17,7 @@ on:
 
 jobs:
   test-pypi-install:
-    name: Test PyPI install ${{ matrix.install-target }} (${{ matrix.python-version }}, ${{ matrix.os }})
+    name: Test PyPI install ${{ matrix.install-target }} ${{ matrix.pip-install-flags }} (${{ matrix.os }}, ${{ matrix.python-version }}, ${{ matrix.toolchain }})
     runs-on: "${{ matrix.os }}"
     strategy:
       fail-fast: false
@@ -28,6 +28,7 @@ jobs:
         # Check both 'library' install and the 'application' (i.e. locked) install
         install-target: ["example-fgen-basic", "example-fgen-basic[locked]"]
         pip-install-flags: ["--only-binary example-fgen-basic"]
+        toolchain: "na"
         include:
           # Source installs on all OS for a stable Python version
           # (no need to do more than this)
