@@ -28,7 +28,7 @@ jobs:
         # Check both 'library' install and the 'application' (i.e. locked) install
         install-target: [ "example-fgen-basic", "example-fgen-basic[locked]" ]
         pip-install-flags: [ "--only-binary example-fgen-basic" ]
-        toolchain: "no-toolchain"
+        toolchain: [ "no-toolchain" ]
         include:
           # Source installs on all OS for a stable Python version
           # (no need to do more than this)
