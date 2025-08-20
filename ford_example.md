@@ -1,6 +1,10 @@
 ---
-project: My Fortran project
+project: Example fgen - basic
 author: Me
+output_dir: docs/fortran-api
+src_dir: src
+markdown: true
+graph: true
 ---
 
-This is my Fortran project!
+API docs for Fortran components!
