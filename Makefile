@@ -7,7 +7,6 @@ TEMP_FILE := $(shell mktemp)
 # Directory in which to build the Fortran when using a standalone build
 BUILD_DIR := build
 
-JUNK := $(shell uv run --no-sync python -c 'from pathlib import Path; import example_fgen_basic; print(Path(example_fgen_basic.__file__).parent)'); \
 # A helper script to get short descriptions of each target in the Makefile
 define PRINT_HELP_PYSCRIPT
 import re, sys
