@@ -7,7 +7,6 @@ TEMP_FILE := $(shell mktemp)
 # Directory in which to build the Fortran when using a standalone build
 BUILD_DIR := build
 
-JUNK := $(shell uv run --no-sync python -c 'from pathlib import Path; import example_fgen_basic; print(Path(example_fgen_basic.__file__).parent)'); \
 # A helper script to get short descriptions of each target in the Makefile
 define PRINT_HELP_PYSCRIPT
 import re, sys
@@ -52,6 +51,7 @@ test:  ## run the tests (re-installs the package every time so you might want to
 	# We don't have a solution to this yet.
 	#
 	# Coverage directory - needed to trick code cov to looking at the right place
+	uv run --no-sync python -c 'from pathlib import Path; import example_fgen_basic' || ( echo "Run make virtual-environment first" && false )
 	COV_DIR=$$(uv run --no-sync python -c 'from pathlib import Path; import example_fgen_basic; print(Path(example_fgen_basic.__file__).parent)'); \
 		uv run --no-editable --reinstall-package example-fgen-basic pytest -r a -v tests src --doctest-modules --doctest-report ndiff --cov=$$COV_DIR
 
