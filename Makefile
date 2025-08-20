@@ -6,8 +6,9 @@
 TEMP_FILE := $(shell mktemp)
 # Directory in which to build the Fortran when using a standalone build
 BUILD_DIR := build
+# Coverage directory - needed to trick code cov to look in the right place
+COV_DIR := $(shell uv run --no-sync python -c 'from pathlib import  Path; import example_fgen_basic; print(Path(example_fgen_basic.__file__).parent)')
 
-JUNK := $(shell uv run --no-sync python -c 'from pathlib import Path; import example_fgen_basic; print(Path(example_fgen_basic.__file__).parent)'); \
 # A helper script to get short descriptions of each target in the Makefile
 define PRINT_HELP_PYSCRIPT
 import re, sys
@@ -50,10 +51,7 @@ test:  ## run the tests (re-installs the package every time so you might want to
 	# because it is looking for lines in `src` to be run,
 	# but they're not because lines in `.venv` are run instead.
 	# We don't have a solution to this yet.
-	#
-	# Coverage directory - needed to trick code cov to looking at the right place
-	COV_DIR=$$(uv run --no-sync python -c 'from pathlib import Path; import example_fgen_basic; print(Path(example_fgen_basic.__file__).parent)'); \
-		uv run --no-editable --reinstall-package example-fgen-basic pytest -r a -v tests src --doctest-modules --doctest-report ndiff --cov=$$COV_DIR
+	uv run --no-editable --reinstall-package example-fgen-basic pytest -r a -v tests src --doctest-modules --doctest-report ndiff --cov=$(COV_DIR)
 
 # Note on code coverage and testing:
 # You must specify cov=src.
