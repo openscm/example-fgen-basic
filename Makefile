@@ -69,12 +69,15 @@ test:  ## run the tests (re-installs the package every time so you might want to
 .PHONY: docs
 docs:  ## build the docs
 	@echo "Building Fortran docs"
-	uv run ford ford_example.md
+	uv run --no-sync ford ford_example.md
 	@echo "Building documentation"
 	uv run --no-sync mkdocs build
 
 .PHONY: docs-strict
 docs-strict:  ## build the docs strictly (e.g. raise an error on warnings, this most closely mirrors what we do in the CI)
+	@echo "Building Fortran docs"
+	uv run --no-sync ford ford_example.md
+	@echo "Building documentation"
 	uv run --no-sync mkdocs build --strict
 
 .PHONY: docs-serve
