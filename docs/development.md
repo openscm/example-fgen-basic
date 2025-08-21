@@ -31,6 +31,35 @@ Try and keep your merge requests as small as possible
 This makes life much easier for reviewers
 which allows contributions to be accepted at a faster rate.
 
+## Using uv with a compiled package
+
+Using uv with a compiled package is a bit more painful.
+Whenever you do `uv run` or `uv sync` or similar,
+uv tries to install the compiled package as an editable package.
+This can then cause issues on later calls to `uv run` or `uv sync`
+as having compiled packages as editable packages doesn't really work
+(you get errors like
+`ImportError: re-building the <package-name> meson-python editable wheel package failed`).
+The way around this is to:
+
+1. use the `--no-editable` flag with `uv sync`
+    so that uv doesn't do an editable install
+1. use the `--no-sync` flag with `uv run`
+    (and any other command that takes this flag)
+    so that `uv` doesn't try and re-build packages
+1. use the `--reinstall-package` flag with `uv run`
+    whenever you want to be sure that the latest changes
+    will be used for running a command
+    (yes, this makes running things slower,
+    but slower and reliable is better than broken)
+
+We include these flags in our `Makefile` and GitHub workflows
+if you want to see them in use.
+
+If you forget and run `uv run ...` in your terminal.
+The easiest solution seems to be to delete your virtual environment entirely and start again.
+We haven't found a way to get out of an accidental editable install.
+
 ## Language
 
 We use British English for our development.
