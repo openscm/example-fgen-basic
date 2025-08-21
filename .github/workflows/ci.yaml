@@ -39,10 +39,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           uv-dependency-install-flags: "--all-extras --group docs"
-      - name: FORD docs
-        run: ford ford_example.md
       - name: docs
         run: |
+          uv run --no-sync ford ford_example.md
           uv run --no-sync mkdocs build --strict
       - uses: ./.github/actions/setup
         with:
