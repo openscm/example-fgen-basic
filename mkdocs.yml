@@ -28,6 +28,7 @@ theme:
         name: Switch to light mode
 
 plugins:
+  - ford ford_example.md
   # https://mkdocstrings.github.io/autorefs/
   - autorefs
   # Required for auto-generating our documentation stubs
