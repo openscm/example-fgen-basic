@@ -41,7 +41,6 @@ jobs:
           uv-dependency-install-flags: "--all-extras --group docs"
       - name: docs
         run: |
-          uv run --no-sync ford ford_example.md
           uv run --no-sync mkdocs build --strict
       - uses: ./.github/actions/setup
         with:
