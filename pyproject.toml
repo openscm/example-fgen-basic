@@ -95,6 +95,7 @@ docs = [
     # Key dependencies for notebook_based_docs
     # ----------------------------------------
     "ford >=6.0.1",
+    "graphviz>=0.21",
 ]
 # For minimum test dependencies.
 # These are used when running our minimum PyPI install tests.
