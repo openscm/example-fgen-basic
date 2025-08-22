@@ -82,20 +82,14 @@ jobs:
     #   id-token: write
     runs-on: ubuntu-latest
     steps:
-      - name: Download wheels
+      - name: Download artefacts
         uses: actions/download-artifact@v5
         with:
           pattern: cibw-*
-          path: wheelhouse
-          merge-multiple: true
-      - name: Download sdist
-        uses: actions/download-artifact@v5
-        with:
-          pattern: cibw-*
-          path: dist
           merge-multiple: true
       - name: Diagnose where things are
         run: |
+          ls
           ls dist
           ls wheelhouse
       # - name: Publish to PyPI
