@@ -32,11 +32,11 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      # - name: Setup Python
-      #   if: ${{ startsWith(matrix.os, 'windows') }}
-      #   uses: actions/setup-python@v5
-      #   with:
-      #     python-version: '3.11'
+      - name: Setup Python
+        if: ${{ startsWith(matrix.os, 'windows') }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
 
       # Maybe not necessary, source:
       # https://dvdhrm.github.io/2021/04/21/meson-msvc-github-actions/
