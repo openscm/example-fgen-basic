@@ -20,11 +20,12 @@ jobs:
           # Failing, probably need to:
           # - read https://github.com/mesonbuild/meson-python/issues/222
           # - maybe try with https://github.com/numpy/numpy/blob/71eebaf8513dfd6ed40b0c689702d81e3f6f2527/.github/workflows/wheels.yml#L133
+          # - maybe try with https://github.com/matplotlib/matplotlib/blob/5054100eaf8b49cfd8d42cac9c224f9f5dd92508/.github/workflows/cibuildwheel.yml#L81
           windows-2022,
           # # windows-latest is moving target at the moment
           # windows-latest,
-          # # Seems to be experimental, leave out for now
-          # # https://cibuildwheel.pypa.io/en/stable/#usage
+          # To make this work, likely need some more trickery, see:
+          # - https://github.com/matplotlib/matplotlib/blob/5054100eaf8b49cfd8d42cac9c224f9f5dd92508/pyproject.toml#L89
           # windows-11-arm,
           # Maybe something crazy required,
           # see numpy's fun https://github.com/numpy/numpy/blob/main/.github/windows_arm64_steps/action.yml
