@@ -1,7 +1,6 @@
 ---
 project: Example fgen - basic
 author: TODO align this with pyproject.toml
-output_dir: docs/fortran-api
 src_dir: src
 graph: true
 ---
