@@ -77,6 +77,8 @@ docs = [
     # Key dependencies
     # ----------------
     "attrs>=25.3.0",
+    "ford>=6.0.1",
+    "graphviz>=0.21",
     "mkdocs-autorefs>=1.4.2",
     "mkdocs-gen-files>=0.5.0",
     "mkdocs-literate-nav>=0.6.2",
@@ -92,10 +94,6 @@ docs = [
     "jupyterlab>=4.4.5",
     "jupytext>=1.17.2",
     "mkdocs-jupyter>=0.25.1",
-    # Key dependencies for notebook_based_docs
-    # ----------------------------------------
-    "ford >=6.0.1",
-    "graphviz>=0.21",
 ]
 # For minimum test dependencies.
 # These are used when running our minimum PyPI install tests.
