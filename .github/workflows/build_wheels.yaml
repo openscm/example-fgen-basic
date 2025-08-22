@@ -4,7 +4,7 @@ name: Build
 # on:
 #   release:
 #     types: [published]
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   build_wheels:
@@ -75,10 +75,11 @@ jobs:
     # Having an environment for deployment is strongly recommend by PyPI
     # https://docs.pypi.org/trusted-publishers/adding-a-publisher/#github-actions
     # You can comment this line out if you don't want it.
-    environment: deploy
-    permissions:
-      # this permission is mandatory for trusted publishing with PyPI
-      id-token: write
+    # # TODO: turn back on when we only run this on main
+    # environment: deploy
+    # permissions:
+    #   # this permission is mandatory for trusted publishing with PyPI
+    #   id-token: write
     runs-on: ubuntu-latest
     steps:
       - name: Download wheels
