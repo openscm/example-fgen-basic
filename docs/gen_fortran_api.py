@@ -18,7 +18,7 @@ def main():
         raise AssertionError(msg)
 
     subprocess.run(  # noqa: S603
-        [ford, "ford_example.md"],
+        [ford, "ford_config.md"],
         check=True,
     )
 
