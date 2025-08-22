@@ -32,15 +32,18 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Setup Python
-        if: ${{ startsWith(matrix.os, 'windows') }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+      # - name: Setup Python
+      #   if: ${{ startsWith(matrix.os, 'windows') }}
+      #   uses: actions/setup-python@v5
+      #   with:
+      #     python-version: '3.11'
 
       # Maybe not necessary, source:
       # https://dvdhrm.github.io/2021/04/21/meson-msvc-github-actions/
-      - name: Prepare MSVC
+      # and
+      # https://github.com/numpy/numpy/blob/71eebaf8513dfd6ed40b0c689702d81e3f6f2527/.github/workflows/wheels.yml#L123
+      - name: Setup MSVC developer shell (32-bit)
+        if: ${{ matrix.os == 'windows-2022' }}
         uses: bus1/cabuild/action/msdevshell@v1
         with:
           architecture: x64
