@@ -17,6 +17,9 @@ jobs:
         os: [
           ubuntu-latest,
           ubuntu-24.04-arm,
+          # Failing, probably need to:
+          # - read https://github.com/mesonbuild/meson-python/issues/222
+          # - maybe try with https://github.com/numpy/numpy/blob/71eebaf8513dfd6ed40b0c689702d81e3f6f2527/.github/workflows/wheels.yml#L133
           windows-2022,
           # # windows-latest is moving target at the moment
           # windows-latest,
