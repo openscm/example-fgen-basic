@@ -41,13 +41,15 @@ for entry in (REPO_ROOT / FORD_OUTPUT_DIR).rglob("*"):
 
         with mkdocs_gen_files.open(target_file, "wb") as fh:
             fh.write(contents)
-
+# # If we want to move back to using literate-nav for maanging our navigation,
+# # also for the Fortran bits, we'll need something like the below
+# # and adjustments to the existing `NAVIGATION.md`.
 # with mkdocs_gen_files.open(
 #     (FORD_OUTPUT_DIR).relative_to("docs") / "NAVIGATION.md", "w"
 # ) as fh:
 #     fh.writelines("* [example_fgen_basic](home.html)")
 
-# Remove the ford files (which were just copied)
+# Remove the ford files (which were just generated and copied)
 shutil.rmtree(REPO_ROOT / FORD_OUTPUT_DIR)
 
 # Put back the gitkeep file which ford deletes
