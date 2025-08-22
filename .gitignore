@@ -17,6 +17,8 @@ docs/fgen/api/*
 !docs/fgen/api/.gitkeep
 docs/fgen-runtime/api/*
 !docs/fgen-runtime/api/.gitkeep
+docs/fortran-api/*
+!docs/fortran-api/.gitkeep
 
 # Databases
 *.db
