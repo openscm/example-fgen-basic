@@ -20,6 +20,12 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Setup Python
+        if: ${{ startsWith(matrix.os, 'windows') }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
       - name: Install Fortran compiler
         # When building from source, ensure we have a Fortran compiler
         if: ${{ startsWith(matrix.os, 'macos') }}
@@ -97,7 +103,7 @@ jobs:
           pattern: cibw-*
           path: dist
           merge-multiple: true
-      # - name: Publish to PyPI
-      #   run: |
-      #     ls dist
-      #     uv publish
+      - name: Publish to PyPI
+        run: |
+          ls dist
+          # uv publish
