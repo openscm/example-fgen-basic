@@ -15,8 +15,7 @@ jobs:
       matrix:
         # macos-13 is an intel runner, macos-14 is apple silicon
         # os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, windows-11-arm, macos-13, macos-14]
-        os: [ubuntu-latest, ubuntu-24.04-arm]
-        # os: [ubuntu-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-13, macos-14]
 
     steps:
       - uses: actions/checkout@v5
@@ -30,6 +29,16 @@ jobs:
           # TODO: figure out whether we need to use other compilers too
           compiler: "gcc"
           version: "10"
+
+      - name: Set macOS-13 specific flags
+        if: matrix.os == 'macos-13'
+        run: |
+          echo "MACOSX_DEPLOYMENT_TARGET=13.0" >> "$GITHUB_ENV"
+
+      - name: Set macOS-14 specific flags
+        if: matrix.os == 'macos-14'
+        run: |
+          echo "MACOSX_DEPLOYMENT_TARGET=14.0" >> "$GITHUB_ENV"
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.1.4
@@ -86,12 +95,9 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           pattern: cibw-*
+          path: dist
           merge-multiple: true
-      - name: Diagnose where things are
-        run: |
-          ls
-          ls dist
-          ls wheelhouse
       # - name: Publish to PyPI
       #   run: |
+      #     ls dist
       #     uv publish
