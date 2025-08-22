@@ -1,5 +1,9 @@
 name: Build
 
+# TODO: only run on published releases
+# on:
+#   release:
+#     types: [published]
 on: [push, pull_request]
 
 jobs:
@@ -7,6 +11,7 @@ jobs:
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         # macos-13 is an intel runner, macos-14 is apple silicon
         os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, windows-11-arm, macos-13, macos-14]
@@ -23,7 +28,7 @@ jobs:
         with:
           # TODO: figure out whether we need to use other compilers too
           compiler: "gcc"
-          version: "13"
+          version: "10"
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.1.4
@@ -38,4 +43,59 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
-          path: ./wheelhouse/*.whl
+          path: wheelhouse/*.whl
+
+  make_sdist:
+    name: Make source distribution
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup
+        with:
+          python-version: ${{ matrix.python-version }}
+          uv-dependency-install-flags: "--all-extras --group dev"
+
+      - name: Create source distribution
+        run: uv build --sdist
+
+      - name: Upload the source distribution artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cibw-sdist
+          path: dist/*.tar.gz
+
+  deploy-pypi:
+    needs: [build_wheels, make_sdist]
+    # Having an environment for deployment is strongly recommend by PyPI
+    # https://docs.pypi.org/trusted-publishers/adding-a-publisher/#github-actions
+    # You can comment this line out if you don't want it.
+    environment: deploy
+    permissions:
+      # this permission is mandatory for trusted publishing with PyPI
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download wheels
+        uses: actions/download-artifact@v5
+        with:
+          pattern: cibw-*
+          path: wheelhouse
+          merge-multiple: true
+      - name: Download sdist
+        uses: actions/download-artifact@v5
+        with:
+          pattern: cibw-*
+          path: dist
+          merge-multiple: true
+      - name: Diagnose where things are
+        run: |
+          ls dist
+          ls wheelhouse
+      # - name: Publish to PyPI
+      #   run: |
+      #     uv publish
