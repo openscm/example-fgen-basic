@@ -13,5 +13,5 @@ See https://oprypin.github.io/mkdocs-literate-nav/
     - [Dependency pinning and testing](further-background/dependency-pinning-and-testing.md)
 - [Development](development.md)
 - [API reference](api/example_fgen_basic/)
-- [Fortran API](fortran-api/index.html)
+- [Fortran API](fortran-api/home.html)
 - [Changelog](changelog.md)
