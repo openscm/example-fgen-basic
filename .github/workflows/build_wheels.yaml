@@ -15,6 +15,16 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Install Fortran compiler
+        # When building from source, ensure we have a Fortran compiler
+        if: ${{ startsWith(matrix.os, 'macos') }}
+        uses: fortran-lang/setup-fortran@v1
+        id: setup-fortran
+        with:
+          # TODO: figure out whether we need to use other compilers too
+          compiler: "gcc"
+          version: "13"
+
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.1.4
         # env:
