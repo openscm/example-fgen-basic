@@ -14,8 +14,20 @@ jobs:
       fail-fast: false
       matrix:
         # macos-13 is an intel runner, macos-14 is apple silicon
-        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, windows-11-arm, macos-13, macos-14]
-        # os: [ubuntu-latest, ubuntu-24.04-arm, macos-13, macos-14]
+        os: [
+          ubuntu-latest,
+          ubuntu-24.04-arm,
+          windows-2022,
+          # # windows-latest is moving target at the moment
+          # windows-latest,
+          # # Seems to be experimental, leave out for now
+          # # https://cibuildwheel.pypa.io/en/stable/#usage
+          # windows-11-arm,
+          # Maybe something crazy required,
+          # see numpy's fun https://github.com/numpy/numpy/blob/main/.github/windows_arm64_steps/action.yml
+          macos-13,
+          macos-14,
+        ]
 
     steps:
       - uses: actions/checkout@v5
@@ -25,6 +37,13 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
+      # Maybe not necessary, source:
+      # https://dvdhrm.github.io/2021/04/21/meson-msvc-github-actions/
+      - name: Prepare MSVC
+        uses: bus1/cabuild/action/msdevshell@v1
+        with:
+          architecture: x64
 
       - name: Install Fortran compiler
         # When building from source, ensure we have a Fortran compiler
