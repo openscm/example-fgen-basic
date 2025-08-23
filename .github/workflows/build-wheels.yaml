@@ -58,6 +58,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
+      - name: Install Fortran compiler
+        # When building on Mac, we need to have a Fortran compiler
+        if: ${{ startsWith(matrix.os, 'macos') }}
+        uses: fortran-lang/setup-fortran@v1
+        id: setup-fortran
+        with:
+          # TODO: figure out whether we need/want to use other compilers too
+          compiler: "gcc"
+          version: "13"
       - name: Build wheels
         # TODO: remove
         if: matrix.cibw_archs == 'AMD64'
@@ -91,16 +100,6 @@ jobs:
   #     #   uses: bus1/cabuild/action/msdevshell@v1
   #     #   with:
   #     #     architecture: x64
-  #     #
-  #     # - name: Install Fortran compiler
-  #     #   # When building from source, ensure we have a Fortran compiler
-  #     #   if: ${{ startsWith(matrix.os, 'macos') }}
-  #     #   uses: fortran-lang/setup-fortran@v1
-  #     #   id: setup-fortran
-  #     #   with:
-  #     #     # TODO: figure out whether we need/want to use other compilers too
-  #     #     compiler: "gcc"
-  #     #     version: "13"
   #     #
   #     # - name: Set macOS-13 specific flags
   #     #   if: matrix.os == 'macos-13'
