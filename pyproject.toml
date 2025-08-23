@@ -135,7 +135,6 @@ setup = [
     '--default-library=static',
     '-Dpyprojectwheelbuild=enabled',
 ]
-compile = ['-v']
 install = [
     '--skip-subprojects',
 ]
