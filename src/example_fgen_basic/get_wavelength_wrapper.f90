@@ -9,7 +9,7 @@
 !> so there will be one extra file compared to what we have here.
 module m_get_wavelength_w  ! Convention to date: just suffix wrappers with _w
 
-    use m_get_wavelength, only: o_get_wavelength => get_wavelength
+    use m_get_wavelength, only: inner_get_wavelength
     ! We won't always need the renaming trick,
     ! but here we do as the wrapper function
     ! and the original function should have the same name.
@@ -34,7 +34,7 @@ contains
         real(kind=dp) :: wavelength
             !! Corresponding wavelength
 
-        wavelength = o_get_wavelength(frequency)
+        wavelength = inner_get_wavelength(frequency)
 
     end function get_wavelength
 
