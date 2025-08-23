@@ -114,14 +114,6 @@ jobs:
       #     # (https://numpy.org/devdocs/f2py/windows/intel.html#f2py-and-windows-intel-fortran)
       #     compiler: "intel-classic"
       #     version: "2021.10"
-      # TODO: remove, diagnostic only
-      - name: Upload build dir
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: cibw-wheels-${{ matrix.os }}-${{ matrix.cibw_archs }}
-          path: ./build
-          if-no-files-found: error
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.1.4  # matplotlib had v3.1.3
         with:
@@ -130,6 +122,13 @@ jobs:
           config-file: "{package}/pyproject.toml"
         env:
           CIBW_ARCHS: ${{ matrix.cibw_archs }}
+      - name: Upload build dir to help with diagnosis
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cibw-wheels-${{ matrix.os }}-${{ matrix.cibw_archs }}
+          path: ./build
+          if-no-files-found: error
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
