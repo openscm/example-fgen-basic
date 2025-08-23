@@ -49,8 +49,6 @@ jobs:
             cibw_archs: "aarch64"
           - os: windows-2025
             cibw_archs: "AMD64"
-          - os: windows-2022
-            cibw_archs: "AMD64"
           - os: windows-11-arm
             cibw_archs: "ARM64"
           - os: macos-13
