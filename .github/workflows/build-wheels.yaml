@@ -13,8 +13,12 @@ jobs:
     name: Build wheels on ${{ matrix.os }} for ${{ matrix.cibw_archs }}
     runs-on: ${{ matrix.os }}
     env:
-      # CIBW_BEFORE_BUILD: >-
-      #   rm -rf {package}/build
+      # 3.9, 3.10 seem to not be happy on windows arm64
+      # because you can't install numpy from a wheel for the build environment
+      # (and we're not going to try recompiling from source)
+      CIBW_SKIP: "cp39-win_arm64 cp310-win_arm64"
+      # TODO: consider turning this on
+      # CIBW_ENABLE: cpython-freethreading
       CIBW_BEFORE_BUILD_WINDOWS: >-
         pip install delvewheel
       CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: >-
@@ -25,36 +29,32 @@ jobs:
         pip install -r {project}/requirements-only-tests-min-locked.txt
       CIBW_TEST_COMMAND: >-
         pytest {project}/tests
-      # # On Windows, we explicitly request MSVC compilers (as GitHub Action runners have
-      # # MinGW on PATH that would be picked otherwise), switch to a static build for
-      # # runtimes, but use dynamic linking for `VCRUNTIME140.dll`, `VCRUNTIME140_1.dll`,
-      # # and the UCRT. This avoids requiring specific versions of `MSVCP140.dll`, while
-      # # keeping shared state with the rest of the Python process/extensions.
-      # CIBW_CONFIG_SETTINGS_WINDOWS: >-
-      #   setup-args="--vsenv"
-      #   setup-args="-Db_vscrt=mt"
-      #   setup-args="-Dcpp_link_args=['ucrt.lib','vcruntime.lib','/nodefaultlib:libucrt.lib','/nodefaultlib:libvcruntime.lib']"
-      # CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
-      # CIBW_SKIP: "*-musllinux_aarch64"
-      # CIBW_TEST_COMMAND: >-
-      #   python {package}/ci/check_version_number.py
-      # MACOSX_DEPLOYMENT_TARGET: "10.12"
+      MACOSX_DEPLOYMENT_TARGET: "10.12"
+      # On Windows, we explicitly request MSVC compilers (as GitHub Action runners have
+      # MinGW on PATH that would be picked otherwise), switch to a static build for
+      # runtimes, but use dynamic linking for `VCRUNTIME140.dll`, `VCRUNTIME140_1.dll`,
+      # and the UCRT. This avoids requiring specific versions of `MSVCP140.dll`, while
+      # keeping shared state with the rest of the Python process/extensions.
+      CIBW_CONFIG_SETTINGS_WINDOWS: >-
+        setup-args="--vsenv"
+        setup-args="-Db_vscrt=mt"
+        setup-args="-Dcpp_link_args=['ucrt.lib','vcruntime.lib','/nodefaultlib:libucrt.lib','/nodefaultlib:libvcruntime.lib']"
     strategy:
       fail-fast: false
       matrix:
         include:
-          # - os: ubuntu-latest
-          #   cibw_archs: "x86_64"
-          # - os: ubuntu-24.04-arm
-          #   cibw_archs: "aarch64"
-          # - os: windows-latest
-          #   cibw_archs: "AMD64"
+          - os: ubuntu-latest
+            cibw_archs: "x86_64"
+          - os: ubuntu-24.04-arm
+            cibw_archs: "aarch64"
+          - os: windows-latest
+            cibw_archs: "AMD64"
           - os: windows-11-arm
             cibw_archs: "ARM64"
-          # - os: macos-13
-          #   cibw_archs: "x86_64"
-          # - os: macos-14
-          #   cibw_archs: "arm64"
+          - os: macos-13
+            cibw_archs: "x86_64"
+          - os: macos-14
+            cibw_archs: "arm64"
 
     steps:
       - uses: actions/checkout@v5
@@ -69,22 +69,13 @@ jobs:
         env:
           CIBW_ARCHS: ${{ matrix.cibw_archs }}
       - name: Build wheels
-        # TODO: remove
-        if: matrix.cibw_archs == 'ARM64'
         uses: pypa/cibuildwheel@v3.1.4  # matplotlib had v3.1.3
         with:
           package-dir: .
           output-dir: wheelhouse
           config-file: "{package}/pyproject.toml"
         env:
-          # 3.9, 3.10 seem to not be happy because you can't install numpy from a wheel
-          # (and we're not going to try recompiling)
-          CIBW_SKIP: "cp39-win_arm64 cp310-win_arm64"
           CIBW_ARCHS: ${{ matrix.cibw_archs }}
-          # See: https://github.com/matplotlib/matplotlib/blob/1ddb1eccac8cfc25dee47bc538dc5913384b253f/pyproject.toml#L89C1-L95C23
-          CIBW_BEFORE_BUILD_WINDOWS: >-
-            pip install delvewheel
-            && pip install numpy
   #     # - name: Setup Python
   #     #   if: ${{ startsWith(matrix.os, 'windows') }}
   #     #   uses: actions/setup-python@v5
