@@ -70,6 +70,14 @@ jobs:
           # TODO: figure out whether we need/want to use other compilers too
           compiler: "gcc"
           version: "13"
+      - name: Install Fortran compiler - Windows
+        if: ${{ matrix.os == 'windows-11-arm' }}
+        uses: fortran-lang/setup-fortran@v1
+        id: setup-fortran-windows-arm
+        with:
+          # TODO: figure out whether we need/want to use other compilers too
+          compiler: "gcc"
+          version: "13"
       # # From numpy: https://github.com/numpy/numpy/blob/37c9cb68ba7db9c48bc0e3354953c57a78d2b0e8/.github/windows_arm64_steps/action.yml
       # - name: Install LLVM with checksum verification
       #   if: ${{ matrix.os == 'windows-11-arm' }}
