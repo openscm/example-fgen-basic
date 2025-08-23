@@ -58,7 +58,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-      - name: Install Fortran compiler
+      - name: Install Fortran compiler - MacOS
         # When building on Mac, we need to have a Fortran compiler
         if: ${{ startsWith(matrix.os, 'macos') }}
         uses: fortran-lang/setup-fortran@v1
@@ -67,16 +67,21 @@ jobs:
           # TODO: figure out whether we need/want to use other compilers too
           compiler: "gcc"
           version: "13"
-      - name: Build wheels
-        # TODO: remove
-        if: matrix.cibw_archs == 'AMD64'
-        uses: pypa/cibuildwheel@v3.1.4  # matplotlib had v3.1.3
+      - name: Specify MSVC toolchain - windows-arm
+        # When building on windows ARM, we need to use the MSVC toolchain
+        run: |
+          echo 'CIBW_CONFIG_SETTINGS_WINDOWS=setup-args="--vsenv" setup-args="-Db_vscrt=mt"' >> $GITHUB_ENV
+        # TODO: figure out escaping and add back in (?)
+        # setup-args="-Dcpp_link_args=['ucrt.lib','vcruntime.lib','/nodefaultlib:libucrt.lib','/nodefaultlib:libvcruntime.lib']"
+      - name: Install Fortran compiler - windows-arm
+        # When building on windows ARM, we need to use the MSVC toolchain
+        if: ${{ matrix.os == 'windows-11-arm' }}
+        uses: fortran-lang/setup-fortran@v1
+        id: setup-fortran
         with:
-          package-dir: .
-          output-dir: wheelhouse
-          config-file: "{package}/pyproject.toml"
-        env:
-          CIBW_ARCHS: ${{ matrix.cibw_archs }}
+          # TODO: figure out whether we need/want to use other compilers too
+          compiler: "intel"
+          version: "2025.0"
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.1.4  # matplotlib had v3.1.3
         with:
