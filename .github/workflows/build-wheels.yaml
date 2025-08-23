@@ -79,6 +79,8 @@ jobs:
         env:
           CIBW_BUILD: "cp39-*"
           CIBW_ARCHS: ${{ matrix.cibw_archs }}
+          # See: https://github.com/matplotlib/matplotlib/blob/1ddb1eccac8cfc25dee47bc538dc5913384b253f/pyproject.toml#L89C1-L95C23
+          CIBW_BEFORE_BUILD: pip install --pre --index-url https://pypi.anaconda.org/scientific-python-nightly-wheels/simple numpy --only-binary numpy
       - name: Build wheels for CPython 3.12
         # TODO: remove
         if: matrix.cibw_archs == 'ARM64'
