@@ -69,32 +69,50 @@ jobs:
           # TODO: figure out whether we need/want to use other compilers too
           compiler: "gcc"
           version: "13"
-      - name: Specify MSVC toolchain - windows-arm
-        # When building on windows ARM, we need to use the MSVC toolchain
-        # # Original from: https://github.com/matplotlib/matplotlib/blob/1ddb1eccac8cfc25dee47bc538dc5913384b253f/.github/workflows/cibuildwheel.yml#L108
-        # # On Windows, we explicitly request MSVC compilers (as GitHub Action runners have
-        # # MinGW on PATH that would be picked otherwise), switch to a static build for
-        # # runtimes, but use dynamic linking for `VCRUNTIME140.dll`, `VCRUNTIME140_1.dll`,
-        # # and the UCRT. This avoids requiring specific versions of `MSVCP140.dll`, while
-        # # keeping shared state with the rest of the Python process/extensions.
-        # CIBW_CONFIG_SETTINGS_WINDOWS: >-
-        #   setup-args="--vsenv"
-        #   setup-args="-Db_vscrt=mt"
-        #   setup-args="-Dcpp_link_args=['ucrt.lib','vcruntime.lib','/nodefaultlib:libucrt.lib','/nodefaultlib:libvcruntime.lib']"
-        run: |
-          echo 'CIBW_CONFIG_SETTINGS_WINDOWS=setup-args="--vsenv" setup-args="-Db_vscrt=mt"' >> $GITHUB_ENV
-        # TODO: figure out escaping and add back in (?)
-        # setup-args="-Dcpp_link_args=['ucrt.lib','vcruntime.lib','/nodefaultlib:libucrt.lib','/nodefaultlib:libvcruntime.lib']"
-      - name: Install Fortran compiler - windows-arm
-        # When building on windows ARM, we need to use the MSVC toolchain
+      # From numpy: https://github.com/numpy/numpy/blob/37c9cb68ba7db9c48bc0e3354953c57a78d2b0e8/.github/windows_arm64_steps/action.yml
+      - name: Install LLVM with checksum verification
         if: ${{ matrix.os == 'windows-11-arm' }}
-        uses: fortran-lang/setup-fortran@v1
-        id: setup-fortran-windows-arm
-        with:
-          # Only intel-classic supported by f2py
-          # (https://numpy.org/devdocs/f2py/windows/intel.html#f2py-and-windows-intel-fortran)
-          compiler: "intel-classic"
-          version: "2021.10"
+        shell: pwsh
+        run: |
+          Invoke-WebRequest https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.6/LLVM-20.1.6-woa64.exe -UseBasicParsing -OutFile LLVM-woa64.exe
+          $expectedHash = "92f69a1134e32e54b07d51c6e24d9594852f6476f32c3d70471ae00fffc2d462"
+          $fileHash = (Get-FileHash -Path "LLVM-woa64.exe" -Algorithm SHA256).Hash
+          if ($fileHash -ne $expectedHash) {
+              Write-Error "Checksum verification failed. The downloaded file may be corrupted or tampered with."
+              exit 1
+          }
+          Start-Process -FilePath ".\LLVM-woa64.exe" -ArgumentList "/S" -Wait
+          echo "C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "CC=clang-cl" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "CXX=clang-cl" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "FC=flang-new" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      # - name: Specify MSVC toolchain - windows-arm
+      #   if: ${{ matrix.os == 'windows-11-arm' }}
+      #   # When building on windows ARM, we need to use the MSVC toolchain
+      #   # # Original from: https://github.com/matplotlib/matplotlib/blob/1ddb1eccac8cfc25dee47bc538dc5913384b253f/.github/workflows/cibuildwheel.yml#L108
+      #   # # On Windows, we explicitly request MSVC compilers (as GitHub Action runners have
+      #   # # MinGW on PATH that would be picked otherwise), switch to a static build for
+      #   # # runtimes, but use dynamic linking for `VCRUNTIME140.dll`, `VCRUNTIME140_1.dll`,
+      #   # # and the UCRT. This avoids requiring specific versions of `MSVCP140.dll`, while
+      #   # # keeping shared state with the rest of the Python process/extensions.
+      #   # CIBW_CONFIG_SETTINGS_WINDOWS: >-
+      #   #   setup-args="--vsenv"
+      #   #   setup-args="-Db_vscrt=mt"
+      #   #   setup-args="-Dcpp_link_args=['ucrt.lib','vcruntime.lib','/nodefaultlib:libucrt.lib','/nodefaultlib:libvcruntime.lib']"
+      #   run: |
+      #     echo 'CIBW_CONFIG_SETTINGS_WINDOWS=setup-args="--vsenv" setup-args="-Db_vscrt=mt"' >> $GITHUB_ENV
+      #   # TODO: figure out escaping and add back in (?)
+      #   # setup-args="-Dcpp_link_args=['ucrt.lib','vcruntime.lib','/nodefaultlib:libucrt.lib','/nodefaultlib:libvcruntime.lib']"
+      # - name: Install Fortran compiler - windows-arm
+      #   # When building on windows ARM, we need to use the MSVC toolchain
+      #   if: ${{ matrix.os == 'windows-11-arm' }}
+      #   uses: fortran-lang/setup-fortran@v1
+      #   id: setup-fortran-windows-arm
+      #   with:
+      #     # Only intel-classic supported by f2py
+      #     # (https://numpy.org/devdocs/f2py/windows/intel.html#f2py-and-windows-intel-fortran)
+      #     compiler: "intel-classic"
+      #     version: "2021.10"
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.1.4  # matplotlib had v3.1.3
         with:
