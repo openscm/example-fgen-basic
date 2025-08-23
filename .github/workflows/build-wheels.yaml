@@ -32,12 +32,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
-            cibw_archs: "x86_64"
-          - os: ubuntu-24.04-arm
-            cibw_archs: "aarch64"
-          - os: windows-2025
-            cibw_archs: "AMD64"
+          # - os: ubuntu-latest
+          #   cibw_archs: "x86_64"
+          # - os: ubuntu-24.04-arm
+          #   cibw_archs: "aarch64"
+          # - os: windows-2025
+          #   cibw_archs: "AMD64"
           # # Not happy at the moment hence turned off
           # # It doesn't seem too far away, but something isn't quite right.
           # # Latest run by Zeb: https://github.com/openscm/example-fgen-basic/actions/runs/17173313157/job/48725872212
@@ -51,12 +51,12 @@ jobs:
           # # potentially relevant scipy issues:
           # # - https://github.com/scipy/scipy/issues/21716
           # # - https://github.com/scipy/scipy/issues/14812
-          # - os: windows-11-arm
-          #   cibw_archs: "ARM64"
-          - os: macos-13
-            cibw_archs: "x86_64"
-          - os: macos-14
-            cibw_archs: "arm64"
+          - os: windows-11-arm
+            cibw_archs: "ARM64"
+          # - os: macos-13
+          #   cibw_archs: "x86_64"
+          # - os: macos-14
+          #   cibw_archs: "arm64"
 
     steps:
       - uses: actions/checkout@v5
