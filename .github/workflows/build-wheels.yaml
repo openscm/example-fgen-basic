@@ -30,15 +30,15 @@ jobs:
       CIBW_TEST_COMMAND: >-
         pytest {project}/tests
       MACOSX_DEPLOYMENT_TARGET: "10.12"
-      # On Windows, we explicitly request MSVC compilers (as GitHub Action runners have
-      # MinGW on PATH that would be picked otherwise), switch to a static build for
-      # runtimes, but use dynamic linking for `VCRUNTIME140.dll`, `VCRUNTIME140_1.dll`,
-      # and the UCRT. This avoids requiring specific versions of `MSVCP140.dll`, while
-      # keeping shared state with the rest of the Python process/extensions.
-      CIBW_CONFIG_SETTINGS_WINDOWS: >-
-        setup-args="--vsenv"
-        setup-args="-Db_vscrt=mt"
-        setup-args="-Dcpp_link_args=['ucrt.lib','vcruntime.lib','/nodefaultlib:libucrt.lib','/nodefaultlib:libvcruntime.lib']"
+      # # On Windows, we explicitly request MSVC compilers (as GitHub Action runners have
+      # # MinGW on PATH that would be picked otherwise), switch to a static build for
+      # # runtimes, but use dynamic linking for `VCRUNTIME140.dll`, `VCRUNTIME140_1.dll`,
+      # # and the UCRT. This avoids requiring specific versions of `MSVCP140.dll`, while
+      # # keeping shared state with the rest of the Python process/extensions.
+      # CIBW_CONFIG_SETTINGS_WINDOWS: >-
+      #   setup-args="--vsenv"
+      #   setup-args="-Db_vscrt=mt"
+      #   setup-args="-Dcpp_link_args=['ucrt.lib','vcruntime.lib','/nodefaultlib:libucrt.lib','/nodefaultlib:libvcruntime.lib']"
     strategy:
       fail-fast: false
       matrix:
