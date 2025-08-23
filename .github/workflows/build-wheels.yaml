@@ -47,7 +47,9 @@ jobs:
             cibw_archs: "x86_64"
           - os: ubuntu-24.04-arm
             cibw_archs: "aarch64"
-          - os: windows-latest
+          - os: windows-2025
+            cibw_archs: "AMD64"
+          - os: windows-2022
             cibw_archs: "AMD64"
           - os: windows-11-arm
             cibw_archs: "ARM64"
