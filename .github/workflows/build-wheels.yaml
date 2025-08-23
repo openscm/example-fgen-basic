@@ -45,6 +45,14 @@ jobs:
           # # Latest run by Zeb: https://github.com/openscm/example-fgen-basic/actions/runs/17173313157/job/48725872212
           # # Can't find numpy definitions for some reason.
           # # Maybe helpful issue: https://github.com/numpy/numpy/issues/25000
+          # # numpy uses different compilers, might be something to try, see:
+          # # - https://github.com/numpy/numpy/actions/runs/17087345049/job/48453931521
+          # # - https://github.com/numpy/numpy/blob/37c9cb68ba7db9c48bc0e3354953c57a78d2b0e8/.github/workflows/wheels.yml#L129
+          # # scipy doesn't bother building windows arm wheels, see:
+          # # - https://pypi.org/project/scipy/#files
+          # # potentially relevant scipy issues:
+          # # - https://github.com/scipy/scipy/issues/21716
+          # # - https://github.com/scipy/scipy/issues/14812
           # - os: windows-11-arm
           #   cibw_archs: "ARM64"
           - os: macos-13
