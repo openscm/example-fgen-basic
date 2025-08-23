@@ -76,8 +76,8 @@ jobs:
         id: setup-fortran-windows-arm
         with:
           # TODO: figure out whether we need/want to use other compilers too
-          compiler: "intel-classic"
-          version: "2021.10"
+          compiler: "lfortran"
+          version: "0.45.0"
       # # From numpy: https://github.com/numpy/numpy/blob/37c9cb68ba7db9c48bc0e3354953c57a78d2b0e8/.github/windows_arm64_steps/action.yml
       # - name: Install LLVM with checksum verification
       #   if: ${{ matrix.os == 'windows-11-arm' }}
