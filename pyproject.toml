@@ -134,6 +134,7 @@ requires = [
 setup = [
     '--default-library=static',
     '-Dpyprojectwheelbuild=enabled',
+    # '-Dbuild-dir=build',
 ]
 install = [
     '--skip-subprojects',
