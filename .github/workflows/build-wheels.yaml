@@ -62,7 +62,7 @@ jobs:
         # When building on Mac, we need to have a Fortran compiler
         if: ${{ startsWith(matrix.os, 'macos') }}
         uses: fortran-lang/setup-fortran@v1
-        id: setup-fortran
+        id: setup-fortran-macos
         with:
           # TODO: figure out whether we need/want to use other compilers too
           compiler: "gcc"
@@ -77,7 +77,7 @@ jobs:
         # When building on windows ARM, we need to use the MSVC toolchain
         if: ${{ matrix.os == 'windows-11-arm' }}
         uses: fortran-lang/setup-fortran@v1
-        id: setup-fortran
+        id: setup-fortran-windows-arm
         with:
           # TODO: figure out whether we need/want to use other compilers too
           compiler: "intel"
