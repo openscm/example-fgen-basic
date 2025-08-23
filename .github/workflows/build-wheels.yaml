@@ -80,6 +80,7 @@ jobs:
         id: setup-fortran-windows-arm
         with:
           # Only intel-classic supported by f2py
+          # (https://numpy.org/devdocs/f2py/windows/intel.html#f2py-and-windows-intel-fortran)
           compiler: "intel-classic"
           version: "2021.10"
       - name: Build wheels
