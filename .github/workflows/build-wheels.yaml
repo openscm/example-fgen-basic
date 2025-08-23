@@ -21,8 +21,8 @@ jobs:
         delvewheel repair -w {dest_dir} {wheel}
       # TODO: switch to building based on locked src
       # and use tests-min-locked here
-      CIBW_TEST_EXTRAS: >-
-        tests-min
+      CIBW_BEFORE_TEST: >-
+        pip install -r {project}/requirements-only-tests-min-locked.txt
       CIBW_TEST_COMMAND: >-
         pytest {project}/tests
       # # On Windows, we explicitly request MSVC compilers (as GitHub Action runners have
