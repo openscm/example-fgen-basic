@@ -13,11 +13,11 @@ module m_get_wavelength
     real(kind=dp), parameter, public :: speed_of_light = 2.99792e8_dp
     !! Speed of light [m/s]
 
-    public :: inner_get_wavelength
+    public :: get_wavelength
 
 contains
 
-    pure function inner_get_wavelength(frequency) result(wavelength)
+    pure function get_wavelength(frequency) result(wavelength)
         !! Get wavelength of light for a given frequency
         !
         ! Trying with FORD style docstrings for now
@@ -31,6 +31,6 @@ contains
 
         wavelength = speed_of_light / frequency
 
-    end function inner_get_wavelength
+    end function get_wavelength
 
 end module m_get_wavelength
