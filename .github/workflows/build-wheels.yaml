@@ -70,6 +70,8 @@ jobs:
           # TODO: figure out whether we need/want to use other compilers too
           compiler: "gcc"
           version: "13"
+      # Needed to install lfortran
+      - uses: s-weigand/setup-conda@v1
       - name: Install Fortran compiler - Windows
         if: ${{ matrix.os == 'windows-11-arm' }}
         uses: fortran-lang/setup-fortran@v1
