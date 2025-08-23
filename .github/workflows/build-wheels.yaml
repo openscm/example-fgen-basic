@@ -1,4 +1,4 @@
-name: Build
+name: Build wheels
 # Current draft based on
 # https://github.com/matplotlib/matplotlib/blob/main/.github/workflows/cibuildwheel.yml
 
