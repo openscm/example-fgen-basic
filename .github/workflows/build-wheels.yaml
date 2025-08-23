@@ -70,23 +70,23 @@ jobs:
           # TODO: figure out whether we need/want to use other compilers too
           compiler: "gcc"
           version: "13"
-      # From numpy: https://github.com/numpy/numpy/blob/37c9cb68ba7db9c48bc0e3354953c57a78d2b0e8/.github/windows_arm64_steps/action.yml
-      - name: Install LLVM with checksum verification
-        if: ${{ matrix.os == 'windows-11-arm' }}
-        shell: pwsh
-        run: |
-          Invoke-WebRequest https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.6/LLVM-20.1.6-woa64.exe -UseBasicParsing -OutFile LLVM-woa64.exe
-          $expectedHash = "92f69a1134e32e54b07d51c6e24d9594852f6476f32c3d70471ae00fffc2d462"
-          $fileHash = (Get-FileHash -Path "LLVM-woa64.exe" -Algorithm SHA256).Hash
-          if ($fileHash -ne $expectedHash) {
-              Write-Error "Checksum verification failed. The downloaded file may be corrupted or tampered with."
-              exit 1
-          }
-          Start-Process -FilePath ".\LLVM-woa64.exe" -ArgumentList "/S" -Wait
-          echo "C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          echo "CC=clang-cl" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          echo "CXX=clang-cl" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          echo "FC=flang-new" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      # # From numpy: https://github.com/numpy/numpy/blob/37c9cb68ba7db9c48bc0e3354953c57a78d2b0e8/.github/windows_arm64_steps/action.yml
+      # - name: Install LLVM with checksum verification
+      #   if: ${{ matrix.os == 'windows-11-arm' }}
+      #   shell: pwsh
+      #   run: |
+      #     Invoke-WebRequest https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.6/LLVM-20.1.6-woa64.exe -UseBasicParsing -OutFile LLVM-woa64.exe
+      #     $expectedHash = "92f69a1134e32e54b07d51c6e24d9594852f6476f32c3d70471ae00fffc2d462"
+      #     $fileHash = (Get-FileHash -Path "LLVM-woa64.exe" -Algorithm SHA256).Hash
+      #     if ($fileHash -ne $expectedHash) {
+      #         Write-Error "Checksum verification failed. The downloaded file may be corrupted or tampered with."
+      #         exit 1
+      #     }
+      #     Start-Process -FilePath ".\LLVM-woa64.exe" -ArgumentList "/S" -Wait
+      #     echo "C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      #     echo "CC=clang-cl" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      #     echo "CXX=clang-cl" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      #     echo "FC=flang-new" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       # - name: Specify MSVC toolchain - windows-arm
       #   if: ${{ matrix.os == 'windows-11-arm' }}
       #   # When building on windows ARM, we need to use the MSVC toolchain
