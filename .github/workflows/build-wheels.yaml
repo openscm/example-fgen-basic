@@ -17,7 +17,7 @@ jobs:
       CIBW_SKIP: "cp39-win_arm64 cp310-win_arm64"
       # TODO: consider turning this on
       # CIBW_ENABLE: cpython-freethreading
-      CIBW_CONFIG_SETTINGS: "-Cbuild-dir=build"
+      CIBW_CONFIG_SETTINGS: "build-dir=build"
       CIBW_BEFORE_BUILD_WINDOWS: >-
         pip install delvewheel
       CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: >-
