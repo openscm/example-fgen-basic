@@ -9,7 +9,7 @@ name: Build
 on: [push]
 
 jobs:
-  build_wheels:
+  build-wheels:
     name: Build wheels on ${{ matrix.os }} for ${{ matrix.cibw_archs }}
     runs-on: ${{ matrix.os }}
     env:
