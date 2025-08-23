@@ -1,8 +1,6 @@
 name: Build wheels
-# Current draft based on
-# https://github.com/matplotlib/matplotlib/blob/main/.github/workflows/cibuildwheel.yml
 
-# TODO: only run on published releases
+# TODO: move into the release-deploy workflow and only run on published releases
 # on:
 #   release:
 #     types: [published]
