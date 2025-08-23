@@ -58,6 +58,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
+      - name: Build wheels for CPython 3.9
+        uses: pypa/cibuildwheel@v3.1.4  # matplotlib had v3.1.3
+        with:
+          package-dir: .
+          output-dir: wheelhouse
+          config-file: "{package}/pyproject.toml"
+        env:
+          CIBW_BUILD: "cp39-*"
+          CIBW_ARCHS: ${{ matrix.cibw_archs }}
       - name: Build wheels for CPython 3.12
         uses: pypa/cibuildwheel@v3.1.4  # matplotlib had v3.1.3
         with:
