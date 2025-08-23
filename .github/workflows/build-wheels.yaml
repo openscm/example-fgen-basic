@@ -1,0 +1,154 @@
+name: Build wheels
+
+# TODO: move into the release-deploy workflow and only run on published releases
+# on:
+#   release:
+#     types: [published]
+on: [push]
+
+jobs:
+  build-wheels:
+    name: Build wheels on ${{ matrix.os }} for ${{ matrix.cibw_archs }}
+    runs-on: ${{ matrix.os }}
+    env:
+      # 3.9, 3.10 seem to not be happy on windows arm64
+      # because you can't install numpy from a wheel for the build environment
+      # (and we're not going to try recompiling from source)
+      CIBW_SKIP: "cp39-win_arm64 cp310-win_arm64"
+      # TODO: consider turning this on
+      # CIBW_ENABLE: cpython-freethreading
+      CIBW_BEFORE_BUILD_WINDOWS: >-
+        pip install delvewheel
+      CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: >-
+        delvewheel repair -w {dest_dir} {wheel}
+      # TODO: switch to building based on locked src
+      # and use tests-min-locked here
+      CIBW_BEFORE_TEST: >-
+        pip install -r {project}/requirements-only-tests-min-locked.txt
+      CIBW_TEST_COMMAND: >-
+        pytest {project}/tests
+      MACOSX_DEPLOYMENT_TARGET: "13.0"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            cibw_archs: "x86_64"
+          - os: ubuntu-24.04-arm
+            cibw_archs: "aarch64"
+          - os: windows-2025
+            cibw_archs: "AMD64"
+          # # Not happy at the moment hence turned off
+          # # It doesn't seem too far away, but something isn't quite right.
+          # # Latest run by Zeb: https://github.com/openscm/example-fgen-basic/actions/runs/17173313157/job/48725872212
+          # # Can't find numpy definitions for some reason.
+          # # Maybe helpful issue: https://github.com/numpy/numpy/issues/25000
+          # # numpy uses different compilers, might be something to try, see:
+          # # - https://github.com/numpy/numpy/actions/runs/17087345049/job/48453931521
+          # # - https://github.com/numpy/numpy/blob/37c9cb68ba7db9c48bc0e3354953c57a78d2b0e8/.github/workflows/wheels.yml#L129
+          # # scipy doesn't bother building windows arm wheels, see:
+          # # - https://pypi.org/project/scipy/#files
+          # # potentially relevant scipy issues:
+          # # - https://github.com/scipy/scipy/issues/21716
+          # # - https://github.com/scipy/scipy/issues/14812
+          # - os: windows-11-arm
+          #   cibw_archs: "ARM64"
+          - os: macos-13
+            cibw_archs: "x86_64"
+          - os: macos-14
+            cibw_archs: "arm64"
+
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install Fortran compiler - MacOS
+        # When building on Mac, we need to have a Fortran compiler
+        if: ${{ startsWith(matrix.os, 'macos') }}
+        uses: fortran-lang/setup-fortran@v1
+        id: setup-fortran-macos
+        with:
+          # TODO: figure out whether we need/want to use other compilers too
+          compiler: "gcc"
+          version: "13"
+      - name: Specify MSVC toolchain - windows-arm
+        # When building on windows ARM, we need to use the MSVC toolchain
+        # # Original from: https://github.com/matplotlib/matplotlib/blob/1ddb1eccac8cfc25dee47bc538dc5913384b253f/.github/workflows/cibuildwheel.yml#L108
+        # # On Windows, we explicitly request MSVC compilers (as GitHub Action runners have
+        # # MinGW on PATH that would be picked otherwise), switch to a static build for
+        # # runtimes, but use dynamic linking for `VCRUNTIME140.dll`, `VCRUNTIME140_1.dll`,
+        # # and the UCRT. This avoids requiring specific versions of `MSVCP140.dll`, while
+        # # keeping shared state with the rest of the Python process/extensions.
+        # CIBW_CONFIG_SETTINGS_WINDOWS: >-
+        #   setup-args="--vsenv"
+        #   setup-args="-Db_vscrt=mt"
+        #   setup-args="-Dcpp_link_args=['ucrt.lib','vcruntime.lib','/nodefaultlib:libucrt.lib','/nodefaultlib:libvcruntime.lib']"
+        run: |
+          echo 'CIBW_CONFIG_SETTINGS_WINDOWS=setup-args="--vsenv" setup-args="-Db_vscrt=mt"' >> $GITHUB_ENV
+        # TODO: figure out escaping and add back in (?)
+        # setup-args="-Dcpp_link_args=['ucrt.lib','vcruntime.lib','/nodefaultlib:libucrt.lib','/nodefaultlib:libvcruntime.lib']"
+      - name: Install Fortran compiler - windows-arm
+        # When building on windows ARM, we need to use the MSVC toolchain
+        if: ${{ matrix.os == 'windows-11-arm' }}
+        uses: fortran-lang/setup-fortran@v1
+        id: setup-fortran-windows-arm
+        with:
+          # Only intel-classic supported by f2py
+          # (https://numpy.org/devdocs/f2py/windows/intel.html#f2py-and-windows-intel-fortran)
+          compiler: "intel-classic"
+          version: "2021.10"
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v3.1.4  # matplotlib had v3.1.3
+        with:
+          package-dir: .
+          output-dir: wheelhouse
+          config-file: "{package}/pyproject.toml"
+        env:
+          CIBW_ARCHS: ${{ matrix.cibw_archs }}
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-${{ matrix.os }}-${{ matrix.cibw_archs }}
+          path: ./wheelhouse/*.whl
+          if-no-files-found: error
+
+  make-sdist:
+    name: Make source distribution
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+        with:
+          python-version: ${{ matrix.python-version }}
+          uv-dependency-install-flags: "--all-extras --group dev"
+      - name: Create source distribution
+        run: uv build --sdist
+      - name: Upload the source distribution artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cibw-sdist
+          path: dist/*.tar.gz
+
+  deploy-pypi:
+    needs: [ build-wheels, make-sdist ]
+    # Having an environment for deployment is strongly recommend by PyPI
+    # https://docs.pypi.org/trusted-publishers/adding-a-publisher/#github-actions
+    # You can comment this line out if you don't want it.
+    # # TODO: turn back on when we only run this on main
+    # environment: deploy
+    # permissions:
+    #   # this permission is mandatory for trusted publishing with PyPI
+    #   id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artefacts
+        uses: actions/download-artifact@v5
+        with:
+          pattern: cibw-*
+          path: dist
+          merge-multiple: true
+      - name: Publish to PyPI
+        run: |
+          ls dist
+          # uv publish
