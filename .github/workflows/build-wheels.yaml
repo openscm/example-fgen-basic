@@ -30,15 +30,6 @@ jobs:
       CIBW_TEST_COMMAND: >-
         pytest {project}/tests
       MACOSX_DEPLOYMENT_TARGET: "13.0"
-      # # On Windows, we explicitly request MSVC compilers (as GitHub Action runners have
-      # # MinGW on PATH that would be picked otherwise), switch to a static build for
-      # # runtimes, but use dynamic linking for `VCRUNTIME140.dll`, `VCRUNTIME140_1.dll`,
-      # # and the UCRT. This avoids requiring specific versions of `MSVCP140.dll`, while
-      # # keeping shared state with the rest of the Python process/extensions.
-      # CIBW_CONFIG_SETTINGS_WINDOWS: >-
-      #   setup-args="--vsenv"
-      #   setup-args="-Db_vscrt=mt"
-      #   setup-args="-Dcpp_link_args=['ucrt.lib','vcruntime.lib','/nodefaultlib:libucrt.lib','/nodefaultlib:libvcruntime.lib']"
     strategy:
       fail-fast: false
       matrix:
@@ -49,8 +40,13 @@ jobs:
             cibw_archs: "aarch64"
           - os: windows-2025
             cibw_archs: "AMD64"
-          - os: windows-11-arm
-            cibw_archs: "ARM64"
+          # # Not happy at the moment hence turned off
+          # # It doesn't seem too far away, but something isn't quite right.
+          # # Latest run by Zeb: https://github.com/openscm/example-fgen-basic/actions/runs/17173313157/job/48725872212
+          # # Can't find numpy definitions for some reason.
+          # # Maybe helpful issue: https://github.com/numpy/numpy/issues/25000
+          # - os: windows-11-arm
+          #   cibw_archs: "ARM64"
           - os: macos-13
             cibw_archs: "x86_64"
           - os: macos-14
@@ -69,6 +65,16 @@ jobs:
           version: "13"
       - name: Specify MSVC toolchain - windows-arm
         # When building on windows ARM, we need to use the MSVC toolchain
+        # # Original from: https://github.com/matplotlib/matplotlib/blob/1ddb1eccac8cfc25dee47bc538dc5913384b253f/.github/workflows/cibuildwheel.yml#L108
+        # # On Windows, we explicitly request MSVC compilers (as GitHub Action runners have
+        # # MinGW on PATH that would be picked otherwise), switch to a static build for
+        # # runtimes, but use dynamic linking for `VCRUNTIME140.dll`, `VCRUNTIME140_1.dll`,
+        # # and the UCRT. This avoids requiring specific versions of `MSVCP140.dll`, while
+        # # keeping shared state with the rest of the Python process/extensions.
+        # CIBW_CONFIG_SETTINGS_WINDOWS: >-
+        #   setup-args="--vsenv"
+        #   setup-args="-Db_vscrt=mt"
+        #   setup-args="-Dcpp_link_args=['ucrt.lib','vcruntime.lib','/nodefaultlib:libucrt.lib','/nodefaultlib:libvcruntime.lib']"
         run: |
           echo 'CIBW_CONFIG_SETTINGS_WINDOWS=setup-args="--vsenv" setup-args="-Db_vscrt=mt"' >> $GITHUB_ENV
         # TODO: figure out escaping and add back in (?)
@@ -91,41 +97,6 @@ jobs:
           config-file: "{package}/pyproject.toml"
         env:
           CIBW_ARCHS: ${{ matrix.cibw_archs }}
-  #     # - name: Setup Python
-  #     #   if: ${{ startsWith(matrix.os, 'windows') }}
-  #     #   uses: actions/setup-python@v5
-  #     #   with:
-  #     #     python-version: '3.x'
-  #     #
-  #     # # Maybe not necessary, source:
-  #     # # https://dvdhrm.github.io/2021/04/21/meson-msvc-github-actions/
-  #     # # and
-  #     # # https://github.com/numpy/numpy/blob/71eebaf8513dfd6ed40b0c689702d81e3f6f2527/.github/workflows/wheels.yml#L123
-  #     # - name: Setup MSVC developer shell (32-bit)
-  #     #   if: ${{ matrix.os == 'windows-2022' }}
-  #     #   uses: bus1/cabuild/action/msdevshell@v1
-  #     #   with:
-  #     #     architecture: x64
-  #     #
-  #     # - name: Set macOS-13 specific flags
-  #     #   if: matrix.os == 'macos-13'
-  #     #   run: |
-  #     #     echo "MACOSX_DEPLOYMENT_TARGET=13.0" >> "$GITHUB_ENV"
-  #     #
-  #     # - name: Set macOS-14 specific flags
-  #     #   if: matrix.os == 'macos-14'
-  #     #   run: |
-  #     #     echo "MACOSX_DEPLOYMENT_TARGET=14.0" >> "$GITHUB_ENV"
-  #     #
-  #     # - name: Build wheels
-  #     #   uses: pypa/cibuildwheel@v3.1.4
-  #     #   # env:
-  #     #   #   CIBW_SOME_OPTION: value
-  #     #   #   ...
-  #     #   with:
-  #     #     package-dir: .
-  #     #     output-dir: wheelhouse
-  #     #     config-file: "{package}/pyproject.toml"
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
@@ -133,34 +104,28 @@ jobs:
           path: ./wheelhouse/*.whl
           if-no-files-found: error
 
-  # make-sdist:
-  #   name: Make source distribution
-  #   runs-on: "ubuntu-latest"
-  #
-  #   steps:
-  #     - name: Check out repository
-  #       uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 0
-  #
-  #     - uses: ./.github/actions/setup
-  #       with:
-  #         python-version: ${{ matrix.python-version }}
-  #         uv-dependency-install-flags: "--all-extras --group dev"
-  #
-  #     - name: Create source distribution
-  #       run: uv build --sdist
-  #
-  #     - name: Upload the source distribution artefact
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: cibw-sdist
-  #         path: dist/*.tar.gz
+  make-sdist:
+    name: Make source distribution
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+        with:
+          python-version: ${{ matrix.python-version }}
+          uv-dependency-install-flags: "--all-extras --group dev"
+      - name: Create source distribution
+        run: uv build --sdist
+      - name: Upload the source distribution artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cibw-sdist
+          path: dist/*.tar.gz
 
   deploy-pypi:
-    # TODO: turn back on
-    # needs: [ build-wheels, make-sdist ]
-    needs: [build-wheels]
+    needs: [ build-wheels, make-sdist ]
     # Having an environment for deployment is strongly recommend by PyPI
     # https://docs.pypi.org/trusted-publishers/adding-a-publisher/#github-actions
     # You can comment this line out if you don't want it.
