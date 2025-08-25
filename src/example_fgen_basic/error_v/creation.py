@@ -8,10 +8,10 @@ from example_fgen_basic.error_v.error_v import ErrorV
 from example_fgen_basic.pyfgen_runtime.exceptions import CompiledExtensionNotFoundError
 
 try:
-    from example._lib import (  # type: ignore
+    from example_fgen_basic._lib import (  # type: ignore
         m_error_v_creation_w,
     )
-except (ModuleNotFoundError, ImportError) as exc:
+except (ModuleNotFoundError, ImportError) as exc:  # pragma: no cover
     raise CompiledExtensionNotFoundError("example._lib.m_error_v_creation_w") from exc
 
 

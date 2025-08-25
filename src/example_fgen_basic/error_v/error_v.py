@@ -4,6 +4,8 @@ Wrapper of the Fortran :class:`ErrorV`
 
 from __future__ import annotations
 
+from typing import Any
+
 from attrs import define
 
 from example_fgen_basic.pyfgen_runtime.base_finalisable import (
@@ -13,10 +15,10 @@ from example_fgen_basic.pyfgen_runtime.base_finalisable import (
 from example_fgen_basic.pyfgen_runtime.exceptions import CompiledExtensionNotFoundError
 
 try:
-    from example._lib import (  # type: ignore
+    from example_fgen_basic._lib import (  # type: ignore
         m_error_v_creation_w,
     )
-except (ModuleNotFoundError, ImportError) as exc:
+except (ModuleNotFoundError, ImportError) as exc:  # pragma: no cover
     raise CompiledExtensionNotFoundError("example._lib.m_error_v_creation_w") from exc
 
 
@@ -25,6 +27,15 @@ class ErrorV(FinalisableWrapperBase):
     """
     TODO: auto docstring e.g. "Wrapper around the Fortran :class:`ErrorV`"
     """
+
+    # Bug in Ipython pretty hence have to put this on every object?
+    def _repr_pretty_(self, p: Any, cycle: bool) -> None:
+        """
+        Get pretty representation of self
+
+        Used by IPython notebooks and other tools
+        """
+        super()._repr_pretty_(p=p, cycle=cycle)
 
     @property
     def exposed_attributes(self) -> tuple[str, ...]:

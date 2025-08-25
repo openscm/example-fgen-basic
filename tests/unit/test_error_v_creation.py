@@ -6,6 +6,9 @@ I haven't written unit tests for the Fortran directly
 (deliberately, just to see how it goes).
 """
 
+import pytest
+from IPython.lib.pretty import pretty
+
 from example_fgen_basic.error_v import ErrorV
 from example_fgen_basic.error_v.creation import create_error
 
@@ -38,10 +41,40 @@ def test_create_error_negative():
     assert res.message == "Negative number supplied"
 
 
-# Tests to write:
-# - if we create more errors than we have available, we don't segfault.
-#   Instead, we should get an error back.
-#   That error should just use the instance ID of the last available array index
-#   (it is ok to overwrite an already used error to avoid a complete failure,
-#   but we should probably include that we did this in the error message).
-# - we can resize the available number of error instances to avoid hitting limits
+def test_error_too_many_instances():
+    pytest.skip("Causes segfault right now")
+    # - if we create more errors than we have available, we don't segfault.
+    #   Instead, we should get an error back.
+    #   That error should just use the instance ID of the last available array index
+    #   (it is ok to overwrite an already used error to avoid a complete failure,
+    #   but we should probably include that we did this in the error message).
+    # TODO: expect error here
+    for _ in range(4097):
+        create_error(1)
+
+
+def test_increase_number_of_instances():
+    raise NotImplementedError
+    # - Make 4096 instances
+    # - show that making one more raises an error
+    # - increase number of instances
+    # - show that making one more now works without error
+
+
+# Some test to illustrate what the formatting does
+def test_error_str(file_regression):
+    res = create_error(1.0)
+
+    file_regression.check(str(res))
+
+
+def test_error_pprint(file_regression):
+    res = create_error(1.0)
+
+    file_regression.check(pretty(res))
+
+
+def test_error_html(file_regression):
+    res = create_error(1.0)
+
+    file_regression.check(res._repr_html_(), extension=".html")

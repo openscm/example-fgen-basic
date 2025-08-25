@@ -101,6 +101,7 @@ tests-min = [
     # Key dependencies
     # ----------------
     "pytest>=8.3.4",
+    "pytest-regressions>=2.8.2",
 ]
 # Full test dependencies.
 tests-full = [
@@ -114,6 +115,7 @@ tests-full = [
 tests = [
     {include-group = "tests-min"},
     {include-group = "tests-full"},
+    "ipython>=8.18.1",
 ]
 all-dev = [
     {include-group = "dev"},
