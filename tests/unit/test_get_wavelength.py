@@ -1,5 +1,5 @@
 """
-Dummy tests
+Tests of `example_fgen_basic.get_wavelength`
 """
 
 import numpy as np
