@@ -48,6 +48,7 @@ if pyprojectwheelbuild_enabled
   # These are the src with which Python interacts.
   # Injected with `script/inject-srcs-into-meson-build.py`
   srcs = files(
+    'src/example_fgen_basic/error_v/creation_wrapper.f90',
     'src/example_fgen_basic/get_wavelength_wrapper.f90',
   )
 
@@ -56,7 +57,9 @@ if pyprojectwheelbuild_enabled
   srcs_ancillary_lib = files(
     'src/example_fgen_basic/error_v/creation.f90',
     'src/example_fgen_basic/error_v/error_v.f90',
+    'src/example_fgen_basic/error_v/error_v_manager.f90',
     'src/example_fgen_basic/fpyfgen/base_finalisable.f90',
+    'src/example_fgen_basic/fpyfgen/derived_type_manager_helpers.f90',
     'src/example_fgen_basic/get_wavelength.f90',
     'src/example_fgen_basic/kind_parameters.f90',
   )
