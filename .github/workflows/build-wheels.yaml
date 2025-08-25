@@ -88,14 +88,14 @@ jobs:
       - name: Install Fortran compiler - windows-arm
         # When building on windows ARM, we need to use the MSVC toolchain
         if: ${{ matrix.os == 'windows-11-arm' }}
-          #uses: fortran-lang/setup-fortran@v1
-        uses: modflowpy/install-intelfortran-action@v1
-        #id: setup-fortran-windows-arm
-        #with:
+        uses: fortran-lang/setup-fortran@v1
+        id: setup-fortran-windows-arm
+        with:
           # Only intel-classic supported by f2py
-          # (https://numpy.org/devdocs/f2py/windows/intel.html#f2py-and-windows-intel-fortran)
-          #compiler: "intel-classic"
-            #version: "2021.10"
+          # # (https://numpy.org/devdocs/f2py/windows/intel.html#f2py-and-windows-intel-fortran)
+          compiler: "intel-classic"
+          version: "2021.10"
+
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.1.4  # matplotlib had v3.1.3
         with:
