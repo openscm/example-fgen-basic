@@ -12,6 +12,9 @@ project(
   ],
 )
 
+# https://mesonbuild.com/Fs-module.html
+fs = import('fs')
+
 # Some useful constants
 pyprojectwheelbuild_enabled = get_option('pyprojectwheelbuild').enabled()
 
@@ -68,8 +71,15 @@ if pyprojectwheelbuild_enabled
   # Injected with `script/inject-srcs-into-meson-build.py`
   python_srcs = files(
     'src/example_fgen_basic/__init__.py',
+    'src/example_fgen_basic/error_v/__init__.py',
+    'src/example_fgen_basic/error_v/creation.py',
+    'src/example_fgen_basic/error_v/error_v.py',
     'src/example_fgen_basic/exceptions.py',
     'src/example_fgen_basic/get_wavelength.py',
+    'src/example_fgen_basic/pyfgen_runtime/__init__.py',
+    'src/example_fgen_basic/pyfgen_runtime/base_finalisable.py',
+    'src/example_fgen_basic/pyfgen_runtime/exceptions.py',
+    'src/example_fgen_basic/pyfgen_runtime/formatting.py',
     'src/example_fgen_basic/runtime_helpers.py',
   )
 
@@ -137,9 +147,12 @@ if pyprojectwheelbuild_enabled
   # this is where that operation happens.
   # Files get copied to <python directory>/site-packages/<subdir>
   foreach python_src : python_srcs
+    message(python_src)
+    message(python_project_name)
+    message(fs.relative_to(python_src, python_project_name))
     py.install_sources(
         python_src,
-        subdir: python_project_name,
+        subdir: python_project_name / fs.relative_to(python_src, python_project_name),
         pure: false,
     )
 

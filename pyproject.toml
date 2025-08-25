@@ -130,12 +130,14 @@ requires = [
 # https://mesonbuild.com/meson-python/how-to-guides/meson-args.html
 [tool.meson-python.args]
 setup = [
-  '--default-library=static',
-  '-Dpyprojectwheelbuild=enabled',
-  ]
-install = [
-'--skip-subprojects',
+    # '-v',
+    '--default-library=static',
+    '-Dpyprojectwheelbuild=enabled',
 ]
+install = [
+    '--skip-subprojects',
+]
+compile = ['-v']
 
 [tool.coverage.run]
 source = [
