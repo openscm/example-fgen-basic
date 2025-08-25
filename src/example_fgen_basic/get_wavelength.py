@@ -18,7 +18,9 @@ if TYPE_CHECKING:
 try:
     from example_fgen_basic._lib import m_get_wavelength_w  # type: ignore
 except (ModuleNotFoundError, ImportError) as exc:  # pragma: no cover
-    raise CompiledExtensionNotFoundError("example_fgen_basic._lib") from exc
+    raise CompiledExtensionNotFoundError(
+        "example_fgen_basic._lib.m_get_wavelength_w"
+    ) from exc
 
 
 def get_wavelength_plain(frequency: float) -> float:
