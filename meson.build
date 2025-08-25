@@ -54,6 +54,9 @@ if pyprojectwheelbuild_enabled
   # Specify all the other source Fortran files (original files and managers)
   # Injected with `script/inject-srcs-into-meson-build.py`
   srcs_ancillary_lib = files(
+    'src/example_fgen_basic/error_v/creation.f90',
+    'src/example_fgen_basic/error_v/error_v.f90',
+    'src/example_fgen_basic/fpyfgen/base_finalisable.f90',
     'src/example_fgen_basic/get_wavelength.f90',
     'src/example_fgen_basic/kind_parameters.f90',
   )
