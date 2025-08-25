@@ -69,7 +69,7 @@ jobs:
           # TODO: figure out whether we need/want to use other compilers too
           compiler: "gcc"
           version: "13"
-      - name: Specify MSVC toolchain - windows-arm
+            #- name: Specify MSVC toolchain - windows-arm
         # When building on windows ARM, we need to use the MSVC toolchain
         # # Original from: https://github.com/matplotlib/matplotlib/blob/1ddb1eccac8cfc25dee47bc538dc5913384b253f/.github/workflows/cibuildwheel.yml#L108
         # # On Windows, we explicitly request MSVC compilers (as GitHub Action runners have
@@ -81,15 +81,15 @@ jobs:
         #   setup-args="--vsenv"
         #   setup-args="-Db_vscrt=mt"
         #   setup-args="-Dcpp_link_args=['ucrt.lib','vcruntime.lib','/nodefaultlib:libucrt.lib','/nodefaultlib:libvcruntime.lib']"
-        run: |
-          choco install intel-oneapi-compiler-fortran --version=2025.0.0 --yes
+        #        run: |
           # echo 'CIBW_CONFIG_SETTINGS_WINDOWS=setup-args="--vsenv" setup-args="-Db_vscrt=mt"' >> $GITHUB_ENV
         # TODO: figure out escaping and add back in (?)
         # setup-args="-Dcpp_link_args=['ucrt.lib','vcruntime.lib','/nodefaultlib:libucrt.lib','/nodefaultlib:libvcruntime.lib']"
-        #   - name: Install Fortran compiler - windows-arm
+      - name: Install Fortran compiler - windows-arm
         # When building on windows ARM, we need to use the MSVC toolchain
-        #if: ${{ matrix.os == 'windows-11-arm' }}
-        #uses: fortran-lang/setup-fortran@v1
+        if: ${{ matrix.os == 'windows-11-arm' }}
+          #uses: fortran-lang/setup-fortran@v1
+        uses: modflowpy/install-intelfortran-action@v1
         #id: setup-fortran-windows-arm
         #with:
           # Only intel-classic supported by f2py
