@@ -1,5 +1,4 @@
 name: Build wheels
-
 # TODO: move into the release-deploy workflow and only run on published releases
 # on:
 #   release:
@@ -32,12 +31,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
-            cibw_archs: "x86_64"
-          - os: ubuntu-24.04-arm
-            cibw_archs: "aarch64"
-          - os: windows-2025
-            cibw_archs: "AMD64"
+          #- os: ubuntu-latest
+          # cibw_archs: "x86_64"
+          #- os: ubuntu-24.04-arm
+          #  cibw_archs: "aarch64"
+          #- os: windows-2025
+          #  cibw_archs: "AMD64"
           # # Not happy at the moment hence turned off
           # # It doesn't seem too far away, but something isn't quite right.
           # # Latest run by Zeb: https://github.com/openscm/example-fgen-basic/actions/runs/17173313157/job/48725872212
@@ -51,12 +50,12 @@ jobs:
           # # potentially relevant scipy issues:
           # # - https://github.com/scipy/scipy/issues/21716
           # # - https://github.com/scipy/scipy/issues/14812
-          # - os: windows-11-arm
-          #   cibw_archs: "ARM64"
-          - os: macos-13
-            cibw_archs: "x86_64"
-          - os: macos-14
-            cibw_archs: "arm64"
+          - os: windows-11-arm
+            cibw_archs: "ARM64"
+          #- os: macos-13
+          #  cibw_archs: "x86_64"
+          #- os: macos-14
+          # cibw_archs: "arm64"
 
     steps:
       - uses: actions/checkout@v5
@@ -81,20 +80,44 @@ jobs:
         #   setup-args="--vsenv"
         #   setup-args="-Db_vscrt=mt"
         #   setup-args="-Dcpp_link_args=['ucrt.lib','vcruntime.lib','/nodefaultlib:libucrt.lib','/nodefaultlib:libvcruntime.lib']"
-        run: |
-          echo 'CIBW_CONFIG_SETTINGS_WINDOWS=setup-args="--vsenv" setup-args="-Db_vscrt=mt"' >> $GITHUB_ENV
+        #    run: |
+        # echo 'CIBW_CONFIG_SETTINGS_WINDOWS=setup-args="--vsenv" setup-args="-Db_vscrt=mt"' >> $GITHUB_ENV
         # TODO: figure out escaping and add back in (?)
         # setup-args="-Dcpp_link_args=['ucrt.lib','vcruntime.lib','/nodefaultlib:libucrt.lib','/nodefaultlib:libvcruntime.lib']"
-      - name: Install Fortran compiler - windows-arm
-        # When building on windows ARM, we need to use the MSVC toolchain
+        ####
         if: ${{ matrix.os == 'windows-11-arm' }}
-        uses: fortran-lang/setup-fortran@v1
-        id: setup-fortran-windows-arm
-        with:
+        shell: pwsh
+        run: |
+          echo "CC=clang-cl"  | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "CXX=clang-cl" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "FC=flang-new" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "AR=llvm-lib.exe" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+          Invoke-WebRequest https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.8/LLVM-20.1.8-woa64.exe -OutFile LLVM-woa64.exe
+          Start-Process -FilePath ".\LLVM-woa64.exe" -ArgumentList "/S" -Wait
+          echo "C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          $env:PATH = "C:\Program Files\LLVM\bin;" + $env:PATH
+
+          #          $env:VCPKG_ROOT = "C:\vcpkg"
+          #git clone https://github.com/microsoft/vcpkg $env:VCPKG_ROOT
+          #& "$env:VCPKG_ROOT\bootstrap-vcpkg.bat"
+          #& "$env:VCPKG_ROOT\vcpkg.exe" install pkgconf:arm64-windows
+          #$pkgconfPath = "$env:VCPKG_ROOT\installed\arm64-windows\tools\pkgconf"
+          #Copy-Item "$pkgconfPath\pkgconf.exe" "$pkgconfPath\pkg-config.exe" -Force
+          #echo "$pkgconfPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+                    #####
+          #- name: Install Fortran compiler - windows-arm
+        # When building on windows ARM, we need to use the MSVC toolchain
+        #if: ${{ matrix.os == 'windows-11-arm' }}
+        #uses: fortran-lang/setup-fortran@v1
+        #id: setup-fortran-windows-arm
+        #with:
           # Only intel-classic supported by f2py
-          # (https://numpy.org/devdocs/f2py/windows/intel.html#f2py-and-windows-intel-fortran)
-          compiler: "intel-classic"
-          version: "2021.10"
+          # # (https://numpy.org/devdocs/f2py/windows/intel.html#f2py-and-windows-intel-fortran)
+          # compiler: "intel-classic"
+          #version: "2021.10"
+
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.1.4  # matplotlib had v3.1.3
         with:
