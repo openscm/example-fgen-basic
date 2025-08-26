@@ -39,6 +39,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           uv-dependency-install-flags: "--all-extras --group docs"
+      - name: Install Graphviz
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y graphviz
       - name: docs
         run: |
           uv run --no-sync mkdocs build --strict
