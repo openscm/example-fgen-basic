@@ -77,7 +77,7 @@ class FinalisableWrapperBase(ABC):
         )
 
     @property
-    def initialized(self) -> bool:
+    def initialised(self) -> bool:
         """
         Is the instance initialised, i.e. connected to a Fortran instance?
         """
@@ -108,7 +108,7 @@ class FinalisableWrapperBase(ABC):
     #     ...
     #
     # @abstractmethod
-    # def finalize(self) -> None:
+    # def finalise(self) -> None:
     #     """
     #     Finalise the Fortran instance and set self back to being uninitialised
     #
@@ -157,7 +157,7 @@ def check_initialised(
         *args: P.args,
         **kwargs: P.kwargs,
     ) -> Any:
-        if not ref.initialized:
+        if not ref.initialised:
             raise NotInitialisedError(ref, method)
 
         return method(ref, *args, **kwargs)
@@ -210,7 +210,7 @@ class FinalisableWrapperBasePtrBased(ABC):
         )
 
     @property
-    def initialized(self) -> bool:
+    def initialised(self) -> bool:
         """
         Is the instance initialised, i.e. connected to a Fortran instance?
         """
@@ -224,37 +224,36 @@ class FinalisableWrapperBasePtrBased(ABC):
         """
         ...
 
-    # TODO: consider whether we need these
-    # @classmethod
-    # @abstractmethod
-    # def from_new_connection(cls) -> FinalisableWrapperBase:
-    #     """
-    #     Initialise by establishing a new connection with the Fortran module
-    #
-    #     This requests a new model index from the Fortran module and then
-    #     initialises a class instance
-    #
-    #     Returns
-    #     -------
-    #     New class instance
-    #     """
-    #     ...
-    #
-    # @abstractmethod
-    # def finalize(self) -> None:
-    #     """
-    #     Finalise the Fortran instance and set self back to being uninitialised
-    #
-    #     This method resets `self.instance_ptr` back to
-    #     `None`
-    #
-    #     Should be decorated with :func:`check_initialised`
-    #     """
-    #     # call to Fortran module goes here when implementing
-    #     self._uninitialise_instance_index()
+    @classmethod
+    @abstractmethod
+    def from_new_connection(cls) -> FinalisableWrapperBase:
+        """
+        Initialise by establishing a new connection with the Fortran module
 
-    def _uninitialise_instance_index(self) -> None:
-        self.instance_index = None
+        This requests a new model index from the Fortran module and then
+        initialises a class instance.
+
+        Returns
+        -------
+        :
+            New class instance
+        """
+        ...
+
+    @abstractmethod
+    def finalise(self) -> None:
+        """
+        Finalise the Fortran instance and set self back to being uninitialised
+
+        This method resets `self.instance_ptr` back to `None`.
+
+        Should be decorated with :func:`check_initialised`
+        """
+        # call to Fortran module goes here when implementing
+        self._uninitialise_instance_ptr()
+
+    def _uninitialise_instance_ptr(self) -> None:
+        self.instance_ptr = None
 
 
 WrapperPtrBased = TypeVar("WrapperPtrBased", bound=FinalisableWrapperBasePtrBased)
@@ -288,9 +287,59 @@ def check_initialised_ptr_based(
         *args: P.args,
         **kwargs: P.kwargs,
     ) -> Any:
-        if not ref.initialized:
+        if not ref.initialised:
             raise NotInitialisedError(ref, method)
 
         return method(ref, *args, **kwargs)
 
     return checked  # type: ignore
+
+
+# Thank you for type hints info
+# https://adamj.eu/tech/2021/05/11/python-type-hints-args-and-kwargs/
+def execute_finalise_on_fail_ptr_based(
+    inst: FinalisableWrapperBasePtrBased,
+    func_to_try: Callable[Concatenate[int, P], T],
+    *args: P.args,
+    **kwargs: P.kwargs,
+) -> T:
+    """
+    Execute a function, finalising the instance before raising if any error occurs
+
+    This function is most useful in factory functions where it provides a
+    clean way of ensuring that any Fortran is freed up in the event of an
+    initialisation failure for any reason
+
+    Parameters
+    ----------
+    inst
+        Instance whose model index we will use when executing the functin
+
+    func_to_try
+        Function to try executing, must take `inst`'s instance pointer as its
+        first argument
+
+    *args
+        Passed to `func_to_try`
+
+    **kwargs
+        Passed to `func_to_try`
+
+    Returns
+    -------
+    :
+        Result of calling `func_to_try(inst.instance_ptr, *args, **kwargs)`
+
+    Raises
+    ------
+    Exception
+        Any exception which occurs when calling `func_to_try`. Before the
+        exception is raised, `inst.finalise()` is called.
+    """
+    try:
+        return func_to_try(inst.instance_ptr, *args, **kwargs)
+    except RuntimeError:
+        # finalise the instance before raising
+        inst.finalise()
+
+        raise

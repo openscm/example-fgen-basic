@@ -92,6 +92,8 @@ contains
         ! Hopefully can leave without docstring (like Python)
 
         ! If we make message allocatable, deallocate here
+        self % code = 1
+        self % message = ""
 
     end subroutine finalise
 

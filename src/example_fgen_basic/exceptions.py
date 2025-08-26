@@ -57,7 +57,7 @@ class NotInitialisedError(WrapperError):
         if method:
             error_msg = f"{instance} must be initialised before {method} is called"
         else:
-            error_msg = f"instance ({instance:r}) is not initialized yet"
+            error_msg = f"instance ({instance:r}) is not initialised yet"
 
         super().__init__(error_msg)
 

@@ -58,7 +58,7 @@ def to_str(instance: FinalisableWrapperBase, exposed_attributes: Iterable[str]) 
     -------
         String representation of the instance
     """
-    if not instance.initialized:
+    if not instance.initialised:
         return f"Uninitialised {instance!r}"
 
     if not exposed_attributes:
@@ -98,7 +98,7 @@ def to_pretty(
     indent
         Indent to apply to the pretty printing group
     """
-    if not instance.initialized:
+    if not instance.initialised:
         p.text(str(instance))
         return
 
@@ -159,7 +159,7 @@ def to_html(instance: FinalisableWrapperBase, exposed_attributes: Iterable[str])
     -------
         HTML representation of the instance
     """
-    if not instance.initialized:
+    if not instance.initialised:
         return str(instance)
 
     if not exposed_attributes:
