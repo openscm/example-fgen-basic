@@ -163,3 +163,134 @@ def check_initialised(
         return method(ref, *args, **kwargs)
 
     return checked  # type: ignore
+
+
+@define
+class FinalisableWrapperBasePtrBased(ABC):
+    """
+    Base class for Fortran derived type wrappers using the pointer-based passing
+    """
+
+    instance_ptr: int | None = None
+    """
+    Pointer to Fortran instance (technically a C pointer)
+    """
+
+    def __str__(self) -> str:
+        """
+        Get string representation of self
+        """
+        return to_str(
+            self,
+            self.exposed_attributes,
+        )
+
+    def _repr_pretty_(self, p: Any, cycle: bool) -> None:
+        """
+        Get pretty representation of self
+
+        Used by IPython notebooks and other tools
+        """
+        to_pretty(
+            self,
+            self.exposed_attributes,
+            p=p,
+            cycle=cycle,
+        )
+
+    def _repr_html_(self) -> str:
+        """
+        Get html representation of self
+
+        Used by IPython notebooks and other tools
+        """
+        return to_html(
+            self,
+            self.exposed_attributes,
+        )
+
+    @property
+    def initialized(self) -> bool:
+        """
+        Is the instance initialised, i.e. connected to a Fortran instance?
+        """
+        return self.instance_ptr is not None
+
+    @property
+    @abstractmethod
+    def exposed_attributes(self) -> tuple[str, ...]:
+        """
+        Attributes exposed by this wrapper
+        """
+        ...
+
+    # TODO: consider whether we need these
+    # @classmethod
+    # @abstractmethod
+    # def from_new_connection(cls) -> FinalisableWrapperBase:
+    #     """
+    #     Initialise by establishing a new connection with the Fortran module
+    #
+    #     This requests a new model index from the Fortran module and then
+    #     initialises a class instance
+    #
+    #     Returns
+    #     -------
+    #     New class instance
+    #     """
+    #     ...
+    #
+    # @abstractmethod
+    # def finalize(self) -> None:
+    #     """
+    #     Finalise the Fortran instance and set self back to being uninitialised
+    #
+    #     This method resets `self.instance_ptr` back to
+    #     `None`
+    #
+    #     Should be decorated with :func:`check_initialised`
+    #     """
+    #     # call to Fortran module goes here when implementing
+    #     self._uninitialise_instance_index()
+
+    def _uninitialise_instance_index(self) -> None:
+        self.instance_index = None
+
+
+WrapperPtrBased = TypeVar("WrapperPtrBased", bound=FinalisableWrapperBasePtrBased)
+
+
+def check_initialised_ptr_based(
+    method: Callable[Concatenate[WrapperPtrBased, P], T],
+) -> Callable[Concatenate[WrapperPtrBased, P], T]:
+    """
+    Check that the wrapper object has been initialised before executing the method
+
+    Parameters
+    ----------
+    method
+        Method to wrap
+
+    Returns
+    -------
+    :
+        Wrapped method
+
+    Raises
+    ------
+    InitialisationError
+        Wrapper is not initialised
+    """
+
+    @wraps(method)
+    def checked(
+        ref: WrapperPtrBased,
+        *args: P.args,
+        **kwargs: P.kwargs,
+    ) -> Any:
+        if not ref.initialized:
+            raise NotInitialisedError(ref, method)
+
+        return method(ref, *args, **kwargs)
+
+    return checked  # type: ignore

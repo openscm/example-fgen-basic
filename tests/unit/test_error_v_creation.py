@@ -9,8 +9,8 @@ I haven't written unit tests for the Fortran directly
 import pytest
 from IPython.lib.pretty import pretty
 
-from example_fgen_basic.error_v import ErrorV
-from example_fgen_basic.error_v.creation import create_error
+from example_fgen_basic.error_v import ErrorV, ErrorVPtrBased
+from example_fgen_basic.error_v.creation import create_error, create_error_ptr_based
 
 
 def test_create_error_odd():
@@ -76,5 +76,33 @@ def test_error_pprint(file_regression):
 
 def test_error_html(file_regression):
     res = create_error(1.0)
+
+    file_regression.check(res._repr_html_(), extension=".html")
+
+
+def test_create_error_even_ptr_based():
+    res = create_error_ptr_based(2.0)
+
+    assert isinstance(res, ErrorVPtrBased)
+
+    assert res.code != 0
+    assert res.code == 1
+    assert res.message == "Even number supplied"
+
+
+def test_error_ptr_based_str(file_regression):
+    res = create_error_ptr_based(1.0)
+
+    file_regression.check(str(res))
+
+
+def test_error_ptr_based_pprint(file_regression):
+    res = create_error_ptr_based(1.0)
+
+    file_regression.check(pretty(res))
+
+
+def test_error_ptr_based_html(file_regression):
+    res = create_error_ptr_based(1.0)
 
     file_regression.check(res._repr_html_(), extension=".html")

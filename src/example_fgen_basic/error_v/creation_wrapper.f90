@@ -4,6 +4,8 @@
 !> Generation to be automated in future (including docstrings of some sort).
 module m_error_v_creation_w
 
+    use iso_c_binding, only: c_ptr, c_loc
+
     ! => allows us to rename on import to avoid clashes
     use m_error_v_creation, only: o_create_error => create_error
     use m_error_v, only: ErrorV
@@ -17,7 +19,7 @@ module m_error_v_creation_w
     implicit none
     private
 
-    public :: create_error
+    public :: create_error, create_error_ptr_based
 
 contains
 
@@ -50,5 +52,32 @@ contains
         res % instance_index = res_instance_index
 
     end subroutine create_error
+
+    subroutine create_error_ptr_based(inv, res_instance_ptr)
+    ! Needs to be subroutine to have the created instance persist I think
+    ! (we can check)
+    ! function create_error(inv) result(res_instance_index)
+
+        integer, intent(in) :: inv
+        !! Input value to use to create the error
+
+        !f2py integer(8), intent(out) :: res_instance_ptr
+        type(c_ptr), intent(out) :: res_instance_ptr
+        !! Pointer to the resulting instance
+        !
+        ! This is the major trick for wrapping.
+        ! We return pointers (passed as integers) to Python rather than the instance itself.
+
+        type(ErrorV), pointer :: res
+
+        ! Question is: when does this get deallocated?
+        ! When we go out of scope?
+        ! If yes, that will be why we had to do this array thing.
+        allocate(res)
+        res = o_create_error(inv)
+
+        res_instance_ptr = c_loc(res)
+
+    end subroutine create_error_ptr_based
 
 end module m_error_v_creation_w
