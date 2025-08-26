@@ -17,7 +17,7 @@ module m_error_v_creation_w
     implicit none
     private
 
-    public :: create_error, iget_code, iget_message
+    public :: create_error
 
 contains
 
@@ -50,43 +50,5 @@ contains
         res % instance_index = res_instance_index
 
     end subroutine create_error
-
-    ! Full set of wrapping strategies to pass different types in e.g.
-    ! https://gitlab.com/magicc/fgen/-/blob/switch-to-uv/tests/test-data/exposed_attrs/src/exposed_attrs/exposed_attrs_wrapped.f90
-    ! (we will do a full re-write of the code which generates this,
-    ! but the strategies will probably stay as they are)
-    subroutine iget_code( &
-        instance_index, &
-        code &
-        )
-
-        integer, intent(in) :: instance_index
-
-        integer, intent(out) :: code
-
-        type(ErrorV), pointer :: instance
-
-        call error_v_manager_associate_pointer_with_instance(instance_index, instance)
-
-        code = instance % code
-
-    end subroutine iget_code
-
-    subroutine iget_message( &
-        instance_index, &
-        message &
-        )
-
-        integer, intent(in) :: instance_index
-
-        character(len=128), intent(out) :: message
-
-        type(ErrorV), pointer :: instance
-
-        call error_v_manager_associate_pointer_with_instance(instance_index, instance)
-
-        message = instance % message
-
-    end subroutine iget_message
 
 end module m_error_v_creation_w

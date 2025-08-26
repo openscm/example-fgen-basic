@@ -16,10 +16,10 @@ from example_fgen_basic.pyfgen_runtime.exceptions import CompiledExtensionNotFou
 
 try:
     from example_fgen_basic._lib import (  # type: ignore
-        m_error_v_creation_w,
+        m_error_v_w,
     )
 except (ModuleNotFoundError, ImportError) as exc:  # pragma: no cover
-    raise CompiledExtensionNotFoundError("example._lib.m_error_v_creation_w") from exc
+    raise CompiledExtensionNotFoundError("example._lib.m_error_v_w") from exc
 
 
 @define
@@ -57,7 +57,7 @@ class ErrorV(FinalisableWrapperBase):
         :
             Error code, retrieved from Fortran
         """
-        code: int = m_error_v_creation_w.iget_code(instance_index=self.instance_index)
+        code: int = m_error_v_w.iget_code(instance_index=self.instance_index)
 
         return code
 
@@ -72,7 +72,7 @@ class ErrorV(FinalisableWrapperBase):
         :
             Error message, retrieved from Fortran
         """
-        message: str = m_error_v_creation_w.iget_message(
+        message: str = m_error_v_w.iget_message(
             instance_index=self.instance_index
         ).decode()
 
