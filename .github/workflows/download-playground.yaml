@@ -31,17 +31,11 @@ jobs:
         env:
           GH_TOKEN: "${{ secrets.PERSONAL_ACCESS_TOKEN }}"
         run: |
-          # gh release download --pattern "*.whl"
-          gh release download --pattern "*.tar.gz"
-      - name: Move artifacts into dist
-        run: |
-          ls
+          gh release download --pattern "*.whl" --dir dist
+          gh release download --pattern "*.tar.gz" --dir dist
+          # Check what we have
           tree
-          # TODO
-          #
-          ls dist
+          tree dist
       # - name: Publish to PyPI
       #   run: |
       #     # uv publish
-      #     # # Just in case, undo the changes to `pyproject.toml`
-      #     # git restore --staged . && git restore .
