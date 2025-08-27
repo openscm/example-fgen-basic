@@ -17,6 +17,7 @@ def main():
     exclude = [
         ".github",
         "docs",
+        "ford_config.md",
         "tests",
         "changelog",
         "stubs",
@@ -25,7 +26,6 @@ def main():
         Path("scripts") / "propogate-pyproject-metadata.py",
         Path("scripts") / "test-install.py",
         Path("scripts") / "changelog-to-release-template.py",
-        Path("scripts") / "print-conda-recipe-pins.py",
         # Keep this one
         # Path("scripts") / "strip-sdist.py",
         ".pre-commit-config.yaml",
