@@ -68,6 +68,8 @@ if pyprojectwheelbuild_enabled
     'src/example_fgen_basic/runtime_helpers.py',
   )
 
+    # The ancillary library,
+    # i.e. all the stuff for wrapping that isn't directly exposed to Python.
    ancillary_lib = library(
       '@0@-ancillary'.format(meson.project_name()),
       sources: srcs_ancillary_lib,
