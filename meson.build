@@ -68,21 +68,21 @@ if pyprojectwheelbuild_enabled
     'src/example_fgen_basic/runtime_helpers.py',
   )
 
-  if host_machine.system() == 'windows'
-    meson.override_find_program('ar', find_program('llvm-lib', required: true))
+  #if host_machine.system() == 'windows'
+    #   meson.override_find_program('ar', find_program('llvm-lib', required: true))
     # also tell Meson to use MSVC-compatible static library
-    ancillary_lib = library(
-      '@0@-ancillary'.format(meson.project_name()),
-      sources: srcs_ancillary_lib,
-      version: meson.project_version(),
-      dependencies: [],
-      install: false,
-      override_options: ['b_vscrt=md', 'default_library=static', 'vs_library_format=lib']
-    )
-  else
+   # ancillary_lib = library(
+    #  '@0@-ancillary'.format(meson.project_name()),
+   #   sources: srcs_ancillary_lib,
+   #   version: meson.project_version(),
+   #   dependencies: [],
+   #   install: false,
+   #   override_options: ['b_vscrt=md', 'default_library=static', 'vs_library_format=lib']
+   # )
+  #else
     # The ancillary library,
     # i.e. all the stuff for wrapping that isn't directly exposed to Python.
-    ancillary_lib = library(
+   ancillary_lib = library(
       '@0@-ancillary'.format(meson.project_name()),
       sources: srcs_ancillary_lib,
       version: meson.project_version(),
@@ -91,7 +91,7 @@ if pyprojectwheelbuild_enabled
       # e.g. dependencies: [fgen_core_dep],
       install: false,
       )
-  endif
+   #endif
 
   ancillary_dep = declare_dependency(link_with: ancillary_lib)
 
