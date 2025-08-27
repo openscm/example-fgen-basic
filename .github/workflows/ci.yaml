@@ -249,6 +249,12 @@ jobs:
           pip install example_fgen_basic*
           python -c 'from example_fgen_basic.get_wavelength import get_wavelength_plain; print(get_wavelength_plain(23.4))'
 
+  # check-build-wheel
+  # For now, decide not to do this as odds of breaking the build are low
+  # (and we already implicitly test this when running the tests).
+  # If we find we are breaking the wheel build inadvertently often,
+  # we can always add this step in.
+
   check-dependency-licences:
     strategy:
       matrix:
