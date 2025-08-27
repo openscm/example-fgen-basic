@@ -80,6 +80,12 @@ that will be performed to be manually specified.
 See the `uv version` docs (specifically the `--bump` flag) for the
 [list of available bump rules](https://docs.astral.sh/uv/reference/cli/#uv-version).
 
+Releasing also includes building of wheels for major operating systems and supported Python versions.
+This is done thanks to [cibuildwheel](https://cibuildwheel.pypa.io/), an incredible service.
+The wheel building can be quite tricky and fiddly.
+If there are issues, we recommend starting with the [cibuildwheel](https://cibuildwheel.pypa.io/) docs
+or raising an issue to discuss with the other maintainers.
+
 ### Standard process
 
 The steps required are the following:
@@ -94,7 +100,8 @@ The steps required are the following:
    (see here:
    [project releases](https://github.com/openscm/example-fgen-basic/releases)).
    Once you are happy with the release
-   (removed placeholders, added key announcements etc.)
+   (removed placeholders, added key announcements,
+   checked that all the expected wheels and source distribution is there etc.)
    then hit 'Publish release'.
    This triggers a release to PyPI
    (which you can then add to the release if you want).

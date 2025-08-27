@@ -24,19 +24,22 @@ jobs:
       # this permission is mandatory for trusted publishing with PyPI
       id-token: write
     steps:
-      - name: Check out repository
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: ./.github/actions/setup
-        with:
-          python-version: ${{ matrix.python-version }}
-          uv-dependency-install-flags: "--all-extras --group dev"
-      - name: Publish to PyPI
+      - name: Download artifacts
+        env:
+          GH_TOKEN: "${{ secrets.PERSONAL_ACCESS_TOKEN }}"
         run: |
-          # TODO: move to using cibuildwheel so we have wheels for multiple platforms and python versions
-          # starting docs: https://cibuildwheel.pypa.io/en/stable/
-          uv build --sdist
-          uv publish
-          # Just in case, undo the changes to `pyproject.toml`
-          git restore --staged . && git restore .
+          gh release download --pattern "*.whl" --dir dist
+          gh release download --pattern "*.tar.gz" --dir dist
+          # Check what we have
+          tree dist
+      - name: Setup uv
+        id: setup-uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "0.8.8"
+      - name: Publish to PyPI
+        run: uv publish

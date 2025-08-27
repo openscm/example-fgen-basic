@@ -80,6 +80,19 @@ jobs:
         os: [ "ubuntu-latest" ]
         # Test against all security and bugfix versions: https://devguide.python.org/versions/
         python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
+        include:
+          # Test other OS's for a 'very stable' Python version too
+          - os: "windows-latest"
+            python-version: "3.11"
+          - os: "macos-latest"
+            python-version: "3.11"
+          # Include other OS for latest Python
+          # because these seem to be the flakiest from experience
+          # so are worth the extra testing
+          - os: "windows-latest"
+            python-version: "3.13"
+          - os: "macos-latest"
+            python-version: "3.13"
     runs-on: "${{ matrix.os }}"
     defaults:
       run:
@@ -91,6 +104,15 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Install Fortran compiler - MacOS
+        # When building on Mac, we need to have a Fortran compiler
+        if: ${{ startsWith(matrix.os, 'macos') }}
+        uses: fortran-lang/setup-fortran@v1
+        id: setup-fortran-macos
+        with:
+          # TODO: figure out whether we need/want to use other compilers too
+          compiler: "gcc"
+          version: "13"
       - uses: ./.github/actions/setup
         with:
           python-version: ${{ matrix.python-version }}
@@ -100,10 +122,9 @@ jobs:
           # when people try to run without installing optional dependencies,
           # we should add a CI step that runs the tests without optional dependencies too.
           # We don't have that right now, because we're not sure this pain point exists.
-          uv-dependency-install-flags: "--all-extras --group tests"
+          uv-dependency-install-flags: "-v --reinstall-package example-fgen-basic -Ccompile-args='-v' --all-extras --group tests "
       - name: Run tests
         run: |
-
           COV_DIR=`uv run --no-sync python -c 'from pathlib import  Path; import example_fgen_basic; print(Path(example_fgen_basic.__file__).parent)'`
           uv run --no-sync pytest -r a -v tests src --doctest-modules --doctest-report ndiff --cov=${COV_DIR} --cov-report=term-missing --cov-report=xml
           uv run --no-sync coverage report
@@ -222,6 +243,11 @@ jobs:
   check-build:
     strategy:
       matrix:
+        # The tests are also effectively a test of the build (at least the Fortran compilation).
+        # This test is really just about checking what is packaged
+        # and that we have all the required pieces.
+        # Hence, for now, only test on ubuntu
+        # (little value testing on other OS's because this test is not testing compilation directly).
         os: [ "ubuntu-latest" ]
         python-version: [ "3.11" ]
     runs-on: "${{ matrix.os }}"
@@ -248,10 +274,15 @@ jobs:
           cd dist
           ls
           python3 -m venv venv
-          # TODO: alter for windows
           source venv/bin/activate
           pip install example_fgen_basic*
           python -c 'from example_fgen_basic.get_wavelength import get_wavelength_plain; print(get_wavelength_plain(23.4))'
+
+  # check-build-wheel
+  # For now, decide not to do this as odds of breaking the build are low
+  # (and we already implicitly test this when running the tests).
+  # If we find we are breaking the wheel build inadvertently often,
+  # we can always add this step in.
 
   check-dependency-licences:
     strategy:
