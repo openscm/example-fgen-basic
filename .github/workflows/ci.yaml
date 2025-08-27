@@ -100,6 +100,15 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Install Fortran compiler - MacOS
+        # When building on Mac, we need to have a Fortran compiler
+        if: ${{ startsWith(matrix.os, 'macos') }}
+        uses: fortran-lang/setup-fortran@v1
+        id: setup-fortran-macos
+        with:
+          # TODO: figure out whether we need/want to use other compilers too
+          compiler: "gcc"
+          version: "13"
       - uses: ./.github/actions/setup
         with:
           python-version: ${{ matrix.python-version }}
