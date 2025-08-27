@@ -67,6 +67,11 @@ jobs:
             # (see https://github.com/fortran-lang/setup-fortran)
             compiler: "gcc"
             compiler-version: "13"
+        exclude:
+          - os: windows-11-arm
+            python-version: 3.9
+          - os: windows-11-arm
+            python-version: 3.10
 
     steps:
     - name: Set up Python "${{ matrix.python-version }}"
@@ -87,7 +92,7 @@ jobs:
         pip install --upgrade pip wheel
         pip install "${{ matrix.install-target }}" ${{ matrix.pip-install-flags }}
     - name: Check no warnings
-      if: matrix.os != 'windows-latest'
+      if: ${{ !(startsWith(matrix.os, 'windows')) }}
       run: |
         # Install and save stderr to file so we can check for missing target errors
         # (re-install is a bit stupid,
@@ -95,13 +100,13 @@ jobs:
         pip install "${{ matrix.install-target }}" 2>stderr.txt
         if grep -q "WARN" stderr.txt; then echo "Warnings in pip install output" && cat stderr.txt && exit 1; else exit 0; fi
     - name: Get version non-windows
-      if: matrix.os != 'windows-latest'
+      if: ${{ !(startsWith(matrix.os, 'windows')) }}
       run: |
         INSTALLED_VERSION=`python -c 'import example_fgen_basic; print(f"v{example_fgen_basic.__version__}")'`
         echo $INSTALLED_VERSION
         echo "INSTALLED_VERSION=$INSTALLED_VERSION" >> $GITHUB_ENV
     - name: Get version windows
-      if: matrix.os == 'windows-latest'
+      if: ${{ startsWith(matrix.os, 'windows') }}
       run: |
         chcp 65001  # use utf-8
         python -c 'import example_fgen_basic; f = open("version.txt", "w"); f.write(f"INSTALLED_VERSION=v{example_fgen_basic.__version__}"); f.close()'
