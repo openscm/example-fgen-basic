@@ -36,7 +36,7 @@ contains
         if (mod(inv, 2) .eq. 0) then
             err = ErrorV(code=1, message="Even number supplied")
         else
-            err = ErrorV(code=0)
+            err = ErrorV(code=NO_ERROR_CODE)
         end if
 
     end function create_error

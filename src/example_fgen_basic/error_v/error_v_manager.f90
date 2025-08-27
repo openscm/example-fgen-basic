@@ -44,6 +44,7 @@ contains
 
     end function get_free_instance_number
 
+    ! Might be a better way to do this as the pointers are a bit confusing, let's see
     subroutine associate_pointer_with_instance(instance_index, instance_pointer)
         !! Associate a pointer with the instance corresponding to the given model index
         !!

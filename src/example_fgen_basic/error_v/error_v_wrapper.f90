@@ -48,6 +48,7 @@ contains
 
         integer, intent(in) :: instance_index
 
+        ! TODO: make this variable length
         character(len=128), intent(out) :: message
 
         type(ErrorV), pointer :: instance

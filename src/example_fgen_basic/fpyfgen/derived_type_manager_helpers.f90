@@ -51,6 +51,8 @@ contains
 
         end do
 
+        ! Should be an error or similar here
+
     end subroutine get_derived_type_free_instance_number
 
     subroutine finalise_derived_type_instance_number(instance_index, n_instances, instance_avail, instance_array)

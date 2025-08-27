@@ -33,6 +33,7 @@ module m_error_v
         ! (means you can stop but also unwind errors and traceback along the way)
 
         ! TODO: think about adding trace (might be simpler than compiling with traceback)
+        ! type(ErrorV), allocatable, dimension(:) :: causes
 
     contains
 

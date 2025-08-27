@@ -39,15 +39,15 @@ contains
 
         type(ErrorV), pointer :: res
 
+        ! Use the pointer more or less like a normal instance of the derived type
+        res = o_create_error(inv)
+
         ! This is the other trick for wrapping.
         ! We have to ensure that we have correctly associated pointers
         ! with the derived type instances we want to 'pass' across the Python-Fortran interface.
         ! Once we've done this, we can then set them more or less like normal derived types.
         res_instance_index = error_v_manager_get_free_instance_number()
         call error_v_manager_associate_pointer_with_instance(res_instance_index, res)
-
-        ! Use the pointer more or less like a normal instance of the derived type
-        res = o_create_error(inv)
         ! Ensure that the instance index is set correctly
         res % instance_index = res_instance_index
 
