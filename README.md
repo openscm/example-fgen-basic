@@ -12,11 +12,6 @@ Basic example of using fgen
 [![PyPI](https://img.shields.io/pypi/v/example-fgen-basic.svg)](https://pypi.org/project/example-fgen-basic/)
 [![PyPI install](https://github.com/openscm/example-fgen-basic/actions/workflows/install-pypi.yaml/badge.svg?branch=main)](https://github.com/openscm/example-fgen-basic/actions/workflows/install-pypi.yaml)
 
-**Conda :**
-[![Conda](https://img.shields.io/conda/vn/conda-forge/example-fgen-basic.svg)](https://anaconda.org/conda-forge/example-fgen-basic)
-[![Conda platforms](https://img.shields.io/conda/pn/conda-forge/example-fgen-basic.svg)](https://anaconda.org/conda-forge/example-fgen-basic)
-[![Conda install](https://github.com/openscm/example-fgen-basic/actions/workflows/install-conda.yaml/badge.svg?branch=main)](https://github.com/openscm/example-fgen-basic/actions/workflows/install-conda.yaml)
-
 **Tests :**
 [![CI](https://github.com/openscm/example-fgen-basic/actions/workflows/ci.yaml/badge.svg?branch=main)](https://github.com/openscm/example-fgen-basic/actions/workflows/ci.yaml)
 [![Coverage](https://codecov.io/gh/openscm/example-fgen-basic/branch/main/graph/badge.svg)](https://codecov.io/gh/openscm/example-fgen-basic)
@@ -65,16 +60,6 @@ because of breaking updates to dependencies.
 
 The locked version of Example fgen - basic can be installed with
 
-=== "mamba"
-    ```sh
-    mamba install -c conda-forge example-fgen-basic-locked
-    ```
-
-=== "conda"
-    ```sh
-    conda install -c conda-forge example-fgen-basic-locked
-    ```
-
 === "pip"
     ```sh
     pip install 'example-fgen-basic[locked]'
@@ -99,32 +84,12 @@ please [raise an issue](https://github.com/openscm/example-fgen-basic/issues).
 
 The (non-locked) version of Example fgen - basic can be installed with
 
-=== "mamba"
-    ```sh
-    mamba install -c conda-forge example-fgen-basic
-    ```
-
-=== "conda"
-    ```sh
-    conda install -c conda-forge example-fgen-basic
-    ```
-
 === "pip"
     ```sh
     pip install example-fgen-basic
     ```
 
 Additional dependencies can be installed using
-
-=== "mamba"
-    If you are installing with mamba, we recommend
-    installing the extras by hand because there is no stable
-    solution yet (see [conda issue #7502](https://github.com/conda/conda/issues/7502))
-
-=== "conda"
-    If you are installing with conda, we recommend
-    installing the extras by hand because there is no stable
-    solution yet (see [conda issue #7502](https://github.com/conda/conda/issues/7502))
 
 === "pip"
     ```sh
