@@ -115,7 +115,7 @@ jobs:
     #   id-token: write
     runs-on: ubuntu-latest
     steps:
-      - name: Download artefacts
+      - name: Download artifacts
         uses: actions/download-artifact@v5
         with:
           pattern: cibw-*
