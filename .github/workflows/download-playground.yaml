@@ -1,8 +1,7 @@
-name: Deploy
+name: Download playground
 
 on:
-  release:
-    types: [published]
+  push:
 
 defaults:
   run:
@@ -14,28 +13,29 @@ jobs:
     # Having an environment for deployment is strongly recommend by PyPI
     # https://docs.pypi.org/trusted-publishers/adding-a-publisher/#github-actions
     # You can comment this line out if you don't want it.
-    environment: deploy
+    # environment: deploy
     strategy:
       matrix:
         os: [ "ubuntu-latest" ]
         python-version: [ "3.11" ]
     runs-on: "${{ matrix.os }}"
-    permissions:
-      # this permission is mandatory for trusted publishing with PyPI
-      id-token: write
+    # permissions:
+    #   # this permission is mandatory for trusted publishing with PyPI
+    #   id-token: write
     steps:
-      # TODO: figure out how to download from release step
       - name: Download artifacts
         run: |
-          gh release download --pattern "*.whl"
+          # gh release download --pattern "*.whl"
           gh release download --pattern "*.tar.gz"
       - name: Move artifacts into dist
         run: |
+          ls
+          tree
           # TODO
-          gh release download --pattern "*.whl"
-          gh release download --pattern "*.tar.gz"
-      - name: Publish to PyPI
-        run: |
-          # uv publish
-          # # Just in case, undo the changes to `pyproject.toml`
-          # git restore --staged . && git restore .
+          #
+          ls dist
+      # - name: Publish to PyPI
+      #   run: |
+      #     # uv publish
+      #     # # Just in case, undo the changes to `pyproject.toml`
+      #     # git restore --staged . && git restore .
