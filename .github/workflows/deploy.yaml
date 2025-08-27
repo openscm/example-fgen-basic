@@ -35,7 +35,6 @@ jobs:
           gh release download --pattern "*.whl" --dir dist
           gh release download --pattern "*.tar.gz" --dir dist
           # Check what we have
-          tree
           tree dist
       - name: Setup uv
         id: setup-uv
