@@ -118,10 +118,9 @@ jobs:
           # when people try to run without installing optional dependencies,
           # we should add a CI step that runs the tests without optional dependencies too.
           # We don't have that right now, because we're not sure this pain point exists.
-          uv-dependency-install-flags: "-v --reinstall-package example-fgen-basic -Ccompile-args='-v' --all-extras --group tests"
+          uv-dependency-install-flags: "-v --reinstall-package example-fgen-basic -Ccompile-args='-v' --all-extras --group tests "
       - name: Run tests
         run: |
-
           COV_DIR=`uv run --no-sync python -c 'from pathlib import  Path; import example_fgen_basic; print(Path(example_fgen_basic.__file__).parent)'`
           uv run --no-sync pytest -r a -v tests src --doctest-modules --doctest-report ndiff --cov=${COV_DIR} --cov-report=term-missing --cov-report=xml
           uv run --no-sync coverage report
@@ -240,6 +239,11 @@ jobs:
   check-build:
     strategy:
       matrix:
+        # The tests are also effectively a test of the build (at least the Fortran compilation).
+        # This test is really just about checking what is packaged
+        # and that we have all the required pieces.
+        # Hence, for now, only test on ubuntu
+        # (little value testing on other OS's because this test is not testing compilation directly).
         os: [ "ubuntu-latest" ]
         python-version: [ "3.11" ]
     runs-on: "${{ matrix.os }}"
@@ -266,7 +270,6 @@ jobs:
           cd dist
           ls
           python3 -m venv venv
-          # TODO: alter for windows
           source venv/bin/activate
           pip install example_fgen_basic*
           python -c 'from example_fgen_basic.get_wavelength import get_wavelength_plain; print(get_wavelength_plain(23.4))'
