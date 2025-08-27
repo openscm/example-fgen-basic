@@ -23,6 +23,10 @@ jobs:
     #   # this permission is mandatory for trusted publishing with PyPI
     #   id-token: write
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Download artifacts
         env:
           GH_TOKEN: "${{ secrets.PERSONAL_ACCESS_TOKEN }}"
