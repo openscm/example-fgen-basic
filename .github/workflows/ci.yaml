@@ -118,7 +118,7 @@ jobs:
           # when people try to run without installing optional dependencies,
           # we should add a CI step that runs the tests without optional dependencies too.
           # We don't have that right now, because we're not sure this pain point exists.
-          uv-dependency-install-flags: "--all-extras --group tests"
+          uv-dependency-install-flags: "-v --reinstall-package example-fgen-basic -Ccompile-args='-v' --all-extras --group tests"
       - name: Run tests
         run: |
 
