@@ -24,6 +24,8 @@ jobs:
     #   id-token: write
     steps:
       - name: Download artifacts
+        env:
+          GH_TOKEN: "${{ secrets.PERSONAL_ACCESS_TOKEN }}"
         run: |
           # gh release download --pattern "*.whl"
           gh release download --pattern "*.tar.gz"
