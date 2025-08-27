@@ -21,6 +21,21 @@ from the examples given in that link.
 
 <!-- towncrier release notes start -->
 
+## Example fgen - basic v0.1.9 (2025-08-27)
+
+### 🆕 Features
+
+- Added compilation and publication to PyPI of wheels for major OS's and supported Python versions ([#21](https://github.com/openscm/example-fgen-basic/pull/21))
+
+### 📚 Improved Documentation
+
+- Added documentation of the Fortran back-end/API using [ford](https://forddocs.readthedocs.io/en/stable/) ([#16](https://github.com/openscm/example-fgen-basic/pull/16))
+
+### 🔧 Trivial/Internal Changes
+
+- [#15](https://github.com/openscm/example-fgen-basic/pull/15), [#17](https://github.com/openscm/example-fgen-basic/pull/17), [#18](https://github.com/openscm/example-fgen-basic/pull/18)
+
+
 ## Example fgen - basic v0.1.8 (2025-08-19)
 
 ### 🐛 Bug Fixes
