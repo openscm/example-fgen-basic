@@ -17,6 +17,7 @@ def main():
     exclude = [
         ".github",
         "docs",
+        "ford_config.md",
         "tests",
         "changelog",
         "stubs",
