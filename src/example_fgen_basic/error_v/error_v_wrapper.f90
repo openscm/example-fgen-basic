@@ -9,16 +9,59 @@ module m_error_v_w
 
     ! The manager module, which makes this all work
     use m_error_v_manager, only: &
-        get_free_instance_number, &
+        error_v_manager_get_free_instance_number => get_free_instance_number, &
+        error_v_manager_finalise_instance => finalise_instance, &
         error_v_manager_associate_pointer_with_instance => associate_pointer_with_instance
         ! TODO: build and finalisation
 
     implicit none
     private
 
-    public :: get_free_instance_number, iget_code, iget_message
+    public :: get_free_instance_number, instance_build, instance_finalise, &
+              iget_code, iget_message
 
 contains
+
+    function get_free_instance_number() result(instance_index)
+
+        integer :: instance_index
+
+        instance_index = error_v_manager_get_free_instance_number()
+
+    end function get_free_instance_number
+
+    subroutine instance_build(instance_index, code, message)
+        !> Build an instance
+
+        integer, intent(in) :: instance_index
+        !! Instance index
+        !
+        ! This is the major trick for wrapping.
+        ! We pass instance indexes (integers) to Python rather than the instance itself.
+
+        integer, intent(in) :: code
+        character(len=*), optional, intent(in) :: message
+
+        type(ErrorV), pointer :: instance
+
+        call error_v_manager_associate_pointer_with_instance(instance_index, instance)
+
+        call instance % build(code, message)
+
+    end subroutine instance_build
+
+    subroutine instance_finalise(instance_index)
+        !> Finalise an instance
+
+        integer, intent(in) :: instance_index
+        !! Instance index
+        !
+        ! This is the major trick for wrapping.
+        ! We pass instance indexes (integers) to Python rather than the instance itself.
+
+        call error_v_manager_finalise_instance(instance_index)
+
+    end subroutine instance_finalise
 
     ! Full set of wrapping strategies to pass different types in e.g.
     ! https://gitlab.com/magicc/fgen/-/blob/switch-to-uv/tests/test-data/exposed_attrs/src/exposed_attrs/exposed_attrs_wrapped.f90

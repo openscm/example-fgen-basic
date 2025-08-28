@@ -19,7 +19,7 @@ module m_error_v_creation_w
     implicit none
     private
 
-    public :: create_error, create_error_ptr_based
+    public :: create_error
 
 contains
 
@@ -39,45 +39,22 @@ contains
 
         type(ErrorV), pointer :: res
 
-        ! Use the pointer more or less like a normal instance of the derived type
-        res = o_create_error(inv)
-
         ! This is the other trick for wrapping.
         ! We have to ensure that we have correctly associated pointers
         ! with the derived type instances we want to 'pass' across the Python-Fortran interface.
         ! Once we've done this, we can then set them more or less like normal derived types.
         res_instance_index = error_v_manager_get_free_instance_number()
+        ! We have to associate res with the right index
+        ! before we can set it to the output of the function call
+        ! (in this case `o_create_error`).
         call error_v_manager_associate_pointer_with_instance(res_instance_index, res)
+
+        ! Use the pointer more or less like a normal instance of the derived type
+        res = o_create_error(inv)
+
         ! Ensure that the instance index is set correctly
         res % instance_index = res_instance_index
 
     end subroutine create_error
-
-    subroutine create_error_ptr_based(inv, res_instance_ptr)
-    ! Needs to be subroutine to have the created instance persist I think
-    ! (we can check)
-    ! function create_error(inv) result(res_instance_index)
-
-        integer, intent(in) :: inv
-        !! Input value to use to create the error
-
-        !f2py integer(8), intent(out) :: res_instance_ptr
-        type(c_ptr), intent(out) :: res_instance_ptr
-        !! Pointer to the resulting instance
-        !
-        ! This is the major trick for wrapping.
-        ! We return pointers (passed as integers) to Python rather than the instance itself.
-
-        type(ErrorV), pointer :: res
-
-        ! Question is: when does this get deallocated?
-        ! When we go out of scope?
-        ! If yes, that will be why we had to do this array thing.
-        allocate(res)
-        res = o_create_error(inv)
-
-        res_instance_ptr = c_loc(res)
-
-    end subroutine create_error_ptr_based
 
 end module m_error_v_creation_w

@@ -4,7 +4,7 @@ Demonstration of how to return an error (i.e. derived type)
 
 from __future__ import annotations
 
-from example_fgen_basic.error_v.error_v import ErrorV, ErrorVPtrBased
+from example_fgen_basic.error_v.error_v import ErrorV
 from example_fgen_basic.pyfgen_runtime.exceptions import CompiledExtensionNotFoundError
 
 try:
@@ -22,18 +22,5 @@ def create_error(inv: int) -> ErrorV:
     instance_index = m_error_v_creation_w.create_error(inv)
 
     error = ErrorV(instance_index)
-
-    return error
-
-
-def create_error_ptr_based(inv: int) -> ErrorVPtrBased:
-    """
-    Create an instance of error (a wrapper around our Fortran derived type)
-
-    Uses the pointer based logic
-    """
-    instance_ptr = m_error_v_creation_w.create_error_ptr_based(inv)
-
-    error = ErrorVPtrBased(instance_ptr)
 
     return error

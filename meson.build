@@ -52,7 +52,6 @@ if pyprojectwheelbuild_enabled
   # Injected with `script/inject-srcs-into-meson-build.py`
   srcs = files(
     'src/example_fgen_basic/error_v/creation_wrapper.f90',
-    'src/example_fgen_basic/error_v/error_v_ptr_based_wrapper.f90',
     'src/example_fgen_basic/error_v/error_v_wrapper.f90',
     'src/example_fgen_basic/get_wavelength_wrapper.f90',
   )

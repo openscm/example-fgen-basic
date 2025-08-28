@@ -165,140 +165,10 @@ def check_initialised(
     return checked  # type: ignore
 
 
-@define
-class FinalisableWrapperBasePtrBased(ABC):
-    """
-    Base class for Fortran derived type wrappers using the pointer-based passing
-    """
-
-    instance_ptr: int | None = None
-    """
-    Pointer to Fortran instance (technically a C pointer)
-    """
-
-    def __str__(self) -> str:
-        """
-        Get string representation of self
-        """
-        return to_str(
-            self,
-            self.exposed_attributes,
-        )
-
-    def _repr_pretty_(self, p: Any, cycle: bool) -> None:
-        """
-        Get pretty representation of self
-
-        Used by IPython notebooks and other tools
-        """
-        to_pretty(
-            self,
-            self.exposed_attributes,
-            p=p,
-            cycle=cycle,
-        )
-
-    def _repr_html_(self) -> str:
-        """
-        Get html representation of self
-
-        Used by IPython notebooks and other tools
-        """
-        return to_html(
-            self,
-            self.exposed_attributes,
-        )
-
-    @property
-    def initialised(self) -> bool:
-        """
-        Is the instance initialised, i.e. connected to a Fortran instance?
-        """
-        return self.instance_ptr is not None
-
-    @property
-    @abstractmethod
-    def exposed_attributes(self) -> tuple[str, ...]:
-        """
-        Attributes exposed by this wrapper
-        """
-        ...
-
-    @classmethod
-    @abstractmethod
-    def from_new_connection(cls) -> FinalisableWrapperBase:
-        """
-        Initialise by establishing a new connection with the Fortran module
-
-        This requests a new model index from the Fortran module and then
-        initialises a class instance.
-
-        Returns
-        -------
-        :
-            New class instance
-        """
-        ...
-
-    @abstractmethod
-    def finalise(self) -> None:
-        """
-        Finalise the Fortran instance and set self back to being uninitialised
-
-        This method resets `self.instance_ptr` back to `None`.
-
-        Should be decorated with :func:`check_initialised`
-        """
-        # call to Fortran module goes here when implementing
-        self._uninitialise_instance_ptr()
-
-    def _uninitialise_instance_ptr(self) -> None:
-        self.instance_ptr = None
-
-
-WrapperPtrBased = TypeVar("WrapperPtrBased", bound=FinalisableWrapperBasePtrBased)
-
-
-def check_initialised_ptr_based(
-    method: Callable[Concatenate[WrapperPtrBased, P], T],
-) -> Callable[Concatenate[WrapperPtrBased, P], T]:
-    """
-    Check that the wrapper object has been initialised before executing the method
-
-    Parameters
-    ----------
-    method
-        Method to wrap
-
-    Returns
-    -------
-    :
-        Wrapped method
-
-    Raises
-    ------
-    InitialisationError
-        Wrapper is not initialised
-    """
-
-    @wraps(method)
-    def checked(
-        ref: WrapperPtrBased,
-        *args: P.args,
-        **kwargs: P.kwargs,
-    ) -> Any:
-        if not ref.initialised:
-            raise NotInitialisedError(ref, method)
-
-        return method(ref, *args, **kwargs)
-
-    return checked  # type: ignore
-
-
 # Thank you for type hints info
 # https://adamj.eu/tech/2021/05/11/python-type-hints-args-and-kwargs/
-def execute_finalise_on_fail_ptr_based(
-    inst: FinalisableWrapperBasePtrBased,
+def execute_finalise_on_fail(
+    inst: FinalisableWrapperBase,
     func_to_try: Callable[Concatenate[int, P], T],
     *args: P.args,
     **kwargs: P.kwargs,
@@ -309,6 +179,9 @@ def execute_finalise_on_fail_ptr_based(
     This function is most useful in factory functions where it provides a
     clean way of ensuring that any Fortran is freed up in the event of an
     initialisation failure for any reason
+
+    @Marco note: I'm not sure this is a very good pattern,
+    we may get rid of it.
 
     Parameters
     ----------
@@ -337,7 +210,7 @@ def execute_finalise_on_fail_ptr_based(
         exception is raised, `inst.finalise()` is called.
     """
     try:
-        return func_to_try(inst.instance_ptr, *args, **kwargs)
+        return func_to_try(inst.instance_index, *args, **kwargs)
     except RuntimeError:
         # finalise the instance before raising
         inst.finalise()
