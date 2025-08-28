@@ -1,1 +1,0 @@
-- TODO: ZN to write implementation notes and why we don't use a pure pointer based solution
