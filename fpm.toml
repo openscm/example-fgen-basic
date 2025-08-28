@@ -1,0 +1,15 @@
+name = "my_fortran_project"
+version = "0.1.0"
+license = "MIT"
+description = "An example Fortran project using fpm and Fortitude"
+
+[build]
+src-dir = "src/example-fgen-basic"
+
+[dependencies]
+# List dependencies here if any
+
+[extra.fortitude.check]
+select = ["C", "E", "S"]  # Enable certain error/warning categories
+ignore = ["C003","C132","C002"]         # Ignore specific warnings
+line-length = 120         # Max allowed line length
