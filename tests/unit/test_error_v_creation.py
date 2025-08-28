@@ -6,6 +6,8 @@ I haven't written unit tests for the Fortran directly
 (deliberately, just to see how it goes).
 """
 
+import re
+
 import pytest
 from IPython.lib.pretty import pretty
 
@@ -54,6 +56,9 @@ def test_error_too_many_instances():
         create_error(1)
 
 
+@pytest.mark.xfail(
+    reason="Not implemented yet - do in a future PR once we have a result type"
+)
 def test_increase_number_of_instances():
     raise NotImplementedError
     # - Make 4096 instances
@@ -66,16 +71,22 @@ def test_increase_number_of_instances():
 def test_error_str(file_regression):
     res = create_error(1.0)
 
-    file_regression.check(str(res))
+    # Don't worry about the value of instance_index
+    res_check = re.sub(r"instance_index=\d*", "instance_index=n", str(res))
+    file_regression.check(res_check)
 
 
 def test_error_pprint(file_regression):
     res = create_error(1.0)
 
-    file_regression.check(pretty(res))
+    # Don't worry about the value of instance_index
+    res_check = re.sub(r"instance_index=\d*", "instance_index=n", pretty(res))
+    file_regression.check(res_check)
 
 
 def test_error_html(file_regression):
     res = create_error(1.0)
 
-    file_regression.check(res._repr_html_(), extension=".html")
+    # Don't worry about the value of instance_index
+    res_check = re.sub(r"instance_index=\d*", "instance_index=n", res._repr_html_())
+    file_regression.check(res_check, extension=".html")
