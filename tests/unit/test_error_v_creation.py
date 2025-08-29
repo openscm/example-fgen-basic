@@ -1,18 +1,16 @@
 """
 Tests of `example_fgen_basic.error_v.creation`
-
-Note that this is the only test of the Fortran code.
-I haven't written unit tests for the Fortran directly
-(deliberately, just to see how it goes).
 """
 
-import re
-
-import pytest
-from IPython.lib.pretty import pretty
+import numpy as np
 
 from example_fgen_basic.error_v import ErrorV
-from example_fgen_basic.error_v.creation import create_error
+from example_fgen_basic.error_v.creation import create_error, create_errors
+
+# Tests to write:
+# - passing derived types to Fortran (new test module)
+# - retrieving multiple derived type instances from Fortran
+#   (basically checking the manager's auto-resizing of the number of instances)
 
 
 def test_create_error_odd():
@@ -43,50 +41,24 @@ def test_create_error_negative():
     assert res.message == "Negative number supplied"
 
 
-def test_error_too_many_instances():
-    # @Marco we will fix this when we introduce a result type in a future step
-    pytest.skip("Causes segfault right now")
-    # - if we create more errors than we have available, we don't segfault.
-    #   Instead, we should get an error back.
-    #   That error should just use the instance ID of the last available array index
-    #   (it is ok to overwrite an already used error to avoid a complete failure,
-    #   but we should probably include that we did this in the error message).
-    # TODO: expect error here
-    for _ in range(4097):
+def test_create_error_lots_of_repeated_calls():
+    # We should be able to just keep calling `create_error`
+    # without hitting segfaults or other weirdness.
+    # This is basically testing that we're freeing the temporary
+    # Fortran derived types correctly
+    # (and sort of a speed test, this shouldn't be noticeably slow)
+    # hence we may move this test somewhere more generic at some point.
+    for _ in range(1e5):
         create_error(1)
 
 
-@pytest.mark.xfail(
-    reason="Not implemented yet - do in a future PR once we have a result type"
-)
-def test_increase_number_of_instances():
-    raise NotImplementedError
-    # - Make 4096 instances
-    # - show that making one more raises an error
-    # - increase number of instances
-    # - show that making one more now works without error
+def test_create_multiple_errors():
+    res = create_errors(np.arange(6))
 
-
-# Some test to illustrate what the formatting does
-def test_error_str(file_regression):
-    res = create_error(1.0)
-
-    # Don't worry about the value of instance_index
-    res_check = re.sub(r"instance_index=\d*", "instance_index=n", str(res))
-    file_regression.check(res_check)
-
-
-def test_error_pprint(file_regression):
-    res = create_error(1.0)
-
-    # Don't worry about the value of instance_index
-    res_check = re.sub(r"instance_index=\d*", "instance_index=n", pretty(res))
-    file_regression.check(res_check)
-
-
-def test_error_html(file_regression):
-    res = create_error(1.0)
-
-    # Don't worry about the value of instance_index
-    res_check = re.sub(r"instance_index=\d*", "instance_index=n", res._repr_html_())
-    file_regression.check(res_check, extension=".html")
+    for i, v in enumerate(res):
+        if i % 2 == 0:
+            assert res.code == 1
+            assert res.message == "Even number supplied"
+        else:
+            assert res.code == 0
+            assert res.message == ""
