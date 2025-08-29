@@ -11,10 +11,12 @@ module m_error_v_manager
     implicit none
     private
 
-    type(ErrorV), dimension(1) :: instance_array
-    logical, dimension(1) :: instance_available = .true.
+    type(ErrorV), dimension(:), allocatable :: instance_array
+    logical, dimension(:), allocatable :: instance_available
 
-    public :: finalise_instance, get_available_instance_index, get_instance, set_instance_index_to
+    ! TODO: think about ordering here, alphabetical probably easiest
+    public :: finalise_instance, get_available_instance_index, get_instance, set_instance_index_to, &
+              ensure_instance_array_size_is_at_least
 
 contains
 
@@ -109,5 +111,35 @@ contains
         end if
 
     end subroutine check_index_claimed
+
+    subroutine ensure_instance_array_size_is_at_least(n)
+        !! Ensure that `instance_array` and `instance_available` have at least `n` slots
+
+        integer, intent(in) :: n
+
+        type(ErrorV), dimension(:), allocatable :: tmp_instances
+        logical, dimension(:), allocatable :: tmp_available
+
+        if (.not. allocated(instance_array)) then
+
+            allocate(instance_array(n))
+
+            allocate(instance_available(n))
+            ! Race conditions ?
+            instance_available = .true.
+
+        elseif (size(instance_available) < n) then
+
+            allocate(tmp_instances(n))
+            tmp_instances(1:size(instance_array)) = instance_array
+            call move_alloc(tmp_instances, instance_array)
+
+            allocate(tmp_available(n))
+            tmp_available(1:size(instance_available)) = instance_available
+            call move_alloc(tmp_available, instance_available)
+
+        end if
+
+    end subroutine ensure_instance_array_size_is_at_least
 
 end module m_error_v_manager

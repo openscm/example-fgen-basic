@@ -11,7 +11,7 @@ module m_error_v_creation
     implicit none
     private
 
-    public :: create_error
+    public :: create_error, create_errors
 
 contains
 
@@ -40,5 +40,31 @@ contains
         end if
 
     end function create_error
+
+    function create_errors(invs, n) result(errs)
+        !! Create a number of errors
+        !!
+        !! If an odd number is supplied, the error code is no error (TODO: cross-ref).
+        !! If an even number is supplied, the error code is 1.
+        !! If a negative number is supplied, the error code is 2.
+
+        integer, dimension(n), intent(in) :: invs
+        !! Values to use to create the error
+
+        integer, intent(in) :: n
+        !! Number of values to create
+
+        type(ErrorV), dimension(n) :: errs
+        !! Created errors
+
+        integer :: i
+
+        do i = 1, n
+
+            errs(i) = create_error(invs(i))
+
+        end do
+
+    end function create_errors
 
 end module m_error_v_creation

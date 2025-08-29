@@ -6,18 +6,21 @@ module m_error_v_creation_w
 
     ! => allows us to rename on import to avoid clashes
     ! "o_" for original (TODO: better naming convention)
-    use m_error_v_creation, only: o_create_error => create_error
+    use m_error_v_creation, only: &
+        o_create_error => create_error, &
+        o_create_errors => create_errors
     use m_error_v, only: ErrorV
 
     ! The manager module, which makes this all work
     use m_error_v_manager, only: &
         error_v_manager_get_available_instance_index => get_available_instance_index, &
-        error_v_manager_set_instance_index_to => set_instance_index_to
+        error_v_manager_set_instance_index_to => set_instance_index_to, &
+        error_v_manager_ensure_instance_array_size_is_at_least => ensure_instance_array_size_is_at_least
 
     implicit none
     private
 
-    public :: create_error
+    public :: create_error, create_errors
 
 contains
 
@@ -41,6 +44,8 @@ contains
         ! Do the Fortran call
         res = o_create_error(inv)
 
+        call error_v_manager_ensure_instance_array_size_is_at_least(1)
+
         ! Get the instance index to return to Python
         call error_v_manager_get_available_instance_index(res_instance_index)
 
@@ -49,5 +54,49 @@ contains
         call error_v_manager_set_instance_index_to(res_instance_index, res)
 
     end function create_error
+
+    function create_errors(invs, n) result(res_instance_indexes)
+        !! Wrapper around `m_error_v_creation.create_errors` (TODO: x-ref)
+
+        integer, dimension(n), intent(in) :: invs
+        !! Input value to use to create the error
+        !!
+        !! See docstring of `m_error_v_creation.create_error` for details.
+        !! [TODO: x-ref]
+
+        integer, intent(in) :: n
+        !! Number of values to create
+
+        integer, dimension(n) :: res_instance_indexes
+        !! Instance indexes of the result
+        !
+        ! This is the major trick for wrapping.
+        ! We return instance indexes (integers) to Python rather than the instance itself.
+
+        type(ErrorV), dimension(n) :: res
+
+        integer :: i, tmp
+
+        ! Lots of ways resizing could work.
+        ! Optimising could be very tricky.
+        ! Just do something stupid for now to see the pattern.
+        call error_v_manager_ensure_instance_array_size_is_at_least(n)
+
+        ! Do the Fortran call
+        res = o_create_errors(invs, n)
+
+        do i = 1, n
+
+            ! Get the instance index to return to Python
+            call error_v_manager_get_available_instance_index(tmp)
+            ! Set the derived type value in the manager's array,
+            ! ready for its attributes to be retrieved from Python.
+            call error_v_manager_set_instance_index_to(tmp, res(i))
+            ! Set the result in the output array
+            res_instance_indexes(i) = tmp
+
+        end do
+
+    end function create_errors
 
 end module m_error_v_creation_w
