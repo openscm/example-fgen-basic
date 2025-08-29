@@ -15,10 +15,28 @@ module m_error_v_manager
     logical, dimension(:), allocatable :: instance_available
 
     ! TODO: think about ordering here, alphabetical probably easiest
-    public :: finalise_instance, get_available_instance_index, get_instance, set_instance_index_to, &
+    public :: build_instance, finalise_instance, get_available_instance_index, get_instance, set_instance_index_to, &
               ensure_instance_array_size_is_at_least
 
 contains
+
+    function build_instance(code, message) result(instance_index)
+        !! Build an instance
+
+        integer, intent(in) :: code
+        !! Error code
+
+        character(len=*), optional, intent(in) :: message
+        !! Error message
+
+        integer :: instance_index
+        !! Index of the built instance
+
+        call ensure_instance_array_size_is_at_least(1)
+        call get_available_instance_index(instance_index)
+        call instance_array(instance_index) % build(code=code, message=message)
+
+    end function build_instance
 
     subroutine finalise_instance(instance_index)
         !! Finalise an instance
@@ -59,7 +77,6 @@ contains
         end do
 
         ! TODO: switch to returning a Result type with an error set
-        print *, "No free indexes"
         error stop 1
 
     end subroutine get_available_instance_index
@@ -112,9 +129,6 @@ contains
 
     end subroutine check_index_claimed
 
-    ! TODO: think about exposing this to Python
-    ! so power users can ensure there are enough arrays at the start
-    ! rather than relying on automatic resizing.
     subroutine ensure_instance_array_size_is_at_least(n)
         !! Ensure that `instance_array` and `instance_available` have at least `n` slots
 
@@ -139,6 +153,7 @@ contains
 
             allocate(tmp_available(n))
             tmp_available(1:size(instance_available)) = instance_available
+            tmp_available(size(instance_available) + 1:size(tmp_available)) = .true.
             call move_alloc(tmp_available, instance_available)
 
         end if

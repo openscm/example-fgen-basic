@@ -53,6 +53,7 @@ if pyprojectwheelbuild_enabled
   srcs = files(
     'src/example_fgen_basic/error_v/creation_wrapper.f90',
     'src/example_fgen_basic/error_v/error_v_wrapper.f90',
+    'src/example_fgen_basic/error_v/passing_wrapper.f90',
     'src/example_fgen_basic/get_wavelength_wrapper.f90',
   )
 
@@ -62,6 +63,7 @@ if pyprojectwheelbuild_enabled
     'src/example_fgen_basic/error_v/creation.f90',
     'src/example_fgen_basic/error_v/error_v.f90',
     'src/example_fgen_basic/error_v/error_v_manager.f90',
+    'src/example_fgen_basic/error_v/passing.f90',
     'src/example_fgen_basic/fpyfgen/base_finalisable.f90',
     'src/example_fgen_basic/fpyfgen/derived_type_manager_helpers.f90',
     'src/example_fgen_basic/get_wavelength.f90',
@@ -75,12 +77,11 @@ if pyprojectwheelbuild_enabled
     'src/example_fgen_basic/error_v/__init__.py',
     'src/example_fgen_basic/error_v/creation.py',
     'src/example_fgen_basic/error_v/error_v.py',
+    'src/example_fgen_basic/error_v/passing.py',
     'src/example_fgen_basic/exceptions.py',
     'src/example_fgen_basic/get_wavelength.py',
     'src/example_fgen_basic/pyfgen_runtime/__init__.py',
-    'src/example_fgen_basic/pyfgen_runtime/base_finalisable.py',
     'src/example_fgen_basic/pyfgen_runtime/exceptions.py',
-    'src/example_fgen_basic/pyfgen_runtime/formatting.py',
   )
 
     # The ancillary library,

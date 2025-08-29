@@ -27,11 +27,11 @@ def test_pass_error_lots_of_repeated_calls():
     # Fortran derived types correctly
     # (and sort of a speed test, this shouldn't be noticeably slow)
     # hence we may move this test somewhere more generic at some point.
-    for _ in range(1e5):
+    for _ in range(int(1e5)):
         pass_error(ErrorV(code=0))
 
 
 def test_pass_multiple_errors():
     res = pass_errors([ErrorV(code=0), ErrorV(code=0), ErrorV(code=1)])
 
-    np.testing.assert_all_equal(res, np.array([True, True, False]))
+    np.testing.assert_array_equal(res, np.array([False, False, True]))
