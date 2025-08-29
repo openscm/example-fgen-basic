@@ -7,11 +7,6 @@ import numpy as np
 from example_fgen_basic.error_v import ErrorV
 from example_fgen_basic.error_v.creation import create_error, create_errors
 
-# Tests to write:
-# - passing derived types to Fortran (new test module)
-# - retrieving multiple derived type instances from Fortran
-#   (basically checking the manager's auto-resizing of the number of instances)
-
 
 def test_create_error_odd():
     res = create_error(1.0)
