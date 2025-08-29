@@ -112,6 +112,9 @@ contains
 
     end subroutine check_index_claimed
 
+    ! TODO: think about exposing this to Python
+    ! so power users can ensure there are enough arrays at the start
+    ! rather than relying on automatic resizing.
     subroutine ensure_instance_array_size_is_at_least(n)
         !! Ensure that `instance_array` and `instance_available` have at least `n` slots
 

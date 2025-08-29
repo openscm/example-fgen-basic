@@ -52,8 +52,8 @@ def test_create_multiple_errors():
 
     for i, v in enumerate(res):
         if i % 2 == 0:
-            assert res.code == 1
-            assert res.message == "Even number supplied"
+            assert v.code == 1
+            assert v.message == "Even number supplied"
         else:
-            assert res.code == 0
-            assert res.message == ""
+            assert v.code == 0
+            assert v.message == ""

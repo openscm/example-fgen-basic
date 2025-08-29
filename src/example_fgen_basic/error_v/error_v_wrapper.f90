@@ -15,7 +15,7 @@ module m_error_v_w
     implicit none
     private
 
-    public :: finalise_instance, &
+    public :: finalise_instance, finalise_instances, &
               get_code, get_message
 
 contains
@@ -32,6 +32,24 @@ contains
         call error_v_manager_finalise_instance(instance_index)
 
     end subroutine finalise_instance
+
+
+    subroutine finalise_instances(instance_indexes)
+        !! Finalise an instance
+
+        integer, dimension(:), intent(in) :: instance_indexes
+        !! Instance indexes to finalise
+        !
+        ! This is the major trick for wrapping.
+        ! We pass instance indexes (integers) to Python rather than the instance itself.
+
+        integer :: i
+
+        do i = 1, size(instance_indexes)
+            call error_v_manager_finalise_instance(instance_indexes(i))
+        end do
+
+    end subroutine finalise_instances
 
     ! Full set of wrapping strategies to get/pass different types in e.g.
     ! https://gitlab.com/magicc/fgen/-/blob/switch-to-uv/tests/test-data/exposed_attrs/src/exposed_attrs/exposed_attrs_wrapped.f90
