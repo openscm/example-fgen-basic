@@ -4,17 +4,15 @@
 !> Generation to be automated in future (including docstrings of some sort).
 module m_error_v_creation_w
 
-    use iso_c_binding, only: c_ptr, c_loc
-
     ! => allows us to rename on import to avoid clashes
+    ! "o_" for original (TODO: better naming convention)
     use m_error_v_creation, only: o_create_error => create_error
     use m_error_v, only: ErrorV
 
     ! The manager module, which makes this all work
     use m_error_v_manager, only: &
-        error_v_manager_get_free_instance_number => get_free_instance_number, &
-        error_v_manager_associate_pointer_with_instance => associate_pointer_with_instance
-        ! TODO: finalisation
+        error_v_manager_get_available_instance_index => get_available_instance_index, &
+        error_v_manager_set_instance_index_to => set_instance_index_to
 
     implicit none
     private
@@ -23,38 +21,33 @@ module m_error_v_creation_w
 
 contains
 
-    subroutine create_error(inv, res_instance_index)
-    ! Needs to be subroutine to have the created instance persist I think
-    ! (we can check)
-    ! function create_error(inv) result(res_instance_index)
+    function create_error(inv) result(res_instance_index)
+        !! Wrapper around `m_error_v_creation.create_error` (TODO: x-ref)
 
         integer, intent(in) :: inv
         !! Input value to use to create the error
+        !!
+        !! See docstring of `m_error_v_creation.create_error` for details.
+        !! [TODO: x-ref]
 
-        integer, intent(out) :: res_instance_index
+        integer :: res_instance_index
         !! Instance index of the result
         !
         ! This is the major trick for wrapping.
         ! We return instance indexes (integers) to Python rather than the instance itself.
 
-        type(ErrorV), pointer :: res
+        type(ErrorV) :: res
 
-        ! This is the other trick for wrapping.
-        ! We have to ensure that we have correctly associated pointers
-        ! with the derived type instances we want to 'pass' across the Python-Fortran interface.
-        ! Once we've done this, we can then set them more or less like normal derived types.
-        res_instance_index = error_v_manager_get_free_instance_number()
-        ! We have to associate res with the right index
-        ! before we can set it to the output of the function call
-        ! (in this case `o_create_error`).
-        call error_v_manager_associate_pointer_with_instance(res_instance_index, res)
-
-        ! Use the pointer more or less like a normal instance of the derived type
+        ! Do the Fortran call
         res = o_create_error(inv)
 
-        ! Ensure that the instance index is set correctly
-        res % instance_index = res_instance_index
+        ! Get the instance index to return to Python
+        call error_v_manager_get_available_instance_index(res_instance_index)
 
-    end subroutine create_error
+        ! Set the derived type value in the manager's array,
+        ! ready for its attributes to be retrieved from Python.
+        call error_v_manager_set_instance_index_to(res_instance_index, res)
+
+    end function create_error
 
 end module m_error_v_creation_w

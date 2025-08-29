@@ -72,7 +72,7 @@ Whenever we need to return a derived type to Python, we:
       it can just be that multiple levels of recursion are needed
       if you have derived types that themselves have derived type attributes
 1. we then call the manager [TODO I think this will end up being wrapper, we can tighten the language later]
-   module's `finalise_instance_index` function to free the (temporary) instance
+   module's `finalise_instance` function to free the (temporary) instance
    that was used by the manager
     - this instance is no longer needed because all the data has been transferred to Python
 1. we end up with a Python instance that has the result
@@ -95,7 +95,7 @@ Whenever we need to pass a derived type to Fortran, we:
    and use this to call the Fortran function/subroutine of interest
 1. return the result from Fortran back to Python
 1. call the manager [TODO I think this will end up being wrapper, we can tighten the language later]
-   module's `finalise_instance_index` function to free the (temporary) instance
+   module's `finalise_instance` function to free the (temporary) instance
    that was used to pass the instance in the first place
     - this instance is no longer needed because all the data has been transferred and used by Fortran
 1. we end up with the result of the Fortran callable back in Python

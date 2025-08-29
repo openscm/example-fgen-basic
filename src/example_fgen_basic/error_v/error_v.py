@@ -1,18 +1,14 @@
 """
-Wrapper of the Fortran :class:`ErrorV`
+Python equivalent of the Fortran `ErrorV` class [TODO: x-refs]
+
+At the moment, all written by hand.
+We will auto-generate this in future.
 """
 
 from __future__ import annotations
 
-from typing import Any
-
 from attrs import define
 
-from example_fgen_basic.pyfgen_runtime.base_finalisable import (
-    FinalisableWrapperBase,
-    check_initialised,
-    execute_finalise_on_fail,
-)
 from example_fgen_basic.pyfgen_runtime.exceptions import CompiledExtensionNotFoundError
 
 try:
@@ -20,114 +16,47 @@ try:
         m_error_v_w,
     )
 except (ModuleNotFoundError, ImportError) as exc:  # pragma: no cover
-    raise CompiledExtensionNotFoundError("example._lib.m_error_v_w") from exc
+    raise CompiledExtensionNotFoundError("example_fgen_basic._lib.m_error_v_w") from exc
+
+NO_ERROR_CODE = 0
+"""Code that indicates no error"""
 
 
 @define
-class ErrorV(FinalisableWrapperBase):
+class ErrorV:
     """
-    TODO: auto docstring e.g. "Wrapper around the Fortran :class:`ErrorV`"
+    Error value
     """
 
-    # Bug in Ipython pretty hence have to put this on every object?
-    def _repr_pretty_(self, p: Any, cycle: bool) -> None:
-        """
-        Get pretty representation of self
+    code: int = 1
+    """Error code"""
 
-        Used by IPython notebooks and other tools
-        """
-        super()._repr_pretty_(p=p, cycle=cycle)
-
-    @property
-    def exposed_attributes(self) -> tuple[str, ...]:
-        """
-        Attributes exposed by this wrapper
-        """
-        return ("code", "message")
-
-    # TODO: context manager
-    @classmethod
-    def from_new_connection(cls) -> ErrorV:
-        """
-        Initialise from a new connection
-
-        The user is responsible for releasing this connection
-        using :attr:`~finalise` when it is no longer needed.
-        Alternatively an [ErrorVContext][]
-        can be used to handle the finalisation using a context manager.
-
-        Returns
-        -------
-        :
-            A new instance with a unique instance index
-
-        Raises
-        ------
-        WrapperErrorUnknownCause
-            If a new instance could not be allocated
-
-            This could occur if too many instances are allocated at any one time
-        """
-        instance_ptr: int = m_error_v_w.get_free_instance_number()
-
-        return cls(instance_ptr)
+    message: str = ""
+    """Error message"""
 
     @classmethod
-    def from_build_args(
-        cls,
-        code: int,
-        message: str = "",
-    ) -> ErrorV:
+    def from_instance_index(cls, instance_index: int) -> ErrorV:
         """
-        Build the class (including connecting to Fortran)
-        """
-        out = cls.from_new_connection()
-        # TODO: remove or update this construct when we have result types
-        execute_finalise_on_fail(
-            out,
-            m_error_v_w.instance_build,
-            code=code,
-            message=message,
-        )
+        Initialise from an instance index received from Fortran
 
-        return out
-
-    @check_initialised
-    def finalise(self) -> None:
-        """
-        Close the connection with the Fortran module
-        """
-        m_error_v_w.instance_finalise(self.instance_index)
-        self._uninitialise_instance_index()
-
-    @property
-    @check_initialised
-    def code(self) -> int:
-        """
-        Error code
+        Parameters
+        ----------
+        instance_index
+            Instance index received from Fortran
 
         Returns
         -------
         :
-            Error code, retrieved from Fortran
+            Initialised index
         """
-        code: int = m_error_v_w.iget_code(instance_index=self.instance_index)
+        # Different wrapping strategies are needed
 
-        return code
+        # Integer is very simple
+        code = m_error_v_w.get_code(instance_index)
 
-    @property
-    @check_initialised
-    def message(self) -> str:
-        """
-        Error message
+        # String requires decode
+        message = m_error_v_w.get_message(instance_index).decode()
 
-        Returns
-        -------
-        :
-            Error message, retrieved from Fortran
-        """
-        message: str = m_error_v_w.iget_message(
-            instance_index=self.instance_index
-        ).decode()
+        res = cls(code=code, message=message)
 
-        return message
+        return res

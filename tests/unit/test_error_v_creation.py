@@ -43,7 +43,7 @@ def test_create_error_lots_of_repeated_calls():
     # Fortran derived types correctly
     # (and sort of a speed test, this shouldn't be noticeably slow)
     # hence we may move this test somewhere more generic at some point.
-    for _ in range(1e5):
+    for _ in range(int(1e5)):
         create_error(1)
 
 

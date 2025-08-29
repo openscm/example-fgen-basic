@@ -6,60 +6,17 @@
 ! TODO: make it possible to reallocate the number of instances
 module m_error_v_manager
 
-    use fpyfgen_derived_type_manager_helpers, only: finalise_derived_type_instance_number, &
-                                              get_derived_type_free_instance_number
     use m_error_v, only: ErrorV
 
     implicit none
     private
 
-    integer, public, parameter :: N_INSTANCES_DEFAULT = 4096
-    !! Default maximum number of instances which can be created simultaneously
-    !
-    ! TODO: allow reallocation if possible
+    type(ErrorV), dimension(1) :: instance_array
+    logical, dimension(1) :: instance_available = .true.
 
-    ! This is the other trick, we hold an array of instances
-    ! for tracking what is being passed back and forth across the interface.
-    type(ErrorV), target, dimension(N_INSTANCES_DEFAULT) :: instance_array
-    logical, dimension(N_INSTANCES_DEFAULT) :: instance_available = .true.
-
-    public :: get_free_instance_number, &
-              associate_pointer_with_instance, &
-              finalise_instance
+    public :: finalise_instance, get_available_instance_index, get_instance, set_instance_index_to
 
 contains
-
-    function get_free_instance_number() result(instance_index)
-        !! Get the index of a free instance
-
-        integer :: instance_index
-        !! Free instance index
-
-        call get_derived_type_free_instance_number( &
-            instance_index, &
-            N_INSTANCES_DEFAULT, &
-            instance_available, &
-            instance_array &
-            )
-
-    end function get_free_instance_number
-
-    ! Might be a better way to do this as the pointers are a bit confusing, let's see
-    subroutine associate_pointer_with_instance(instance_index, instance_pointer)
-        !! Associate a pointer with the instance corresponding to the given model index
-        !!
-        !! Stops execution if the instance has not already been initialised.
-
-        integer, intent(in) :: instance_index
-        !! Index of the instance to point to
-
-        type(ErrorV), pointer, intent(inout) :: instance_pointer
-        !! Pointer to associate
-
-        call check_index_claimed(instance_index)
-        instance_pointer => instance_array(instance_index)
-
-    end subroutine associate_pointer_with_instance
 
     subroutine finalise_instance(instance_index)
         !! Finalise an instance
@@ -68,14 +25,68 @@ contains
         !! Index of the instance to finalise
 
         call check_index_claimed(instance_index)
-        call finalise_derived_type_instance_number( &
-            instance_index, &
-            N_INSTANCES_DEFAULT, &
-            instance_available, &
-            instance_array &
-            )
+
+        call instance_array(instance_index) % finalise()
+        instance_available(instance_index) = .true.
 
     end subroutine finalise_instance
+
+    subroutine get_available_instance_index(available_instance_index)
+        !! Get a free instance index
+
+        ! TODO: think through whether race conditions are possible
+        ! e.g. while returning a free index number to one Python call
+        ! a different one can be looking up a free instance index at the same time
+        ! and something goes wrong (maybe we need a lock)
+
+        integer, intent(out) :: available_instance_index
+        !! Available instance index
+
+        integer :: i
+
+        do i = 1, size(instance_array)
+
+            if (instance_available(i)) then
+
+                instance_available(i) = .false.
+                available_instance_index = i
+                return
+
+            end if
+
+        end do
+
+        ! TODO: switch to returning a Result type with an error set
+        print *, "No free indexes"
+        error stop 1
+
+    end subroutine get_available_instance_index
+
+    ! Change to pure function when we update check_index_claimed to be pure
+    function get_instance(instance_index) result(inst)
+
+        integer, intent(in) :: instance_index
+        !! Index in `instance_array` of which to set the value equal to `val`
+
+        type(ErrorV) :: inst
+        !! Instance at `instance_array(instance_index)`
+
+        call check_index_claimed(instance_index)
+        inst = instance_array(instance_index)
+
+    end function get_instance
+
+    subroutine set_instance_index_to(instance_index, val)
+
+        integer, intent(in) :: instance_index
+        !! Index in `instance_array` of which to set the value equal to `val`
+
+        type(ErrorV), intent(in) :: val
+
+        call check_index_claimed(instance_index)
+        instance_array(instance_index) = val
+
+    end subroutine set_instance_index_to
 
     subroutine check_index_claimed(instance_index)
         !! Check that an index has already been claimed
@@ -94,13 +105,6 @@ contains
         if (instance_index < 1) then
             ! TODO: switch to errors here - will require some thinking
             print *, "Requested index is ", instance_index, " which is less than 1"
-            error stop 1
-        end if
-
-        if (instance_array(instance_index) % instance_index < 1) then
-            ! TODO: switch to errors here - will require some thinking
-            print *, "Index ", instance_index, " is associated with an instance that has instance index < 1", &
-                "instance's instance_index attribute ", instance_array(instance_index) % instance_index
             error stop 1
         end if
 

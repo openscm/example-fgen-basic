@@ -8,25 +8,20 @@
 !> with the convention that a code of 0 indicates no error.
 module m_error_v
 
-    ! TODO: switch `m_` prefix to project name prefix
-    ! (e.g. fpyfgen, "Fortran-code for Python-Fortran wrapper Generator")
-    ! (same idea as `tomlf_` prefix)
-    ! TODO: move this to standalone repo (eventually)
-    use fpyfgen_base_finalisable, only: BaseFinalisable
-
     implicit none
     private
 
     integer, parameter, public :: NO_ERROR_CODE = 0
     !! Code that indicates no error
 
-    type, extends(BaseFinalisable), public :: ErrorV
+    type, public :: ErrorV
     !! Error value
 
         integer :: code = 1
         !! Error code
 
         character(len=128) :: message = ""
+        !! Error message
         ! TODO: think about making the message allocatable to handle long messages
 
         ! TODO: think about adding idea of critical
@@ -47,7 +42,6 @@ module m_error_v
 
     interface ErrorV
     !! Constructor interface - see build (TODO: figure out cross-ref syntax) for details
-    ! This is what allows us to do ErrorV(...) when using this class
         module procedure :: constructor
     end interface ErrorV
 
