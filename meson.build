@@ -82,6 +82,7 @@ if pyprojectwheelbuild_enabled
     'src/example_fgen_basic/get_wavelength.py',
     'src/example_fgen_basic/pyfgen_runtime/__init__.py',
     'src/example_fgen_basic/pyfgen_runtime/exceptions.py',
+    'src/example_fgen_basic/typing.py',
   )
 
     # The ancillary library,

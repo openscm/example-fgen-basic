@@ -30,9 +30,7 @@ except (ModuleNotFoundError, ImportError) as exc:  # pragma: no cover
     ) from exc
 
 if TYPE_CHECKING:
-    # TODO: bring back in numpy type hints
-    NP_ARRAY_OF_INT = None
-    NP_ARRAY_OF_BOOL = None
+    from example_fgen_basic.typing import NP_ARRAY_OF_BOOL, NP_ARRAY_OF_INT
 
 
 def pass_error(inv: ErrorV) -> bool:

@@ -28,8 +28,7 @@ except (ModuleNotFoundError, ImportError) as exc:  # pragma: no cover
     ) from exc
 
 if TYPE_CHECKING:
-    # TODO: bring back in numpy type hints
-    NP_ARRAY_OF_INT = None
+    from example_fgen_basic.typing import NP_ARRAY_OF_INT
 
 
 def create_error(inv: int) -> ErrorV:

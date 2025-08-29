@@ -2,8 +2,6 @@
 !>
 !> Written by hand here.
 !> Generation to be automated in future (including docstrings of some sort).
-!
-! TODO: make it possible to reallocate the number of instances
 module m_error_v_manager
 
     use m_error_v, only: ErrorV
