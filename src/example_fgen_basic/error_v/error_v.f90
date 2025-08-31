@@ -5,7 +5,8 @@
 !>
 !> Fortran doesn't have a null value.
 !> As a result, we introduce this derived type
-!> with the convention that a code of 0 indicates no error.
+!> with the convention that a code of `NO_ERROR_CODE` (0)
+!> indicates no error (i.e. is our equivalent of a null value).
 module m_error_v
 
     implicit none

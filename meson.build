@@ -68,6 +68,7 @@ if pyprojectwheelbuild_enabled
     'src/example_fgen_basic/fpyfgen/derived_type_manager_helpers.f90',
     'src/example_fgen_basic/get_wavelength.f90',
     'src/example_fgen_basic/kind_parameters.f90',
+    'src/example_fgen_basic/result/result.f90',
   )
 
   # All Python files (wrappers and otherwise)

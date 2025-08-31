@@ -68,6 +68,8 @@ contains
 
                 instance_available(i) = .false.
                 available_instance_index = i
+                ! TODO: switch to returning a Result type
+                ! res = ResultInt(data=i)
                 return
 
             end if
@@ -75,6 +77,7 @@ contains
         end do
 
         ! TODO: switch to returning a Result type with an error set
+        ! res = ResultInt(ErrorV(code=1, message="No available instances"))
         error stop 1
 
     end subroutine get_available_instance_index
@@ -114,16 +117,36 @@ contains
         !! Instance index to check
 
         if (instance_available(instance_index)) then
-            ! TODO: switch to errors here - will require some thinking
+            ! TODO: Switch to using Result here
+            ! Use `ResultNone` which is a Result type
+            ! that doesn't have a `data` attribute
+            ! (i.e. if this succeeds, there is no data to check,
+            ! if it fails, the error_v attribute will be set).
+            ! So the code would be something like
+            ! res = ResultNone(ErrorV(code=1, message="Index ", instance_index, " has not been claimed"))
             print *, "Index ", instance_index, " has not been claimed"
             error stop 1
         end if
 
         if (instance_index < 1) then
-            ! TODO: switch to errors here - will require some thinking
+            ! TODO: Switch to using Result here
+            ! Use `ResultNone` which is a Result type
+            ! that doesn't have a `data` attribute
+            ! (i.e. if this succeeds, there is no data to check,
+            ! if it fails, the error_v attribute will be set).
+            ! So the code would be something like
+            ! res = ResultNone(ErrorV(code=2, message="Requested index is ", instance_index, " which is less than 1"))
             print *, "Requested index is ", instance_index, " which is less than 1"
             error stop 1
         end if
+
+        ! ! Here, result becomes
+        ! ! Now that I've thought about this, it's also clear
+        ! ! that we will only use functions
+        ! ! or subroutines with a result type that has `intent(out)`.
+        ! ! We will no longer have subroutines that return nothing
+        ! ! (like this one currently does).
+        ! res = ResultNone()
 
     end subroutine check_index_claimed
 
