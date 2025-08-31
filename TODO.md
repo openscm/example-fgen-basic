@@ -5,4 +5,5 @@
 - clean up
 - final review (including deleting this file)
 - merge
-- move onto a basic result type with a subclass specifically for integers (`ResultInt` or something)
+- move onto a basic result type with a subclass specifically for integers
+  (`ResultInt` or something, outline here: https://github.com/openscm/example-fgen-basic/tree/result-type)
