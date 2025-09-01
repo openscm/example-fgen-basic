@@ -12,7 +12,7 @@ module m_result
     !!
     !! Holds either the result or an error.
 
-        class(*), allocatable :: data(..)
+        class(*), allocatable :: data_v(..)
         !! Data i.e. the result (if no error occurs)
         !!
         ! Assumed rank array
@@ -31,9 +31,10 @@ module m_result
 
         private
 
-        procedure, public:: build, finalise, is_error
+        ! procedure, public:: build
         ! TODO: Think about whether build should be on the abstract class
         ! or just on each concrete implementation
+        procedure, public:: finalise, is_error
 
     end type Result
 
@@ -68,16 +69,33 @@ contains
     !
     ! end subroutine build
 
-    subroutine finalise(self)
+    function finalise(self) result(res)
         !! Finalise the instance (i.e. free/deallocate)
 
         class(Result), intent(inout) :: self
         ! Hopefully can leave without docstring (like Python)
 
-        deallocate(self % data)
-        deallocate(self % error)
+        type(ResultNone) :: res
 
-    end subroutine finalise
+        if (allocated(self % data_v) .and. allocated(self % error)) then
+            deallocate(self % data_v)
+            deallocate(self % error)
+            call res % build(message="Both data and error were allocated")
+
+        elseif (allocated(self % data_v)) then
+            deallocate(self % data_v)
+            ! No error - no need to call res % build
+
+        elseif (allocated(self % error)) then
+            deallocate(self % error)
+            ! No error - no need to call res % build
+
+        else
+            call res % build(message="Neither data nor error was allocated")
+
+        end if
+
+    end function finalise
 
     pure function is_error(self) result(is_err)
         !! Determine whether `self` contains an error or not
@@ -88,8 +106,7 @@ contains
         logical :: is_err
         ! Whether `self` is an error or not
 
-        is_err = self % error_v % is_error()
-        ! TODO: implement is_error on `error_v`
+        is_err = allocated(self % error_v)
 
     end function is_error
 
