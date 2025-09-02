@@ -4,6 +4,8 @@
 !> https://github.com/samharrison7/fortran-error-handler
 module m_result
 
+    use m_error_v, only: ErrorV
+
     implicit none
     private
 
@@ -75,19 +77,21 @@ contains
         class(Result), intent(inout) :: self
         ! Hopefully can leave without docstring (like Python)
 
-        type(ResultNone) :: res
+!        type(ResultNone) :: res
 
-        if (allocated(self % data_v) .and. allocated(self % error)) then
+        res = Result()
+
+        if (allocated(self % data_v) .and. allocated(self % error_v)) then
             deallocate(self % data_v)
-            deallocate(self % error)
+            deallocate(self % error_v)
             call res % build(message="Both data and error were allocated")
 
         elseif (allocated(self % data_v)) then
             deallocate(self % data_v)
             ! No error - no need to call res % build
 
-        elseif (allocated(self % error)) then
-            deallocate(self % error)
+        elseif (allocated(self % error_v)) then
+            deallocate(self % error_v)
             ! No error - no need to call res % build
 
         else

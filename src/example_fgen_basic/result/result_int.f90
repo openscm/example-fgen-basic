@@ -5,6 +5,7 @@
 module m_result_int
 
     use m_error_v, only: ErrorV
+    use m_result, only: Result
 
     implicit none
     private
@@ -42,11 +43,13 @@ contains
         type(ResultInteger), intent(inout) :: self
         ! Hopefully can leave without docstring (like Python)
 
-        type(ResultNone), intent(inout) :: res
+        !type(ResultNone), intent(inout) :: res
         !! Result
 
         integer, optional, intent(in) :: data_v
         !! Data
+
+        res = Result()
 
         class(ErrorV), optional, intent(in) :: error_v
         !! Error message
