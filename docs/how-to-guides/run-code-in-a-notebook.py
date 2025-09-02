@@ -18,7 +18,6 @@
 # Here we show how you can make your docs via notebooks.
 
 # %% editable=true slideshow={"slide_type": ""}
-from example_fgen_basic.operations import add_two
 
 # %% editable=true slideshow={"slide_type": ""}
-add_two(3.2, 4.3)
+c = 1 + 2

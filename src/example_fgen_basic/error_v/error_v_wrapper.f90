@@ -1,4 +1,4 @@
-!> Wrapper for interfacing `m_error_v` with Python
+!> Wrapper for interfacing  [[m_error_v(module)::ErrorV(type)]] with Python
 !>
 !> Written by hand here.
 !> Generation to be automated in future (including docstrings of some sort).
@@ -27,9 +27,9 @@ contains
         !! Build an instance
 
         integer, intent(in) :: code
-        !! Error code
+        !> Error code
         !!
-        !! Use [TODO: figure out xref] `NO_ERROR_CODE` if there is no error
+        !> Use [[m_error_v:NO_ERROR_CODE(variable)]] if there is no error
 
         character(len=*), optional, intent(in) :: message
         !! Error message

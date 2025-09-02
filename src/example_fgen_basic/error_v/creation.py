@@ -1,5 +1,5 @@
 """
-Wrappers of `m_error_v_creation` [TODO think about naming and x-referencing]
+Wrappers of [`m_error_v_creation`](/fortran-api/module/m_error_v_creation.html)
 
 At the moment, all written by hand.
 We will auto-generate this in future.
@@ -41,7 +41,6 @@ def create_error(inv: int) -> ErrorV:
         Input value
 
         If odd, the error code is
-        [NO_ERROR_CODE][example_fgen_basic.error_v.NO_ERROR_CODE].
         If even, the error code is 1.
         If a negative number is supplied, the error code is 2.
 
