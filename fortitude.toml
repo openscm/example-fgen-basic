@@ -1,0 +1,4 @@
+[check]
+select = ["C", "E", "S"]  # Enable certain error/warning categories
+ignore = ["C003", "C132", "C002"]         # Ignore specific warnings
+line-length = 120         # Max allowed line length
