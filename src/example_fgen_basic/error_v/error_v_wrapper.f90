@@ -44,6 +44,12 @@ contains
 
     end subroutine build_instance
 
+    ! build_instances is very hard to do
+    ! because you need to pass an array of variable-length characters which is non-trivial.
+    ! Maybe we will try this another day, for now this isn't that important
+    ! (we can just use a loop from the Python side)
+    ! so we just don't bother implementing `build_instances`.
+
     subroutine finalise_instance(instance_index)
         !! Finalise an instance
 
