@@ -47,7 +47,7 @@ program tester_unit
     end if
 
     if (stat > 0) then
-        write (error_unit, '(i0, 1x, a)') stat, "test(s) failed!"
+        write (error_unit, "(i0, 1x, a)") stat, "test(s) failed!"
         error stop 1
     end if
 

@@ -2,7 +2,7 @@
 module test_get_wavelength
 
     ! How to print to stdout
-    use ISO_Fortran_env, only: stdout => OUTPUT_UNIT
+    use, intrinsic :: ISO_Fortran_env, only: stdout => OUTPUT_UNIT
     use testdrive, only: new_unittest, unittest_type, error_type, check
 
     use kind_parameters, only: dp
