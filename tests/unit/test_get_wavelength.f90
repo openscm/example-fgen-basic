@@ -7,7 +7,7 @@ module test_get_wavelength
 
     use kind_parameters, only: dp
 
-    implicit none
+    implicit none (type, external)
     private
 
     public :: collect_get_wavelength_tests

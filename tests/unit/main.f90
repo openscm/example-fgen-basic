@@ -5,7 +5,7 @@ program tester_unit
     use testdrive, only: run_testsuite, new_testsuite, testsuite_type, select_suite, run_selected, get_argument
     use test_get_wavelength, only: collect_get_wavelength_tests
 
-    implicit none
+    implicit none (type, external)
     integer :: stat, is
     character(len=:), allocatable :: suite_name, test_name
     type(testsuite_type), allocatable :: testsuites(:)
