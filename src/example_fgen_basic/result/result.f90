@@ -4,7 +4,7 @@
 !> https://github.com/samharrison7/fortran-error-handler
 module m_result
 
-    use m_error_v, only: ErrorV
+    use m_error_v, only: ErrorV, NO_ERROR_CODE
 
     implicit none
     private
@@ -40,10 +40,10 @@ module m_result
 
     end type Result
 
-    interface Result
+  !  interface Result
     !! Constructor interface - see build (TODO: figure out cross-ref syntax) for details
-        module procedure :: constructor
-    end interface Result
+    !    module procedure :: constructor
+   ! end interface Result
 
 contains
 
@@ -70,6 +70,26 @@ contains
     !     end if
     !
     ! end subroutine build
+
+    !subroutine constructor(self, code, message)
+    !     !! Build instance
+    !
+     !    class(*), allocatable :: data_v(..)
+     !    class(ErrorV), intent(inout) :: self
+    !     ! Hopefully can leave without docstring (like Python)
+      !   integer, intent(in) :: code = NO_ERROR_CODE
+    !     !! Error code
+    !     !!
+    !     !! Use [TODO: figure out xref] `NO_ERROR_CODE` if there is no error
+       !  character(len=*), optional, intent(in) :: message = ""
+    !     !! Error message
+    !
+    !     self % code = code
+    !     if (present(message)) then
+    !         self % message = message
+    !     end if
+    !
+    !end subroutine constructor
 
     function finalise(self) result(res)
         !! Finalise the instance (i.e. free/deallocate)

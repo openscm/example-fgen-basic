@@ -37,6 +37,25 @@ module m_result_int
 
 contains
 
+    function constructor(res, data_v, error_v) result(self)
+        !! Build instance
+
+        type(ResultInteger), intent(out) :: self
+        ! Hopefully can leave without docstring (like Python)
+
+        class(ErrorV), intent(in) :: error_v
+        !! Error message
+
+        integer, optional, intent(in) :: data_v
+        !! Data
+
+        self%error_v = ErrorV()
+
+        if (present(error_v))  self%error_v = error_v
+        if (present(data_v))  self%data_v = data_v
+
+    end function constructor
+
     subroutine build(self, res, data_v, error_v)
         !! Build instance
 
@@ -49,10 +68,10 @@ contains
         integer, optional, intent(in) :: data_v
         !! Data
 
-        res = Result()
-
         class(ErrorV), optional, intent(in) :: error_v
         !! Error message
+
+        res = Result()
 
         if (present(data_v) and present(error_v)) then
             call res % build(message="Both data and error were provided")
