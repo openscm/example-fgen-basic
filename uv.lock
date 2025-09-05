@@ -825,6 +825,7 @@ docs = [
     { name = "mkdocs-section-index" },
     { name = "mkdocstrings-python" },
     { name = "mkdocstrings-python-xref" },
+    { name = "pint" },
     { name = "pymdown-extensions" },
     { name = "ruff" },
 ]
@@ -917,6 +918,7 @@ docs = [
     { name = "mkdocs-section-index", specifier = ">=0.3.10" },
     { name = "mkdocstrings-python", specifier = ">=1.16.12" },
     { name = "mkdocstrings-python-xref", specifier = ">=1.16.3" },
+    { name = "pint", specifier = ">=0.24.4" },
     { name = "pymdown-extensions", specifier = ">=10.16.1" },
     { name = "ruff", specifier = ">=0.12.8" },
 ]

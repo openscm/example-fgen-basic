@@ -48,7 +48,7 @@ def pass_error(inv: ErrorV) -> bool:
         If `inv` is an error, `True`, otherwise `False`.
     """
     # Tell Fortran to build the object on the Fortran side
-    instance_index: int = m_error_v_w.build_instance(code=inv.code, message=inv.message)
+    instance_index = inv.build_fortran_instance()
 
     # Call the Fortran function
     # Boolean wrapping strategy, have to cast to bool
