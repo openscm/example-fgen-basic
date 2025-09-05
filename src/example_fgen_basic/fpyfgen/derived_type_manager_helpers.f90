@@ -33,7 +33,7 @@ contains
         class(BaseFinalisable), dimension(n_instances), intent(inout) :: instance_array
         !! Array of instances
 
-        integer :: i = 1
+        integer :: i
 
         ! Default if no available models are found
         instance_index = invalid_instance_index

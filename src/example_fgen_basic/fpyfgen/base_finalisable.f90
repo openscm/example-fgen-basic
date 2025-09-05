@@ -37,6 +37,9 @@ module fpyfgen_base_finalisable
             !! Finalise the instance (i.e. free/deallocate)
 
             import :: BaseFinalisable
+
+            implicit none
+
             class(BaseFinalisable), intent(inout) :: self
 
         end subroutine derived_type_finalise
