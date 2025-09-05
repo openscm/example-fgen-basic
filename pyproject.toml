@@ -148,6 +148,7 @@ source = [
 ]
 branch = true
 omit = [
+    "*typing.py",  # Should not be needed at runtime
     # TODO: test these files directly when splitting out pyfgen_runtime
     "*exceptions.py",
     "*runtime_helpers.py",
