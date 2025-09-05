@@ -1,4 +1,4 @@
-!> Tests of get_wavelength
+!> Tests of m_get_wavelength
 module test_get_wavelength
 
     ! How to print to stdout

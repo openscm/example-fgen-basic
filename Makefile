@@ -49,8 +49,7 @@ test:  ## run the tests (re-installs the package every time so you might want to
 	# because it is looking for lines in `src` to be run,
 	# but they're not because lines in `.venv` are run instead.
 	# We don't have a solution to this yet.
-	#
-	# Coverage directory - needed to trick code cov to looking at the right place
+	uv run --no-sync python scripts/inject-srcs-into-meson-build.py
 	uv run --no-sync python -c 'from pathlib import Path; import example_fgen_basic' || ( echo "Run make virtual-environment first" && false )
 	COV_DIR=$$(uv run --no-sync python -c 'from pathlib import Path; import example_fgen_basic; print(Path(example_fgen_basic.__file__).parent)'); \
 		uv run --no-editable --reinstall-package example-fgen-basic pytest -r a -v tests src --doctest-modules --doctest-report ndiff --cov=$$COV_DIR

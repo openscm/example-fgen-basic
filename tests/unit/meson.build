@@ -7,6 +7,7 @@ testdrive_dep = dependency(
 
 test_file_stubs = [
   'test_get_wavelength',
+  'test_error_v_creation',
 ]
 
 test_srcs = files(
