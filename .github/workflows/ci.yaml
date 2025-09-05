@@ -113,6 +113,12 @@ jobs:
           # TODO: figure out whether we need/want to use other compilers too
           compiler: "gcc"
           version: "13"
+      - name: Set DLL directory environment variable
+        # Used when running the tests, see `tests/conftest.py` for details
+        if: ${{ startsWith(matrix.os, 'windows') }}
+        run: |
+          echo "PYTHON_ADD_DLL_DIRECTORY=C:\\mingw64\\bin" >> $GITHUB_ENV
+
       - uses: ./.github/actions/setup
         with:
           python-version: ${{ matrix.python-version }}
