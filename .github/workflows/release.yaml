@@ -28,7 +28,6 @@ jobs:
         pip install -r {project}/requirements-only-tests-min-locked.txt
       CIBW_TEST_COMMAND: >-
         pytest {project}/tests
-      MACOSX_DEPLOYMENT_TARGET: "13.0"
     strategy:
       fail-fast: false
       matrix:
@@ -57,6 +56,14 @@ jobs:
           # TODO: figure out whether we need/want to use other compilers too
           compiler: "gcc"
           version: "13"
+      - name: Set deployment target - MacOS 13.0
+        if: ${{ matrix.os == 'macos-13' }}
+        run: |
+          echo "MACOSX_DEPLOYMENT_TARGET=13.0" >> $GITHUB_ENV
+      - name: Set deployment target - MacOS 14.0
+        if: ${{ matrix.os == 'macos-14' }}
+        run: |
+          echo "MACOSX_DEPLOYMENT_TARGET=14.0" >> $GITHUB_ENV
       - name: Specify LLVM - windows-arm
         if: ${{ matrix.os == 'windows-11-arm' }}
         shell: pwsh
