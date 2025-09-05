@@ -6,7 +6,7 @@ module m_error_v_creation
 
     use m_error_v, only: ErrorV, NO_ERROR_CODE
 
-    implicit none
+    implicit none (type, external)
     private
 
     public :: create_error, create_errors

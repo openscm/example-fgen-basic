@@ -4,7 +4,7 @@
 !> across the Python-Fortran interface.
 module fpyfgen_base_finalisable
 
-    implicit none
+    implicit none (type, external)
     private
 
     integer, parameter, public :: INVALID_INSTANCE_INDEX = -1
@@ -38,7 +38,7 @@ module fpyfgen_base_finalisable
 
             import :: BaseFinalisable
 
-            implicit none
+            implicit none (type, external)
 
             class(BaseFinalisable), intent(inout) :: self
 

@@ -14,7 +14,7 @@ module m_error_v_w
         error_v_manager_get_instance => get_instance, &
         error_v_manager_ensure_instance_array_size_is_at_least => ensure_instance_array_size_is_at_least
 
-    implicit none
+    implicit none (type, external)
     private
 
     public :: build_instance, finalise_instance, finalise_instances, &

@@ -6,7 +6,7 @@ module m_error_v_passing
 
     use m_error_v, only: ErrorV, NO_ERROR_CODE
 
-    implicit none
+    implicit none (type, external)
     private
 
     public :: pass_error, pass_errors
