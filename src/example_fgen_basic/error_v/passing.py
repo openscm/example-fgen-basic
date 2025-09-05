@@ -21,9 +21,7 @@ try:
 except (ModuleNotFoundError, ImportError) as exc:  # pragma: no cover
     raise CompiledExtensionNotFoundError("example_fgen_basic._lib.m_error_v_w") from exc
 try:
-    from example_fgen_basic._lib import (  # type: ignore
-        m_error_v_passing_w,
-    )
+    from example_fgen_basic._lib import m_error_v_passing_w
 except (ModuleNotFoundError, ImportError) as exc:  # pragma: no cover
     raise CompiledExtensionNotFoundError(
         "example_fgen_basic._lib.m_error_v_passing_w"
@@ -84,7 +82,9 @@ def pass_errors(invs: tuple[ErrorV, ...]) -> NP_ARRAY_OF_BOOL:
     )
 
     # Convert the result to boolean
-    res_raw = m_error_v_passing_w.pass_errors(instance_indexes, n=instance_indexes.size)
+    res_raw: NP_ARRAY_OF_INT = m_error_v_passing_w.pass_errors(
+        instance_indexes, n=instance_indexes.size
+    )
     res = res_raw.astype(bool)
 
     # Tell Fortran to finalise the objects on the Fortran side

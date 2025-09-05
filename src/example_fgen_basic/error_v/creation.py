@@ -19,9 +19,7 @@ try:
 except (ModuleNotFoundError, ImportError) as exc:  # pragma: no cover
     raise CompiledExtensionNotFoundError("example_fgen_basic._lib.m_error_v_w") from exc
 try:
-    from example_fgen_basic._lib import (  # type: ignore
-        m_error_v_creation_w,
-    )
+    from example_fgen_basic._lib import m_error_v_creation_w
 except (ModuleNotFoundError, ImportError) as exc:  # pragma: no cover
     raise CompiledExtensionNotFoundError(
         "example_fgen_basic._lib.m_error_v_creation_w"
