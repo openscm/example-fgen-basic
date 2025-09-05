@@ -125,9 +125,6 @@ jobs:
           uv-dependency-install-flags: "-v --reinstall-package example-fgen-basic -Ccompile-args='-v' --all-extras --group tests "
       - name: Run tests
         run: |
-          echo $CI
-          ls C:/mingw64/bin
-          # ls C:\\ProgramData\\mingw64\\mingw64\\bin
           COV_DIR=`uv run --no-sync python -c 'from pathlib import  Path; import example_fgen_basic; print(Path(example_fgen_basic.__file__).parent)'`
           uv run --no-sync pytest -r a -v tests src --doctest-modules --doctest-report ndiff --cov=${COV_DIR} --cov-report=term-missing --cov-report=xml
           uv run --no-sync coverage report
