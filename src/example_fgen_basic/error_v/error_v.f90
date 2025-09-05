@@ -23,6 +23,7 @@ module m_error_v
         character(len=128) :: message = ""
         !! Error message
         ! TODO: think about making the message allocatable to handle long messages
+        !character(len=:), allocatable :: message --- would not work?
 
         ! TODO: think about adding idea of critical
         ! (means you can stop but also unwind errors and traceback along the way)
@@ -34,7 +35,7 @@ module m_error_v
 
         private
 
-        procedure, public:: build, finalise
+        procedure, public :: build, finalise
         ! get_res sort of not needed (?)
         ! get_err sort of not needed (?)
 
@@ -68,7 +69,7 @@ contains
         integer, intent(in) :: code
         !! Error code
         !!
-        !! Use [TODO: figure out xref] `NO_ERROR_CODE` if there is no error
+        !> Use [[m_error_v:NO_ERROR_CODE(variable)]] if there is no error.
 
         character(len=*), optional, intent(in) :: message
         !! Error message

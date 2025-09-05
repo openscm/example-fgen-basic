@@ -1,4 +1,4 @@
-!> Manager of `ErrorV` (TODO: xref) across the Fortran-Python interface
+!> Manager of [[m_error_v(module)]] across the Fortran-Python interface
 !>
 !> Written by hand here.
 !> Generation to be automated in future (including docstrings of some sort).
@@ -12,9 +12,9 @@ module m_error_v_manager
     type(ErrorV), dimension(:), allocatable :: instance_array
     logical, dimension(:), allocatable :: instance_available
 
-    ! TODO: think about ordering here, alphabetical probably easiest
-    public :: build_instance, finalise_instance, get_available_instance_index, get_instance, set_instance_index_to, &
-              ensure_instance_array_size_is_at_least
+    public :: build_instance, ensure_instance_array_size_is_at_least, finalise_instance, &
+              get_available_instance_index, get_instance, set_instance_index_to
+
 
 contains
 
@@ -143,7 +143,7 @@ contains
             ! Race conditions ?
             instance_available = .true.
 
-        elseif (size(instance_available) < n) then
+        else if (size(instance_available) < n) then
 
             allocate(tmp_instances(n))
             tmp_instances(1:size(instance_array)) = instance_array

@@ -18,9 +18,9 @@ contains
     function create_error(inv) result(err)
         !! Create an error
         !!
-        !! If an odd number is supplied, the error code is no error (TODO: cross-ref).
-        !! If an even number is supplied, the error code is 1.
-        !! If a negative number is supplied, the error code is 2.
+        !> If an odd number is supplied, the error code is [[m_error_v:NO_ERROR_CODE(variable)]].
+        !> If an even number is supplied, the error code is `1`.
+        !> If a negative number is supplied, the error code is `2`.
 
         integer, intent(in) :: inv
         !! Value to use to create the error
@@ -44,9 +44,9 @@ contains
     function create_errors(invs, n) result(errs)
         !! Create a number of errors
         !!
-        !! If an odd number is supplied, the error code is no error (TODO: cross-ref).
-        !! If an even number is supplied, the error code is 1.
-        !! If a negative number is supplied, the error code is 2.
+        !> If an odd number is supplied, the error code is [[m_error_v:NO_ERROR_CODE(variable)]].
+        !> If an even number is supplied, the error code is `1`.
+        !> If a negative number is supplied, the error code is `2`.
 
         integer, dimension(n), intent(in) :: invs
         !! Values to use to create the error

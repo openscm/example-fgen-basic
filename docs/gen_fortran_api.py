@@ -55,9 +55,9 @@ for entry in (REPO_ROOT / FORD_OUTPUT_DIR).rglob("*"):
 #     fh.writelines("* [example_fgen_basic](home.html)")
 
 # Remove the ford files (which were just copied)
-shutil.rmtree(REPO_ROOT / FORD_OUTPUT_DIR)
+# shutil.rmtree(REPO_ROOT / FORD_OUTPUT_DIR)
 
 # Put back the gitkeep file
 gitkeep = REPO_ROOT / FORD_OUTPUT_DIR / ".gitkeep"
-gitkeep.parent.mkdir()
+# gitkeep.parent.mkdir()
 gitkeep.touch()

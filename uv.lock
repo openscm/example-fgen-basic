@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 2
 requires-python = ">=3.9"
 resolution-markers = [
     "python_full_version >= '3.13' and sys_platform == 'win32'",
@@ -765,6 +765,7 @@ plots = [
 all-dev = [
     { name = "attrs" },
     { name = "ford" },
+    { name = "fortitude-lint", marker = "python_full_version >= '3.10'" },
     { name = "fprettify" },
     { name = "graphviz" },
     { name = "ipython", version = "8.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
@@ -813,6 +814,7 @@ dev = [
 docs = [
     { name = "attrs" },
     { name = "ford" },
+    { name = "fortitude-lint", marker = "python_full_version >= '3.10'" },
     { name = "graphviz" },
     { name = "jupyterlab" },
     { name = "jupytext" },
@@ -859,6 +861,7 @@ provides-extras = ["plots", "full"]
 all-dev = [
     { name = "attrs", specifier = ">=25.3.0" },
     { name = "ford", specifier = ">=6.0.1" },
+    { name = "fortitude-lint", marker = "python_full_version >= '3.10'", specifier = ">=0.7.0" },
     { name = "fprettify", specifier = ">=0.3.7" },
     { name = "graphviz", specifier = ">=0.21" },
     { name = "ipython", specifier = ">=8.18.1" },
@@ -905,6 +908,7 @@ dev = [
 docs = [
     { name = "attrs", specifier = ">=25.3.0" },
     { name = "ford", specifier = ">=6.0.1" },
+    { name = "fortitude-lint", marker = "python_full_version >= '3.10'", specifier = ">=0.7.0" },
     { name = "graphviz", specifier = ">=0.21" },
     { name = "jupyterlab", specifier = ">=4.4.5" },
     { name = "jupytext", specifier = ">=1.17.2" },
@@ -1062,6 +1066,29 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/1c/80/a8750198772c8647aa2c8d1459d5d8dbedd317a2ba18fdad73802073e1d5/FORD-6.1.13.tar.gz", hash = "sha256:95b743ea25c5a9c6a9e13db3633e04f91e11d1debb69f48ca3ef7fefc51f0559", size = 5849087, upload-time = "2022-07-01T15:19:31.983Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b3/49/00fb42b10bcb6b241f3c29248afa55000554aa05fb67588a4f2616361953/FORD-6.1.13-py3-none-any.whl", hash = "sha256:701ecd4b8744714a50cd31a8b49a95a85d647716b9d971a60ab1b58c53032048", size = 666132, upload-time = "2022-07-01T15:19:29.65Z" },
+]
+
+[[package]]
+name = "fortitude-lint"
+version = "0.7.5"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/64/c6/302ba32b7a847aa7b79d169b585909e55408762b7c8916550c64ad9d4222/fortitude_lint-0.7.5.tar.gz", hash = "sha256:5a0c6d38a6444fbe31d1724c14672181a264e48d755629b757e9b10c688685d9", size = 168429, upload-time = "2025-08-18T17:56:11.606Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1f/61/d7f7d5fbc340e7aafcb6bb27baba771ed14087b444d781860fd713d6252b/fortitude_lint-0.7.5-py3-none-macosx_10_12_x86_64.whl", hash = "sha256:6a45422fce15e6fec7f9e4b196515dced704b3f83c176ebb00a2d2b62c14399f", size = 2846506, upload-time = "2025-08-18T17:55:50.258Z" },
+    { url = "https://files.pythonhosted.org/packages/0c/91/933444d1532566761e0f69c0cbe71465a5798fb1179a34196b77cdadfc25/fortitude_lint-0.7.5-py3-none-macosx_11_0_arm64.whl", hash = "sha256:b323599be8074c1340866b56e8a758f8dccadc11e0d97d5eb12b472c582e9393", size = 2750718, upload-time = "2025-08-18T17:55:52.569Z" },
+    { url = "https://files.pythonhosted.org/packages/12/76/5cc7b280dfce3a9fc6a08d03abafa52d8b4e3dc87ee61e518fbb17c8423f/fortitude_lint-0.7.5-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:61aeb00b4324b2b2191a6b73c574ccdc5faf409f8efdb7ae1199a79a71039b86", size = 2743040, upload-time = "2025-08-18T17:55:54.152Z" },
+    { url = "https://files.pythonhosted.org/packages/7c/45/a04c26d73664a733cd3d1aac63489f24bab17b333d7c08d3936d0e2d8ef4/fortitude_lint-0.7.5-py3-none-manylinux_2_28_armv7l.whl", hash = "sha256:8c692c0b95334c1cc3c327d1fb56fd7ae15254ae9c0d94629c285fc096005b96", size = 2633794, upload-time = "2025-08-18T17:55:55.606Z" },
+    { url = "https://files.pythonhosted.org/packages/31/c7/fc918b3bb3ae8c3152782669cd2808b525726c41e533ce6151ec19f8c8e5/fortitude_lint-0.7.5-py3-none-manylinux_2_28_i686.whl", hash = "sha256:77d155a6879e13884b517134bc3ef3f75882b428821b053e8e85716c38ea095c", size = 3103134, upload-time = "2025-08-18T17:55:57.047Z" },
+    { url = "https://files.pythonhosted.org/packages/ec/83/afdbeb6e261ba4d942758a99863ee51ab356e87f88b95922d389c11fb665/fortitude_lint-0.7.5-py3-none-manylinux_2_28_ppc64le.whl", hash = "sha256:cbef4aacb376f36c5771269ed28c6d69317725ea09098784a0744bee200291ea", size = 3290143, upload-time = "2025-08-18T17:55:58.345Z" },
+    { url = "https://files.pythonhosted.org/packages/03/1d/afbee8b15115baa6e9a1b8c62fd535f3e8c1eafe9f0e2f3858a62390ccca/fortitude_lint-0.7.5-py3-none-manylinux_2_28_s390x.whl", hash = "sha256:2d2e557c9a22de85d380e43ab9edb29c93e4a15d8dbd2ff41695f1e61cd5c27b", size = 2995614, upload-time = "2025-08-18T17:55:59.53Z" },
+    { url = "https://files.pythonhosted.org/packages/4b/b4/1685e75a26efb32f0f773debdb06c15cf59dfd0f0f560de3e54afdf4f077/fortitude_lint-0.7.5-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:14a6ef16e7e317e89e608187df2b752c8b5b45b2788516f2353f8b1d787041cd", size = 2965875, upload-time = "2025-08-18T17:56:00.783Z" },
+    { url = "https://files.pythonhosted.org/packages/63/96/e85d934685fea551574c6cc4d7f2e2fc46980122769bb9479cd46b115c4f/fortitude_lint-0.7.5-py3-none-musllinux_1_2_aarch64.whl", hash = "sha256:fce8ba427e52f013b4d6ab67ab79eb331c18c63b510c6020283cf216b2d5f440", size = 2709886, upload-time = "2025-08-18T17:56:02.248Z" },
+    { url = "https://files.pythonhosted.org/packages/7b/b5/84dc4ae7de32181d2f819d117de900a68a92a18afeb05cd07684c2105f18/fortitude_lint-0.7.5-py3-none-musllinux_1_2_armv7l.whl", hash = "sha256:f6c0e90dbff55f5ad0a353fa608621df48568e97aa6954b8f640ac5f9a7e5cc9", size = 2645263, upload-time = "2025-08-18T17:56:03.727Z" },
+    { url = "https://files.pythonhosted.org/packages/f3/e7/d85f5627adadcc5e8228b21cd114de5306f0a2e2dff2f57d3c12d5408fd0/fortitude_lint-0.7.5-py3-none-musllinux_1_2_i686.whl", hash = "sha256:896cb9edb5a81bfb1c16889b72167ac363b2260e3e980ecfb32310705e8eef5b", size = 2953603, upload-time = "2025-08-18T17:56:05.317Z" },
+    { url = "https://files.pythonhosted.org/packages/9f/2d/620db4009a83dd29b18b6902e8862c5d8172d96f09c84460cf3736e839f1/fortitude_lint-0.7.5-py3-none-musllinux_1_2_x86_64.whl", hash = "sha256:44a3e762b5b561b5a9f91aa2f6cd4fe60e7814b25d4f0d635b9397311b49d920", size = 3020086, upload-time = "2025-08-18T17:56:06.569Z" },
+    { url = "https://files.pythonhosted.org/packages/24/d6/56acede6a71841560c56bc7d23e9dc32d931c57a3ed0dc5cb64be30b9b78/fortitude_lint-0.7.5-py3-none-win32.whl", hash = "sha256:8ced135143ce087a7b3859152ae1069be448eb7f22d64dfebf9cd3d7554d7f6a", size = 2627018, upload-time = "2025-08-18T17:56:07.775Z" },
+    { url = "https://files.pythonhosted.org/packages/4f/a2/9be916b8f0da17da6b0b6d2ca2cb18996a10847ac080196f5ce6aa97a2fd/fortitude_lint-0.7.5-py3-none-win_amd64.whl", hash = "sha256:b03539fcb804f240b426b23dc759635dae9417dd4a363d74eb001a28fbf7fb2f", size = 2847258, upload-time = "2025-08-18T17:56:08.924Z" },
+    { url = "https://files.pythonhosted.org/packages/3f/dc/c0625ffd4d827d9da57de5f88decc4a0c95235f872eef1037d3cfa28fdc2/fortitude_lint-0.7.5-py3-none-win_arm64.whl", hash = "sha256:5766a2c26aa5bc008d63f8d1e79392adfee94ef8cc1bbaca1aad9a2ba7db4548", size = 2665927, upload-time = "2025-08-18T17:56:10.402Z" },
 ]
 
 [[package]]
@@ -3283,7 +3310,7 @@ wheels = [
 
 [[package]]
 name = "requests"
-version = "2.32.3"
+version = "2.31.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "certifi" },
@@ -3291,9 +3318,9 @@ dependencies = [
     { name = "idna" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/63/70/2bf7780ad2d390a8d301ad0b550f1581eadbd9a20f896afe06353c2a2913/requests-2.32.3.tar.gz", hash = "sha256:55365417734eb18255590a9ff9eb97e9e1da868d4ccd6402399eaf68af20a760", size = 131218, upload-time = "2024-05-29T15:37:49.536Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9d/be/10918a2eac4ae9f02f6cfe6414b7a155ccd8f7f9d4380d62fd5b955065c3/requests-2.31.0.tar.gz", hash = "sha256:942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1", size = 110794, upload-time = "2023-05-22T15:12:44.175Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f9/9b/335f9764261e915ed497fcdeb11df5dfd6f7bf257d4a6a2a686d80da4d54/requests-2.32.3-py3-none-any.whl", hash = "sha256:70761cfe03c773ceb22aa2f671b4757976145175cdfca038c02654d061d6dcc6", size = 64928, upload-time = "2024-05-29T15:37:47.027Z" },
+    { url = "https://files.pythonhosted.org/packages/70/8e/0e2d847013cb52cd35b38c009bb167a1a26b2ce6cd6965bf26b47bc0bf44/requests-2.31.0-py3-none-any.whl", hash = "sha256:58cd2187c01e70e6e26505bca751777aa9f2ee0b7f4300988b709f44e013003f", size = 62574, upload-time = "2023-05-22T15:12:42.313Z" },
 ]
 
 [[package]]
@@ -3821,11 +3848,11 @@ wheels = [
 
 [[package]]
 name = "websocket-client"
-version = "1.8.0"
+version = "1.7.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/e6/30/fba0d96b4b5fbf5948ed3f4681f7da2f9f64512e1d303f94b4cc174c24a5/websocket_client-1.8.0.tar.gz", hash = "sha256:3239df9f44da632f96012472805d40a23281a991027ce11d2f45a6f24ac4c3da", size = 54648, upload-time = "2024-04-23T22:16:16.976Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/20/07/2a94288afc0f6c9434d6709c5320ee21eaedb2f463ede25ed9cf6feff330/websocket-client-1.7.0.tar.gz", hash = "sha256:10e511ea3a8c744631d3bd77e61eb17ed09304c413ad42cf6ddfa4c7787e8fe6", size = 54037, upload-time = "2023-12-03T15:58:47.596Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5a/84/44687a29792a70e111c5c477230a72c4b957d88d16141199bf9acb7537a3/websocket_client-1.8.0-py3-none-any.whl", hash = "sha256:17b44cc997f5c498e809b22cdf2d9c7a9e71c02c8cc2b6c56e7c2d1239bfa526", size = 58826, upload-time = "2024-04-23T22:16:14.422Z" },
+    { url = "https://files.pythonhosted.org/packages/1e/70/1e88138a9afbed1d37093b85f0bebc3011623c4f47c166431599fe9d6c93/websocket_client-1.7.0-py3-none-any.whl", hash = "sha256:f4c3d22fec12a2461427a29957ff07d35098ee2d976d3ba244e688b8b4057588", size = 58462, upload-time = "2023-12-03T15:58:45.15Z" },
 ]
 
 [[package]]
