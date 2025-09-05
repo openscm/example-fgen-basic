@@ -15,7 +15,7 @@ module m_get_wavelength_w  ! Convention to date: just suffix wrappers with _w
     ! and the original function should have the same name.
     ! ("o_" for original)
 
-    implicit none
+    implicit none (type, external)
     private
 
     public :: get_wavelength

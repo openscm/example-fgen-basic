@@ -7,7 +7,7 @@ module m_get_wavelength
 
     use kind_parameters, only: dp
 
-    implicit none
+    implicit none (type, external)
     private
 
     real(kind=dp), parameter, public :: speed_of_light = 2.99792e8_dp
