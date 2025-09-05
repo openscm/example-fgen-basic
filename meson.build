@@ -149,7 +149,6 @@ if pyprojectwheelbuild_enabled
   # this is where that operation happens.
   # Files get copied to <python directory>/site-packages/<subdir>
   foreach python_src : python_srcs
-    message(fs.relative_to(python_src, 'src' / python_project_name))
     py.install_sources(
         python_src,
         subdir: fs.parent(fs.relative_to(python_src, 'src')),
