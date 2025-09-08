@@ -8,7 +8,7 @@ project(
   meson_version: '>=1.3.0',
   default_options: [
     'buildtype=debugoptimized',
-    'default_library=both',
+    'default_library=static',
   ],
 )
 
@@ -95,7 +95,6 @@ if pyprojectwheelbuild_enabled
       # any other dependencies which aren't in source e.g. fgen-core
       # e.g. dependencies: [fgen_core_dep],
       install: false,
-      override_options: ['default_library=static'],
       )
 
   ancillary_dep = declare_dependency(link_with: ancillary_lib)
