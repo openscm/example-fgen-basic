@@ -41,14 +41,14 @@ module m_error_v
     end type ErrorV
 
     interface ErrorV
-    !! Constructor interface - see build (TODO: figure out cross-ref syntax) for details
+    !> Constructor interface - see docs [[m_error_v(module):build(subroutine)]] of for details.
         module procedure :: constructor
     end interface ErrorV
 
 contains
 
+    !> Constructor function: see docs of [[m_error_v(module):build(procedure)]] for details.
     function constructor(code, message) result(self)
-        !! Constructor - see build (TODO: figure out cross-ref syntax) for details
 
         integer, intent(in) :: code
         character(len=*), optional, intent(in) :: message
@@ -68,7 +68,7 @@ contains
         integer, intent(in) :: code
         !! Error code
         !!
-        !! Use [TODO: figure out xref] `NO_ERROR_CODE` if there is no error
+        !> Use [[m_error_v:NO_ERROR_CODE(variable)]] if there is no error.
 
         character(len=*), optional, intent(in) :: message
         !! Error message

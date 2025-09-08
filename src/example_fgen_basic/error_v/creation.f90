@@ -16,7 +16,7 @@ contains
     function create_error(inv) result(err)
         !! Create an error
         !!
-        !! If an odd number is supplied, the error code is no error (TODO: cross-ref).
+        !! If an odd number is supplied, the error code is no error [[m_error_v:NO_ERROR_CODE(variable)]].
         !! If an even number is supplied, the error code is 1.
         !! If a negative number is supplied, the error code is 2.
 
@@ -42,7 +42,7 @@ contains
     function create_errors(invs, n) result(errs)
         !! Create a number of errors
         !!
-        !! If an odd number is supplied, the error code is no error (TODO: cross-ref).
+        !! If an odd number is supplied, the error code is no error [[m_error_v:NO_ERROR_CODE(variable)]].
         !! If an even number is supplied, the error code is 1.
         !! If a negative number is supplied, the error code is 2.
 

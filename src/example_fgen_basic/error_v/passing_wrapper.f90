@@ -26,13 +26,12 @@ module m_error_v_passing_w
 contains
 
     function pass_error(inv_instance_index) result(res)
-        !! Wrapper around `m_error_v_passing.pass_error` (TODO: x-ref)
+        !> Wrapper around `m_error_v_passing.pass_error` [[m_error_v_passing(module):pass_error(function)]].
 
         integer, intent(in) :: inv_instance_index
         !! Input values
-        !!
-        !! See docstring of `m_error_v_passing.pass_error` for details.
-        !! [TODO: x-ref]
+        !> See docstring of [[m_error_v_passing(module):pass_error(function)]] for details.
+
         !! The trick here is to pass in the instance index, not the instance itself
 
         logical :: res
@@ -48,13 +47,12 @@ contains
     end function pass_error
 
     function pass_errors(inv_instance_indexes, n) result(res)
-        !! Wrapper around `m_error_v_passing.pass_errors` (TODO: x-ref)
+        !> Wrapper around `m_error_v_passing.pass_error` [[m_error_v_passing(module):pass_errors(function)]].
 
         integer, dimension(n), intent(in) :: inv_instance_indexes
         !! Input values
         !!
-        !! See docstring of `m_error_v_passing.pass_errors` for details.
-        !! [TODO: x-ref]
+        !! See docstring of [[m_error_v_passing(module):pass_errors(function)]] for details.
 
         integer, intent(in) :: n
         !! Number of values to pass

@@ -1,5 +1,5 @@
 """
-Wrappers of `m_error_v_creation` [TODO think about naming and x-referencing]
+Wrappers of [`m_error_v_creation`](/fortran-api/module/m_error_v_creation.html)
 
 At the moment, all written by hand.
 We will auto-generate this in future.
