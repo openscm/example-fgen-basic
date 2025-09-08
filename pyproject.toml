@@ -94,6 +94,7 @@ docs = [
     "jupyterlab>=4.4.5",
     "jupytext>=1.17.2",
     "mkdocs-jupyter>=0.25.1",
+    "pint>=0.24.4",
 ]
 # For minimum test dependencies.
 # These are used when running our minimum PyPI install tests.
@@ -147,7 +148,8 @@ source = [
 ]
 branch = true
 omit = [
-    # TODO: check this file
+    "*typing.py",  # Should not be needed at runtime
+    # TODO: test these files directly when splitting out pyfgen_runtime
     "*exceptions.py",
     "*runtime_helpers.py",
 ]

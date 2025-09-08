@@ -12,6 +12,9 @@ project(
   ],
 )
 
+# https://mesonbuild.com/Fs-module.html
+fs = import('fs')
+
 # Some useful constants
 pyprojectwheelbuild_enabled = get_option('pyprojectwheelbuild').enabled()
 
@@ -48,12 +51,21 @@ if pyprojectwheelbuild_enabled
   # These are the src with which Python interacts.
   # Injected with `script/inject-srcs-into-meson-build.py`
   srcs = files(
+    'src/example_fgen_basic/error_v/creation_wrapper.f90',
+    'src/example_fgen_basic/error_v/error_v_wrapper.f90',
+    'src/example_fgen_basic/error_v/passing_wrapper.f90',
     'src/example_fgen_basic/get_wavelength_wrapper.f90',
   )
 
   # Specify all the other source Fortran files (original files and managers)
   # Injected with `script/inject-srcs-into-meson-build.py`
   srcs_ancillary_lib = files(
+    'src/example_fgen_basic/error_v/creation.f90',
+    'src/example_fgen_basic/error_v/error_v.f90',
+    'src/example_fgen_basic/error_v/error_v_manager.f90',
+    'src/example_fgen_basic/error_v/passing.f90',
+    'src/example_fgen_basic/fpyfgen/base_finalisable.f90',
+    'src/example_fgen_basic/fpyfgen/derived_type_manager_helpers.f90',
     'src/example_fgen_basic/get_wavelength.f90',
     'src/example_fgen_basic/kind_parameters.f90',
   )
@@ -62,10 +74,15 @@ if pyprojectwheelbuild_enabled
   # Injected with `script/inject-srcs-into-meson-build.py`
   python_srcs = files(
     'src/example_fgen_basic/__init__.py',
+    'src/example_fgen_basic/error_v/__init__.py',
+    'src/example_fgen_basic/error_v/creation.py',
+    'src/example_fgen_basic/error_v/error_v.py',
+    'src/example_fgen_basic/error_v/passing.py',
     'src/example_fgen_basic/exceptions.py',
     'src/example_fgen_basic/get_wavelength.py',
-    'src/example_fgen_basic/operations.py',
-    'src/example_fgen_basic/runtime_helpers.py',
+    'src/example_fgen_basic/pyfgen_runtime/__init__.py',
+    'src/example_fgen_basic/pyfgen_runtime/exceptions.py',
+    'src/example_fgen_basic/typing.py',
   )
 
     # The ancillary library,
@@ -134,7 +151,7 @@ if pyprojectwheelbuild_enabled
   foreach python_src : python_srcs
     py.install_sources(
         python_src,
-        subdir: python_project_name,
+        subdir: fs.parent(fs.relative_to(python_src, 'src')),
         pure: false,
     )
 

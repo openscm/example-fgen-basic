@@ -1,5 +1,5 @@
 """
-Exceptions used throughout
+Runtime exceptions
 """
 
 from __future__ import annotations
@@ -7,7 +7,6 @@ from __future__ import annotations
 from typing import Any, Callable, Optional
 
 
-# TODO: move this into an `fgen_runtime` package
 class CompiledExtensionNotFoundError(ImportError):
     """
     Raised when a compiled extension can't be imported i.e. found

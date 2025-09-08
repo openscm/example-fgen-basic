@@ -3,6 +3,8 @@ program tester_unit
     use, intrinsic :: iso_fortran_env, only: error_unit
 
     use testdrive, only: run_testsuite, new_testsuite, testsuite_type, select_suite, run_selected, get_argument
+
+    use test_error_v_creation, only: collect_error_v_creation_tests
     use test_get_wavelength, only: collect_get_wavelength_tests
 
     implicit none (type, external)
@@ -14,7 +16,10 @@ program tester_unit
     stat = 0
 
     ! add new tests here
-    testsuites = [new_testsuite("test_get_wavelength", collect_get_wavelength_tests)]
+    testsuites = [ &
+        new_testsuite("test_get_wavelength", collect_get_wavelength_tests), &
+        new_testsuite("test_error_v_creation", collect_error_v_creation_tests) &
+    ]
 
     call get_argument(1, suite_name)
     call get_argument(2, test_name)
