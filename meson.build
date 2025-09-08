@@ -8,7 +8,7 @@ project(
   meson_version: '>=1.3.0',
   default_options: [
     'buildtype=debugoptimized',
-    'default_library=static',
+    'default_library=both',
   ],
 )
 
@@ -141,6 +141,7 @@ if pyprojectwheelbuild_enabled
       dependencies : [ancillary_dep],
       # # If you need other deps, add them here too e.g.
       # dependencies : [ancillary_dep, fgen_core_dep],
+      link_args: ['-static-libgcc', '-static-libgfortran'],
       install: true,
       subdir: python_project_name,
   )
