@@ -20,7 +20,7 @@ module m_error_v
         integer :: code = 1
         !! Error code
 
-        character(len=128) :: message = ""
+        character(len=256) :: message = ""
         !! Error message
         ! TODO: think about making the message allocatable to handle long messages
 
