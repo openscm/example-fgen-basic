@@ -113,6 +113,14 @@ jobs:
           # TODO: figure out whether we need/want to use other compilers too
           compiler: "gcc"
           version: "13"
+      - name: Install LLVM (Windows)
+        if: runner.os == 'Windows'
+        uses: KyleMayes/install-llvm-action@v2
+        with:
+          version: "20"
+      - name: Force AR to llvm-lib
+        if: runner.os == 'Windows'
+        run: echo "AR=llvm-lib.exe" >> $env:GITHUB_ENV
       - uses: ./.github/actions/setup
         with:
           python-version: ${{ matrix.python-version }}
