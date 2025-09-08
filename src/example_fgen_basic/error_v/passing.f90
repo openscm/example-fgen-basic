@@ -1,4 +1,4 @@
-!> Error passing
+!> *Error passing*
 !>
 !> A very basic demo to get the idea.
 !

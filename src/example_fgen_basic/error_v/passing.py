@@ -1,5 +1,5 @@
 """
-Wrappers of `m_error_v_passing` [TODO think about naming and x-referencing]
+Wrappers of [`m_error_v_passing`](/fortran-api/module/m_error_v_passing.html).
 
 At the moment, all written by hand.
 We will auto-generate this in future.
@@ -76,7 +76,7 @@ def pass_errors(invs: tuple[ErrorV, ...]) -> NP_ARRAY_OF_BOOL:
     """
     # Controlling memory from the Python side
     m_error_v_w.ensure_at_least_n_instances_can_be_passed_simultaneously(len(invs))
-    # TODO: consider adding `build_instances` too, might be headache
+
     instance_indexes: NP_ARRAY_OF_INT = np.array(
         [m_error_v_w.build_instance(code=inv.code, message=inv.message) for inv in invs]
     )

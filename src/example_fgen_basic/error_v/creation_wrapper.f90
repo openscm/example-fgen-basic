@@ -25,13 +25,12 @@ module m_error_v_creation_w
 contains
 
     function create_error(inv) result(res_instance_index)
-        !! Wrapper around `m_error_v_creation.create_error` (TODO: x-ref)
+        !> Wrapper around `m_error_v_creation.create_error` ([[m_error_v_creation(module):create_error(function)]])
 
         integer, intent(in) :: inv
         !! Input value to use to create the error
         !!
-        !! See docstring of `m_error_v_creation.create_error` for details.
-        !! [TODO: x-ref]
+        !> See docstring of [[m_error_v_creation(module):create_error(function)]] for details.
 
         integer :: res_instance_index
         !! Instance index of the result
@@ -56,13 +55,12 @@ contains
     end function create_error
 
     function create_errors(invs, n) result(res_instance_indexes)
-        !! Wrapper around `m_error_v_creation.create_errors` (TODO: x-ref)
+        !> Wrapper around `m_error_v_creation.create_errors` ([[m_error_v_creation(module):create_errors(function)]])
 
         integer, dimension(n), intent(in) :: invs
         !! Input value to use to create the error
         !!
-        !! See docstring of `m_error_v_creation.create_error` for details.
-        !! [TODO: x-ref]
+        !> See docstring of [[m_error_v_creation(module):create_errors(function)]] for details.
 
         integer, intent(in) :: n
         !! Number of values to create

@@ -1,5 +1,5 @@
 """
-Python equivalent of the Fortran `ErrorV` class [TODO: x-refs]
+Python equivalent of the Fortran [ErrorV](/fortran-api/type/errorv.html) class.
 
 At the moment, all written by hand.
 We will auto-generate this in future.

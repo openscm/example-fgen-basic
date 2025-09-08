@@ -1,4 +1,4 @@
-!> Manager of `ErrorV` (TODO: xref) across the Fortran-Python interface
+!> Manager of [[m_error_v(module)]] across the Fortran-Python interface
 !>
 !> Written by hand here.
 !> Generation to be automated in future (including docstrings of some sort).
