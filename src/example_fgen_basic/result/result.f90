@@ -14,9 +14,10 @@ module m_result
     !!
     !! Holds either the result or an error.
 
-        class(*), allocatable :: data_v(..)
-        !! Data i.e. the result (if no error occurs)
-        !!
+       ! class(*), allocatable :: data_v(..)
+       ! MZ: assumed rank can only be dummy argument NOT type/class argument
+        ! Data i.e. the result (if no error occurs)
+        !
         ! Assumed rank array
         ! (https://fortran-lang.discourse.group/t/assumed-rank-arrays/1049)
         ! Technically a Fortran 2018 feature,
@@ -36,7 +37,8 @@ module m_result
         ! procedure, public:: build
         ! TODO: Think about whether build should be on the abstract class
         ! or just on each concrete implementation
-        procedure, public:: finalise, is_error
+        procedure, public:: is_error
+        final, public:: finalise
 
     end type Result
 
@@ -47,79 +49,15 @@ module m_result
 
 contains
 
-    ! See above about whether we include this here or not
-    ! Build should return a Result with an error if we try to set/allocate both
-    ! data and error
-    ! subroutine build(self, code, message)
-    !     !! Build instance
-    !
-    !     class(ErrorV), intent(inout) :: self
-    !     ! Hopefully can leave without docstring (like Python)
-    !
-    !     integer, intent(in) :: code
-    !     !! Error code
-    !     !!
-    !     !! Use [TODO: figure out xref] `NO_ERROR_CODE` if there is no error
-    !
-    !     character(len=*), optional, intent(in) :: message
-    !     !! Error message
-    !
-    !     self % code = code
-    !     if (present(message)) then
-    !         self % message = message
-    !     end if
-    !
-    ! end subroutine build
-
-    !subroutine constructor(self, code, message)
-    !     !! Build instance
-    !
-     !    class(*), allocatable :: data_v(..)
-     !    class(ErrorV), intent(inout) :: self
-    !     ! Hopefully can leave without docstring (like Python)
-      !   integer, intent(in) :: code = NO_ERROR_CODE
-    !     !! Error code
-    !     !!
-    !     !! Use [TODO: figure out xref] `NO_ERROR_CODE` if there is no error
-       !  character(len=*), optional, intent(in) :: message = ""
-    !     !! Error message
-    !
-    !     self % code = code
-    !     if (present(message)) then
-    !         self % message = message
-    !     end if
-    !
-    !end subroutine constructor
-
-    function finalise(self) result(res)
+    subroutine finalise(self)
         !! Finalise the instance (i.e. free/deallocate)
 
         class(Result), intent(inout) :: self
         ! Hopefully can leave without docstring (like Python)
 
-!        type(ResultNone) :: res
+        if (allocated(self % error_v)) deallocate(self % error_v)
 
-        res = Result()
-
-        if (allocated(self % data_v) .and. allocated(self % error_v)) then
-            deallocate(self % data_v)
-            deallocate(self % error_v)
-            call res % build(message="Both data and error were allocated")
-
-        elseif (allocated(self % data_v)) then
-            deallocate(self % data_v)
-            ! No error - no need to call res % build
-
-        elseif (allocated(self % error_v)) then
-            deallocate(self % error_v)
-            ! No error - no need to call res % build
-
-        else
-            call res % build(message="Neither data nor error was allocated")
-
-        end if
-
-    end function finalise
+    end subroutine finalise
 
     pure function is_error(self) result(is_err)
         !! Determine whether `self` contains an error or not
