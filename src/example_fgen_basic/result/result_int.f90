@@ -15,7 +15,7 @@ module m_result_int
     !!
     !! Holds either an integer value or an error.
 
-        integer, allocatable :: data_v
+        integer, allocatable :: data_vvvvv
         !! Data i.e. the result (if no error occurs)
 
        ! class(ErrorV), allocatable :: error_v
