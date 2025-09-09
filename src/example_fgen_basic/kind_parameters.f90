@@ -2,7 +2,7 @@
 !> See https://fortran-lang.org/learn/best_practices/floating_point/
 module kind_parameters
 
-    implicit none (type, external)
+    implicit none(type, external)
     private
 
     !> Single precision real numbers, 6 digits, range 10⁻³⁷ to 10³⁷-1; 32 bits

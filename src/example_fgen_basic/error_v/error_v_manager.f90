@@ -6,7 +6,7 @@ module m_error_v_manager
 
     use m_error_v, only: ErrorV
 
-    implicit none (type, external)
+    implicit none(type, external)
     private
 
     type(ErrorV), dimension(:), allocatable :: instance_array
@@ -160,19 +160,19 @@ contains
 
         if (.not. allocated(instance_array)) then
 
-            allocate(instance_array(n))
+            allocate (instance_array(n))
 
-            allocate(instance_available(n))
+            allocate (instance_available(n))
             ! Race conditions ?
             instance_available = .true.
 
         else if (size(instance_available) < n) then
 
-            allocate(tmp_instances(n))
+            allocate (tmp_instances(n))
             tmp_instances(1:size(instance_array)) = instance_array
             call move_alloc(tmp_instances, instance_array)
 
-            allocate(tmp_available(n))
+            allocate (tmp_available(n))
             tmp_available(1:size(instance_available)) = instance_available
             tmp_available(size(instance_available) + 1:size(tmp_available)) = .true.
             call move_alloc(tmp_available, instance_available)

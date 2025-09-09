@@ -6,7 +6,7 @@ module m_result
 
     use m_error_v, only: ErrorV, NO_ERROR_CODE
 
-    implicit none
+    implicit none (type, external)
     private
 
     type, abstract, public :: Result
@@ -14,8 +14,8 @@ module m_result
     !!
     !! Holds either the result or an error.
 
-       ! class(*), allocatable :: data_v(..)
-       ! MZ: assumed rank can only be dummy argument NOT type/class argument
+        ! class(*), allocatable :: data_v(..)
+        ! MZ: assumed rank can only be dummy argument NOT type/class argument
         ! Data i.e. the result (if no error occurs)
         !
         ! Assumed rank array
@@ -37,15 +37,15 @@ module m_result
         ! procedure, public:: build
         ! TODO: Think about whether build should be on the abstract class
         ! or just on each concrete implementation
-        procedure, public:: is_error
+        procedure, public :: is_error
         procedure, public :: clean_up
 
     end type Result
 
-  !  interface Result
+    !  interface Result
     !! Constructor interface - see build (TODO: figure out cross-ref syntax) for details
     !    module procedure :: constructor
-   ! end interface Result
+    ! end interface Result
 
 contains
 
@@ -55,7 +55,7 @@ contains
         class(Result), intent(inout) :: self
         ! Hopefully can leave without docstring (like Python)
 
-        if (allocated(self % error_v)) deallocate(self%error_v)
+        if (allocated(self % error_v)) deallocate (self % error_v)
 
     end subroutine clean_up
 
