@@ -38,7 +38,7 @@ module m_result
         ! TODO: Think about whether build should be on the abstract class
         ! or just on each concrete implementation
         procedure, public:: is_error
-        final, public:: finalise
+        procedure, public :: clean_up
 
     end type Result
 
@@ -49,15 +49,15 @@ module m_result
 
 contains
 
-    subroutine finalise(self)
+    subroutine clean_up(self)
         !! Finalise the instance (i.e. free/deallocate)
 
         class(Result), intent(inout) :: self
         ! Hopefully can leave without docstring (like Python)
 
-        if (allocated(self % error_v)) deallocate(self % error_v)
+        if (allocated(self % error_v)) deallocate(self%error_v)
 
-    end subroutine finalise
+    end subroutine clean_up
 
     pure function is_error(self) result(is_err)
         !! Determine whether `self` contains an error or not
