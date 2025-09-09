@@ -18,7 +18,7 @@ module m_error_v_passing_w
     !     error_v_manager_set_instance_index_to => set_instance_index_to, &
     !     error_v_manager_ensure_instance_array_size_is_at_least => ensure_instance_array_size_is_at_least
 
-    implicit none
+    implicit none (type, external)
     private
 
     public :: pass_error, pass_errors

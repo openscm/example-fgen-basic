@@ -1,0 +1,5 @@
+[check]
+# TODO: think about adding other rules
+select = [ "C", "E", "S" ]
+ignore = [ ]
+line-length = 120

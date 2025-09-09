@@ -94,6 +94,7 @@ docs = [
     "jupyterlab>=4.4.5",
     "jupytext>=1.17.2",
     "mkdocs-jupyter>=0.25.1",
+    "pint>=0.24.4",
 ]
 # For minimum test dependencies.
 # These are used when running our minimum PyPI install tests.
@@ -101,7 +102,6 @@ tests-min = [
     # Key dependencies
     # ----------------
     "pytest>=8.3.4",
-    "pytest-regressions>=2.8.2",
 ]
 # Full test dependencies.
 tests-full = [
@@ -115,7 +115,6 @@ tests-full = [
 tests = [
     {include-group = "tests-min"},
     {include-group = "tests-full"},
-    "ipython>=8.18.1",
 ]
 all-dev = [
     {include-group = "dev"},
@@ -149,6 +148,7 @@ source = [
 ]
 branch = true
 omit = [
+    "*typing.py",  # Should not be needed at runtime
     # TODO: test these files directly when splitting out pyfgen_runtime
     "*exceptions.py",
     "*runtime_helpers.py",

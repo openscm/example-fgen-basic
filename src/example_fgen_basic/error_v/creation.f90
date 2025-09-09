@@ -2,13 +2,11 @@
 !>
 !> A very basic demo to get the idea.
 !
-! TODO: discuss - we should probably have some convention for module names.
-! The hard part is avoiding them becoming too long...
 module m_error_v_creation
 
     use m_error_v, only: ErrorV, NO_ERROR_CODE
 
-    implicit none
+    implicit none (type, external)
     private
 
     public :: create_error, create_errors

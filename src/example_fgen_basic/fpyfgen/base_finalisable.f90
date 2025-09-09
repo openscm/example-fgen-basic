@@ -4,7 +4,7 @@
 !> across the Python-Fortran interface.
 module fpyfgen_base_finalisable
 
-    implicit none
+    implicit none (type, external)
     private
 
     integer, parameter, public :: INVALID_INSTANCE_INDEX = -1
@@ -37,6 +37,9 @@ module fpyfgen_base_finalisable
             !! Finalise the instance (i.e. free/deallocate)
 
             import :: BaseFinalisable
+
+            implicit none (type, external)
+
             class(BaseFinalisable), intent(inout) :: self
 
         end subroutine derived_type_finalise

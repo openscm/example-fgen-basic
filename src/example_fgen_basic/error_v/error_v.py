@@ -60,3 +60,21 @@ class ErrorV:
         res = cls(code=code, message=message)
 
         return res
+
+    def build_fortran_instance(self) -> int:
+        """
+        Build an instance equivalent to `self` on the Fortran side
+
+        Intended for use mainly by wrapping functions.
+        Most users should not need to use this method directly.
+
+        Returns
+        -------
+        :
+            Instance index of the object which has been created on the Fortran side
+        """
+        instance_index: int = m_error_v_w.build_instance(
+            code=self.code, message=self.message
+        )
+
+        return instance_index

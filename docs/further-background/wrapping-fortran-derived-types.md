@@ -1,4 +1,6 @@
-@Marco please move these into `docs/further-background/wrapping-derived-types.md` (and do any other clean up and formatting fixes you'd like)
+# Wrapping derived types
+
+Here we describe our approach to wrapping Fortran derived types.
 
 ## What is the goal?
 
@@ -30,7 +32,7 @@ the original Python object will remain unchanged
 
 This assumption makes ownership and memory management clear.
 We do not need to keep instances around as views
-and worry about consistency across the Python-Fortran interface.
+and therefore do not need to worry about consistency across the Python-Fortran interface.
 Instead, we simply pass data back and forth,
 and the normal rules of data consistency within each programming language apply.
 
@@ -45,57 +47,54 @@ The manager module has two key components:
    In practice, they are essentially temporary variables.
 1. an allocatable array of logical (boolean) values,
    call this `available_array`.
-   The convention is that, if `available_array(i)`, where `i` is an integer,
-   is `.true.` then the instance at `instance_array(i)` is available for the manager to use,
-   otherwise the manager assumes that the instance is already being used for some purpose
+   The convention is that, if `available_array(i)` is `.true.`,
+   where `i` is an integer,
+   then the instance at `instance_array(i)` is available for the manager to use.
+   Otherwise, the manager assumes that the instance is already being used for some purpose
    and therefore cannot be used for whatever operation is currently being performed.
 
 This setup allows us to effectively pass derived types back and forth between Python and Fortran.
 
-Whenever we need to return a derived type to Python, we:
+Whenever we need to return a derived type (or derived types) to Python, we:
 
-[TODO think about retrieving multiple derived types at once]
-
-1. get the derived type from whatever Fortran function or subroutine created it,
+1. get the derived type(s) from whatever Fortran function or subroutine created it,
    call this `derived_type_original`
 1. find an index, `idx`, in `available_array` such that `available_array(idx)` is `.true.`
 1. set `instance_array(idx)` equal to `derived_type_original`
 1. we return `idx` to Python
-    - `idx` is an integer, so we can return this easily to Python using `f2py`
-1. we then create a Python object with an API that mirrors `derived_type_original`
+    - `idx` is an integer (or integers), so we can return this easily to Python using `f2py`
+1. we then create a Python object (or objects) with an API that mirrors `derived_type_original`
    using the class method `from_instance_index`.
-   This class method is [TODO or will be] auto-generated via `pyfgen`
+   This class method is auto-generated via `pyfgen`
+   (TODO: implement auto-generation)
    and handles retrieval of all the attribute values of `derived_type_original`
    from Fortran and sets them on the Python object that is being instantiated
     - we can do this as, if you dig down deep enough, all attributes eventually
       become primitive types which can be passed back and forth using `f2py`,
       it can just be that multiple levels of recursion are needed
       if you have derived types that themselves have derived type attributes
-1. we then call the manager [TODO I think this will end up being wrapper, we can tighten the language later]
-   module's `finalise_instance` function to free the (temporary) instance
+1. we then call the wrapper module's `finalise_instance` function to free the (temporary) instance(s)
    that was used by the manager
+   (we cannot access the manager module directly as it cannot be wrapped by `f2py`)
     - this instance is no longer needed because all the data has been transferred to Python
-1. we end up with a Python instance that has the result
+1. we end up with a Python instance(s) that has the result
    and no extra/leftover memory footprint in Fortran
    (and leave Fortran to decide whether to clean up `derived_type_original` or not)
 
-Whenever we need to pass a derived type to Fortran, we:
+Whenever we need to pass a derived type (or derived types) to Fortran, we:
 
-[TODO think about passing multiple derived types at once]
-
-1. call the manager [TODO I think this will end up being wrapper, we can tighten the language later]
-   module's `get_free_instance_index` function to get an available index to use for the passing
-1. call the manager [TODO I think this will end up being wrapper, we can tighten the language later]
-   module's `build_instance` function with the index we just received
-   plus all of the Python object's attribute values
-    - on the Fortran side, there is now an instantiated derived type, ready for use
+1. get an instance index we can use to communicate with Fortran
+    1. call the Python object's `build_fortran_instance` method,
+       which returns the instance index where the object was created on the Fortran side.
+       Under the hood, this calls the wrapper module's
+      `get_free_instance_index` and `build_instance` functions
+    1. on the Fortran side, there is now an instantiated derived type, ready for use
 1. call the wrapped Fortran function of interest,
-   except we pass the instance index instead of the derived type
+   except we pass the instance index instead of the actual Python object itself
 1. on the Fortran side, retrieve the instantiated index from the manager module
    and use this to call the Fortran function/subroutine of interest
 1. return the result from Fortran back to Python
-1. call the manager [TODO I think this will end up being wrapper, we can tighten the language later]
-   module's `finalise_instance` function to free the (temporary) instance
+1. call the wrapper module's `finalise_instance` function to free the (temporary) instance
    that was used to pass the instance in the first place
     - this instance is no longer needed because all the data has been transferred and used by Fortran
 1. we end up with the result of the Fortran callable back in Python
@@ -175,9 +174,7 @@ and normal Python rules apply in Python
 Note: this section was never properly finished.
 Once we started trying to write it,
 we realised how hard it would be to avoid weird edge cases
-so we stopped and changed to [our current solution][Our solution]
-(@Marco please check that this internal cross-reference works
-once the docs are built).
+so we stopped and changed to [our current solution][our-solution].
 
 To pass derived types back and forth across the Python-Fortran interface,
 we introduce a 'manager' module for all derived types.

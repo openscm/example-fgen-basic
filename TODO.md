@@ -1,8 +1,0 @@
-- read through everything
-    - check docstrings
-    - check naming (if you want to propose a consistent naming convention, go for it)
-- consider adding `m_error_v_w.build_instances` too, might be headache to pass arrays of things up and down correctly
-- clean up
-- final review (including deleting this file)
-- merge
-- move onto a basic result type with a subclass specifically for integers (`ResultInt` or something)

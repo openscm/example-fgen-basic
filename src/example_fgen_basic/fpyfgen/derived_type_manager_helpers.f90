@@ -3,7 +3,7 @@ module fpyfgen_derived_type_manager_helpers
 
     use fpyfgen_base_finalisable, only: BaseFinalisable, invalid_instance_index
 
-    implicit none
+    implicit none (type, external)
     private
 
     public :: get_derived_type_free_instance_number, &
@@ -33,7 +33,7 @@ contains
         class(BaseFinalisable), dimension(n_instances), intent(inout) :: instance_array
         !! Array of instances
 
-        integer :: i = 1
+        integer :: i
 
         ! Default if no available models are found
         instance_index = invalid_instance_index

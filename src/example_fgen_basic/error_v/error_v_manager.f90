@@ -6,7 +6,7 @@ module m_error_v_manager
 
     use m_error_v, only: ErrorV
 
-    implicit none
+    implicit none (type, external)
     private
 
     type(ErrorV), dimension(:), allocatable :: instance_array
@@ -166,7 +166,7 @@ contains
             ! Race conditions ?
             instance_available = .true.
 
-        elseif (size(instance_available) < n) then
+        else if (size(instance_available) < n) then
 
             allocate(tmp_instances(n))
             tmp_instances(1:size(instance_array)) = instance_array

@@ -14,7 +14,7 @@ module m_error_v_w
         error_v_manager_get_instance => get_instance, &
         error_v_manager_ensure_instance_array_size_is_at_least => ensure_instance_array_size_is_at_least
 
-    implicit none
+    implicit none (type, external)
     private
 
     public :: build_instance, finalise_instance, finalise_instances, &
@@ -43,6 +43,12 @@ contains
         instance_index = error_v_manager_build_instance(code, message)
 
     end subroutine build_instance
+
+    ! build_instances is very hard to do
+    ! because you need to pass an array of variable-length characters which is non-trivial.
+    ! Maybe we will try this another day, for now this isn't that important
+    ! (we can just use a loop from the Python side)
+    ! so we just don't bother implementing `build_instances`.
 
     subroutine finalise_instance(instance_index)
         !! Finalise an instance

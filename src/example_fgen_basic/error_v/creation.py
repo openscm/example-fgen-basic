@@ -19,9 +19,7 @@ try:
 except (ModuleNotFoundError, ImportError) as exc:  # pragma: no cover
     raise CompiledExtensionNotFoundError("example_fgen_basic._lib.m_error_v_w") from exc
 try:
-    from example_fgen_basic._lib import (  # type: ignore
-        m_error_v_creation_w,
-    )
+    from example_fgen_basic._lib import m_error_v_creation_w
 except (ModuleNotFoundError, ImportError) as exc:  # pragma: no cover
     raise CompiledExtensionNotFoundError(
         "example_fgen_basic._lib.m_error_v_creation_w"
@@ -41,7 +39,7 @@ def create_error(inv: int) -> ErrorV:
         Input value
 
         If odd, the error code is
-        [NO_ERROR_CODE][example_fgen_basic.error_v.NO_ERROR_CODE].
+        [NO_ERROR_CODE][example_fgen_basic.error_v.error_v.NO_ERROR_CODE].
         If even, the error code is 1.
         If a negative number is supplied, the error code is 2.
 

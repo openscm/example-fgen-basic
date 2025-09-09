@@ -7,7 +7,7 @@ program tester_unit
     use test_error_v_creation, only: collect_error_v_creation_tests
     use test_get_wavelength, only: collect_get_wavelength_tests
 
-    implicit none
+    implicit none (type, external)
     integer :: stat, is
     character(len=:), allocatable :: suite_name, test_name
     type(testsuite_type), allocatable :: testsuites(:)
@@ -52,7 +52,7 @@ program tester_unit
     end if
 
     if (stat > 0) then
-        write (error_unit, '(i0, 1x, a)') stat, "test(s) failed!"
+        write (error_unit, "(i0, 1x, a)") stat, "test(s) failed!"
         error stop 1
     end if
 
