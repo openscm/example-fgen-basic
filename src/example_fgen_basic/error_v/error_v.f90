@@ -35,7 +35,9 @@ module m_error_v
 
         private
 
-        procedure, public :: build, finalise
+        procedure, public :: build
+        procedure, public :: finalise
+        final :: clean_up
         ! get_res sort of not needed (?)
         ! get_err sort of not needed (?)
 
@@ -92,5 +94,15 @@ contains
         self % message = ""
 
     end subroutine finalise
+
+    subroutine clean_up(self)
+        !! Finalise the instance (i.e. free/deallocate)
+
+        type(ErrorV), intent(inout) :: self
+        ! Hopefully can leave without docstring (like Python)
+
+        call self%finalise()
+
+    end subroutine clean_up
 
 end module m_error_v

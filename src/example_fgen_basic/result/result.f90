@@ -55,7 +55,7 @@ contains
         class(Result), intent(inout) :: self
         ! Hopefully can leave without docstring (like Python)
 
-        if (allocated(self % error_v)) deallocate (self % error_v)
+        deallocate (self % error_v)
 
     end subroutine clean_up
 

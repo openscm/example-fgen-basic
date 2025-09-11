@@ -69,6 +69,7 @@ if pyprojectwheelbuild_enabled
     'src/example_fgen_basic/get_wavelength.f90',
     'src/example_fgen_basic/kind_parameters.f90',
     'src/example_fgen_basic/result/result.f90',
+    'src/example_fgen_basic/result/result0D_int.f90',
     'src/example_fgen_basic/result/result_int.f90',
   )
 
