@@ -7,6 +7,7 @@ module m_result_dp_w
     ! The manager module, which makes this all work
     use m_error_v_manager, only: &
         error_v_manager_get_instance => get_instance, &
+        error_v_manager_ensure_instance_array_size_is_at_least => ensure_instance_array_size_is_at_least, &
         error_v_manager_get_available_instance_index => get_available_instance_index, &
         error_v_manager_set_instance_index_to => set_instance_index_to
 
@@ -137,13 +138,9 @@ contains
 
         type(ResultDP)  :: instance
 
-        print *, "instance_index"
-        print *, instance_index
         instance = result_dp_manager_get_instance(instance_index)
 
         data_v = instance % data_v
-        print *, "instance % data_v"
-        print *, instance % data_v
 
     end subroutine get_data_v
 
@@ -181,6 +178,8 @@ contains
         instance = result_dp_manager_get_instance(instance_index)
 
         error_v = instance % error_v
+
+        call error_v_manager_ensure_instance_array_size_is_at_least(1)
         call error_v_manager_get_available_instance_index(error_v_instance_index)
         call error_v_manager_set_instance_index_to(error_v_instance_index, error_v)
 

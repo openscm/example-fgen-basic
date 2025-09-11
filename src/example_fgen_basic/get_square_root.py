@@ -47,15 +47,23 @@ def get_square_root(inv: float) -> float:
         TODO: use a more specific error
     """
     result_instance_index: int = m_get_square_root_w.get_square_root(inv)
-
     result = ResultDP.from_instance_index(result_instance_index)
 
     if result.has_error:
         # TODO: be more specific
         raise FortranError(result.error_v.message)
+        # raise LessThanZeroError(result.error_v.message)
 
     res = result.data_v
 
+    # TODO: think
+    # I like the clarity of finalising result_instance_index here
+    # by having an explicit call
+    # (so you can see creation and finalisation in same place).
+    # (Probably the above is my preferred right now, but we should think about it.)
+    # I like the safety of finalising in `from_instance_index`.
+    # if not finalised(result_instance_index):
+    #     finalise(result_instance_index)
     m_result_dp_w.finalise_instance(result_instance_index)
 
     return res

@@ -42,11 +42,6 @@ contains
         ! ready for its attributes to be retrieved from Python.
         call result_dp_manager_set_instance_index_to(res_instance_index, res)
 
-        print *, "res_instance_index"
-        print *, res_instance_index
-        print *, "res % data_v"
-        print *, res % data_v
-
     end function get_square_root
 
 end module m_get_square_root_w
