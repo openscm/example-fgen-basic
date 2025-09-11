@@ -53,7 +53,8 @@ class ResultDP:
 
         # Integer is very simple
         if m_result_dp_w.data_v_is_set(instance_index):
-            data_v = m_result_dp_w.get_data_v(instance_index)
+            data_v: float = m_result_dp_w.get_data_v(instance_index)
+            # data_v: np.Float64 = m_result_dp_w.get_data_v(instance_index)
 
         else:
             data_v = None
@@ -71,6 +72,18 @@ class ResultDP:
         res = cls(data_v=data_v, error_v=error_v)
 
         return res
+
+    @property
+    def has_error(self) -> bool:
+        """
+        Whether this instance holds an error or not
+
+        Returns
+        -------
+        :
+            `True` if this instance holds an error, `False` otherwise
+        """
+        return self.error_v is not None
 
     def build_fortran_instance(self) -> int:
         """

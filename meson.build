@@ -54,7 +54,9 @@ if pyprojectwheelbuild_enabled
     'src/example_fgen_basic/error_v/creation_wrapper.f90',
     'src/example_fgen_basic/error_v/error_v_wrapper.f90',
     'src/example_fgen_basic/error_v/passing_wrapper.f90',
+    'src/example_fgen_basic/get_square_root_wrapper.f90',
     'src/example_fgen_basic/get_wavelength_wrapper.f90',
+    'src/example_fgen_basic/result/result_dp_wrapper.f90',
   )
 
   # Specify all the other source Fortran files (original files and managers)
@@ -71,6 +73,7 @@ if pyprojectwheelbuild_enabled
     'src/example_fgen_basic/kind_parameters.f90',
     'src/example_fgen_basic/result/result.f90',
     'src/example_fgen_basic/result/result_dp.f90',
+    'src/example_fgen_basic/result/result_dp_manager.f90',
     'src/example_fgen_basic/result/result_int.f90',
     'src/example_fgen_basic/result/result_int1D.f90',
     'src/example_fgen_basic/result/result_none.f90',

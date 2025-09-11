@@ -46,11 +46,11 @@ def get_square_root(inv: float) -> float:
 
         TODO: use a more specific error
     """
-    result_instance_index: int = m_get_square_root_w.get_wavelength(inv)
+    result_instance_index: int = m_get_square_root_w.get_square_root(inv)
 
     result = ResultDP.from_instance_index(result_instance_index)
 
-    if result.is_error:
+    if result.has_error:
         # TODO: be more specific
         raise FortranError(result.error_v.message)
 
