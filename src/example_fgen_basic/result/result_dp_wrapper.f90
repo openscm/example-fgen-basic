@@ -1,7 +1,6 @@
 !> Wrapper for interfacing `m_result_dp` with Python
 module m_result_dp_w
 
-    use kind_parameters, only: dp
     use m_error_v, only: ErrorV
     use m_result_dp, only: ResultDP
 
@@ -28,6 +27,10 @@ contains
 
     subroutine build_instance(data_v, error_v_instance_index, instance_index)
         !! Build an instance
+
+        ! Annoying that this has to be injected everywhere,
+        ! but ok it can be automated.
+        integer, parameter :: dp = selected_real_kind(15, 307)
 
         real(kind=dp), intent(in), optional :: data_v
         !! Data
@@ -124,15 +127,23 @@ contains
         data_v &
         )
 
+        ! Annoying that this has to be injected everywhere,
+        ! but ok it can be automated.
+        integer, parameter :: dp = selected_real_kind(15, 307)
+
         integer, intent(in) :: instance_index
 
         real(kind=dp), intent(out) :: data_v
 
         type(ResultDP)  :: instance
 
+        print *, "instance_index"
+        print *, instance_index
         instance = result_dp_manager_get_instance(instance_index)
 
         data_v = instance % data_v
+        print *, "instance % data_v"
+        print *, instance % data_v
 
     end subroutine get_data_v
 
