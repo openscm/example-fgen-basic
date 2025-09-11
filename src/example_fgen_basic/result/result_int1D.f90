@@ -1,8 +1,8 @@
-!> Result type for integers
+!> Result value for 1D arrays of integers
 !>
 !> Inspired by the excellent, MIT licensed
 !> https://github.com/samharrison7/fortran-error-handler
-module m_result_int
+module m_result_int1d
 
     use m_error_v, only: ErrorV
     use m_result, only: ResultBase
@@ -11,10 +11,12 @@ module m_result_int
     implicit none (type, external)
     private
 
-    type, extends(ResultBase), public :: ResultInt
+    type, extends(ResultBase), public :: ResultInt1D
     !! Result type that holds integer values
+    !!
+    !! Holds either an integer value or an error.
 
-        integer, allocatable :: data_v
+        integer, allocatable, dimension(:) :: data_v
         !! Data i.e. the result (if no error occurs)
 
         ! Note: the error_v attribute comes from ResultBase
@@ -27,26 +29,26 @@ module m_result_int
         procedure, public :: finalise
         final :: finalise_auto
 
-    end type ResultInt
+    end type ResultInt1D
 
-    interface ResultInt
+    interface ResultInt1D
     !! Constructor interface - see build [TODO: x-ref] for details
         module procedure :: constructor
-    end interface ResultInt
+    end interface ResultInt1D
 
 contains
 
     function constructor(data_v, error_v) result(self)
         !! Build instance
 
-        type(ResultInt) :: self
+        type(ResultInt1D) :: self
         ! Hopefully can leave without docstring (like Python)
 
-        integer, intent(in), optional :: data_v
+        integer, allocatable, intent(in), dimension(:), optional :: data_v
         !! Data
 
         class(ErrorV), intent(in), optional :: error_v
-        !! Error
+        !! Error message
 
         type(ResultNone) :: build_res
 
@@ -70,10 +72,10 @@ contains
     function build(self, data_v_in, error_v_in) result(res)
         !! Build instance
 
-        class(ResultInt), intent(out) :: self
+        class(ResultInt1D), intent(inout) :: self
         ! Hopefully can leave without docstring (like Python)
 
-        integer, intent(in), optional :: data_v_in
+        integer, intent(in), dimension(:), optional :: data_v_in
         !! Data
 
         class(ErrorV), intent(in), optional :: error_v_in
@@ -103,7 +105,7 @@ contains
     subroutine finalise(self)
         !! Finalise the instance (i.e. free/deallocate)
 
-        class(ResultInt), intent(inout) :: self
+        class(ResultInt1D), intent(inout) :: self
         ! Hopefully can leave without docstring (like Python)
 
         if (allocated(self % data_v)) deallocate (self % data_v)
@@ -117,11 +119,11 @@ contains
         !! This method is expected to be called automatically
         !! by clever clean up, which is why it differs from [TODO x-ref] `finalise`
 
-        type(ResultInt), intent(inout) :: self
+        type(ResultInt1D), intent(inout) :: self
         ! Hopefully can leave without docstring (like Python)
 
         call self % finalise()
 
     end subroutine finalise_auto
 
-end module m_result_int
+end module m_result_int1d

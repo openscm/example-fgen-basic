@@ -37,7 +37,7 @@ module m_error_v
 
         procedure, public :: build
         procedure, public :: finalise
-        final :: clean_up
+        final :: finalise_auto
         ! get_res sort of not needed (?)
         ! get_err sort of not needed (?)
 
@@ -95,14 +95,17 @@ contains
 
     end subroutine finalise
 
-    subroutine clean_up(self)
+    subroutine finalise_auto(self)
         !! Finalise the instance (i.e. free/deallocate)
+        !!
+        !! This method is expected to be called automatically
+        !! by clever clean up, which is why it differs from [TODO x-ref] `finalise`
 
         type(ErrorV), intent(inout) :: self
         ! Hopefully can leave without docstring (like Python)
 
-        call self%finalise()
+        call self % finalise()
 
-    end subroutine clean_up
+    end subroutine finalise_auto
 
 end module m_error_v
