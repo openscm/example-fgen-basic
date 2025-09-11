@@ -85,9 +85,12 @@ if pyprojectwheelbuild_enabled
     'src/example_fgen_basic/error_v/error_v.py',
     'src/example_fgen_basic/error_v/passing.py',
     'src/example_fgen_basic/exceptions.py',
+    'src/example_fgen_basic/get_square_root.py',
     'src/example_fgen_basic/get_wavelength.py',
     'src/example_fgen_basic/pyfgen_runtime/__init__.py',
     'src/example_fgen_basic/pyfgen_runtime/exceptions.py',
+    'src/example_fgen_basic/result/__init__.py',
+    'src/example_fgen_basic/result/result_dp.py',
     'src/example_fgen_basic/typing.py',
   )
 
