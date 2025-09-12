@@ -18,6 +18,12 @@ class CompiledExtensionNotFoundError(ImportError):
         super().__init__(error_msg)
 
 
+class FortranError(Exception):
+    """
+    Base class for errors that originated on the Fortran side
+    """
+
+
 class MissingOptionalDependencyError(ImportError):
     """
     Raised when an optional dependency is missing

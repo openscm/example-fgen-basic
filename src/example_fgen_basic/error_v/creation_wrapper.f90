@@ -17,7 +17,7 @@ module m_error_v_creation_w
         error_v_manager_set_instance_index_to => set_instance_index_to, &
         error_v_manager_ensure_instance_array_size_is_at_least => ensure_instance_array_size_is_at_least
 
-    implicit none (type, external)
+    implicit none(type, external)
     private
 
     public :: create_error, create_errors

@@ -13,12 +13,12 @@ module m_error_v_passing_w
 
     ! The manager module, which makes this all work
     use m_error_v_manager, only: &
-          error_v_manager_get_instance => get_instance
+        error_v_manager_get_instance => get_instance
     !     error_v_manager_get_available_instance_index => get_available_instance_index, &
     !     error_v_manager_set_instance_index_to => set_instance_index_to, &
     !     error_v_manager_ensure_instance_array_size_is_at_least => ensure_instance_array_size_is_at_least
 
-    implicit none (type, external)
+    implicit none(type, external)
     private
 
     public :: pass_error, pass_errors

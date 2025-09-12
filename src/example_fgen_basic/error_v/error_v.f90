@@ -5,10 +5,11 @@
 !>
 !> Fortran doesn't have a null value.
 !> As a result, we introduce this derived type
-!> with the convention that a code of 0 indicates no error.
+!> with the convention that a code of `NO_ERROR_CODE` (0)
+!> indicates no error (i.e. is our equivalent of a null value).
 module m_error_v
 
-    implicit none (type, external)
+    implicit none(type, external)
     private
 
     integer, parameter, public :: NO_ERROR_CODE = 0
@@ -34,7 +35,9 @@ module m_error_v
 
         private
 
-        procedure, public :: build, finalise
+        procedure, public :: build
+        procedure, public :: finalise
+        final :: finalise_auto
         ! get_res sort of not needed (?)
         ! get_err sort of not needed (?)
 
@@ -91,5 +94,18 @@ contains
         self % message = ""
 
     end subroutine finalise
+
+    subroutine finalise_auto(self)
+        !! Finalise the instance (i.e. free/deallocate)
+        !!
+        !! This method is expected to be called automatically
+        !! by clever clean up, which is why it differs from [TODO x-ref] `finalise`
+
+        type(ErrorV), intent(inout) :: self
+        ! Hopefully can leave without docstring (like Python)
+
+        call self % finalise()
+
+    end subroutine finalise_auto
 
 end module m_error_v

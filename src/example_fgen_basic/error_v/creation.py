@@ -80,7 +80,9 @@ def create_errors(invs: NP_ARRAY_OF_INT) -> tuple[ErrorV, ...]:
         Created errors
     """
     # Get the result, but receiving an instance index rather than the object itself
-    instance_indexes: NP_ARRAY_OF_INT = m_error_v_creation_w.create_errors(invs)
+    instance_indexes: NP_ARRAY_OF_INT = m_error_v_creation_w.create_errors(
+        invs, len(invs)
+    )
 
     # Initialise the result from the received index
     res = tuple(ErrorV.from_instance_index(i) for i in instance_indexes)
