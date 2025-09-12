@@ -57,7 +57,7 @@ def create_error(inv: int) -> ErrorV:
     return res
 
 
-def create_errors(invs: NP_ARRAY_OF_INT) -> tuple[ErrorV, ...]:
+def create_errors(invs: NP_ARRAY_OF_INT, n: int) -> tuple[ErrorV, ...]:
     """
     Create a number of errors
 

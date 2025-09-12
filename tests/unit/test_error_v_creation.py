@@ -29,7 +29,7 @@ def test_create_error_even():
     assert res.message == "Even number supplied"
 
 
-@pytest.mark.skip(reason="Not implemented")
+@pytest.mark.xfail(reason="Not implemented")
 def test_create_error_negative_raises():
     # TODO: switch to more precise error type
     with pytest.raises(FortranError):
@@ -48,7 +48,7 @@ def test_create_error_lots_of_repeated_calls():
 
 
 def test_create_multiple_errors():
-    res = create_errors(np.arange(6))
+    res = create_errors(np.arange(6), 6)
 
     for i, v in enumerate(res):
         if i % 2 == 0:
