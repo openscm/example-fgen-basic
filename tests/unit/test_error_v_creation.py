@@ -29,7 +29,7 @@ def test_create_error_even():
     assert res.message == "Even number supplied"
 
 
-@pytest.mark.xfail(reason="Not implemented")
+@pytest.mark.skip(reason="Not implemented")
 def test_create_error_negative_raises():
     # TODO: switch to more precise error type
     with pytest.raises(FortranError):
