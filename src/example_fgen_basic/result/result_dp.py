@@ -28,14 +28,14 @@ class ResultDP:
     # TODO: add validation that one of data_v and error_v is provided but not both
 
     # data_v: np.Float64
-    data_v: float
+    data_v: float | None
     """Data"""
 
-    error_v: ErrorV
+    error_v: ErrorV | None
     """Error"""
 
     @classmethod
-    def from_instance_index(cls, instance_index: int) -> ErrorV:
+    def from_instance_index(cls, instance_index: int) -> ResultDP:
         """
         Initialise from an instance index received from Fortran
 
@@ -53,7 +53,7 @@ class ResultDP:
 
         # Integer is very simple
         if m_result_dp_w.data_v_is_set(instance_index):
-            data_v: float = m_result_dp_w.get_data_v(instance_index)
+            data_v: float | None = m_result_dp_w.get_data_v(instance_index)
             # data_v: np.Float64 = m_result_dp_w.get_data_v(instance_index)
 
         else:

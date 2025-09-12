@@ -18,7 +18,7 @@ except (ModuleNotFoundError, ImportError) as exc:  # pragma: no cover
     ) from exc
 
 try:
-    from example_fgen_basic._lib import m_result_dp_w  # type: ignore
+    from example_fgen_basic._lib import m_result_dp_w
 except (ModuleNotFoundError, ImportError) as exc:  # pragma: no cover
     raise CompiledExtensionNotFoundError(
         "example_fgen_basic._lib.m_result_dp_w"
@@ -49,10 +49,13 @@ def get_square_root(inv: float) -> float:
     result_instance_index: int = m_get_square_root_w.get_square_root(inv)
     result = ResultDP.from_instance_index(result_instance_index)
 
-    if result.has_error:
+    if result.error_v is not None:
         # TODO: be more specific
         raise FortranError(result.error_v.message)
         # raise LessThanZeroError(result.error_v.message)
+
+    if result.data_v is None:
+        raise AssertionError
 
     res = result.data_v
 
