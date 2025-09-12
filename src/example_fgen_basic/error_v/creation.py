@@ -54,10 +54,14 @@ def create_error(inv: int) -> ErrorV:
     # Initialise the result from the received index
     res = ErrorV.from_instance_index(instance_index)
 
+    # Tell Fortran to finalise the object on the Fortran side
+    # (all data has been copied to Python now)
+    m_error_v_w.finalise_instance(instance_index)
+
     return res
 
 
-def create_errors(invs: NP_ARRAY_OF_INT, n: int) -> tuple[ErrorV, ...]:
+def create_errors(invs: NP_ARRAY_OF_INT) -> tuple[ErrorV, ...]:
     """
     Create a number of errors
 
@@ -76,7 +80,9 @@ def create_errors(invs: NP_ARRAY_OF_INT, n: int) -> tuple[ErrorV, ...]:
         Created errors
     """
     # Get the result, but receiving an instance index rather than the object itself
-    instance_indexes: NP_ARRAY_OF_INT = m_error_v_creation_w.create_errors(invs)
+    instance_indexes: NP_ARRAY_OF_INT = m_error_v_creation_w.create_errors(
+        invs, len(invs)
+    )
 
     # Initialise the result from the received index
     res = tuple(ErrorV.from_instance_index(i) for i in instance_indexes)

@@ -59,10 +59,6 @@ class ErrorV:
 
         res = cls(code=code, message=message)
 
-        # Tell Fortran to finalise the object on the Fortran side
-        # (all data has been copied to Python now)
-        m_error_v_w.finalise_instance(instance_index)
-
         return res
 
     def build_fortran_instance(self) -> int:

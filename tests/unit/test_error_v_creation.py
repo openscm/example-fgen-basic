@@ -23,7 +23,6 @@ def test_create_error_even():
     res = create_error(2.0)
 
     assert isinstance(res, ErrorV)
-
     assert res.code != 0
     assert res.code == 1
     assert res.message == "Even number supplied"
@@ -48,12 +47,13 @@ def test_create_error_lots_of_repeated_calls():
 
 
 def test_create_multiple_errors():
-    res = create_errors(np.arange(6), 6)
-
+    res = create_errors(np.arange(6))
     for i, v in enumerate(res):
         if i % 2 == 0:
+            print(v.code, v.message)
             assert v.code == 1
             assert v.message == "Even number supplied"
         else:
+            print(v.code, v.message)
             assert v.code == 0
             assert v.message == ""

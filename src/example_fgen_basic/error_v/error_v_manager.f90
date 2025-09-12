@@ -78,6 +78,7 @@ contains
 
         ! TODO: switch to returning a Result type with an error set
         ! res = ResultInt(ErrorV(code=1, message="No available instances"))
+        print *, "print"
         error stop 1
 
     end subroutine get_available_instance_index
