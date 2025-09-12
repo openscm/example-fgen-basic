@@ -1,15 +1,15 @@
-!> Manager of `ErrorV` (TODO: xref) across the Fortran-Python interface
-!>
-!> Written by hand here.
-!> Generation to be automated in future (including docstrings of some sort).
-module m_error_v_manager
+!> Manager of `ResultDP` (TODO: xref) across the Fortran-Python interface
+module m_result_dp_manager
 
+    use kind_parameters, only: dp
     use m_error_v, only: ErrorV
+    use m_result_dp, only: ResultDP
+    use m_result_none, only: ResultNone
 
     implicit none(type, external)
     private
 
-    type(ErrorV), dimension(:), allocatable :: instance_array
+    type(ResultDP), dimension(:), allocatable :: instance_array
     logical, dimension(:), allocatable :: instance_available
 
     ! TODO: think about ordering here, alphabetical probably easiest
@@ -18,21 +18,25 @@ module m_error_v_manager
 
 contains
 
-    function build_instance(code, message) result(instance_index)
+    function build_instance(data_v_in, error_v_in) result(instance_index)
         !! Build an instance
 
-        integer, intent(in) :: code
-        !! Error code
+        real(kind=dp), intent(in), optional :: data_v_in
+        !! Data
 
-        character(len=*), optional, intent(in) :: message
+        class(ErrorV), intent(in), optional :: error_v_in
         !! Error message
 
         integer :: instance_index
         !! Index of the built instance
 
+        type(ResultNone) :: res_build
+
         call ensure_instance_array_size_is_at_least(1)
         call get_available_instance_index(instance_index)
-        call instance_array(instance_index) % build(code=code, message=message)
+        res_build = instance_array(instance_index) % build(data_v_in=data_v_in, error_v_in=error_v_in)
+
+        ! TODO: check build has no error
 
     end function build_instance
 
@@ -77,8 +81,7 @@ contains
         end do
 
         ! TODO: switch to returning a Result type with an error set
-        ! res = ResultInt(ErrorV(code=1, message="No available instances"))
-        print *, "print"
+        ! res = ResultInt(ResultDP(code=1, message="No available instances"))
         error stop 1
 
     end subroutine get_available_instance_index
@@ -89,7 +92,7 @@ contains
         integer, intent(in) :: instance_index
         !! Index in `instance_array` of which to set the value equal to `val`
 
-        type(ErrorV) :: inst
+        type(ResultDP) :: inst
         !! Instance at `instance_array(instance_index)`
 
         call check_index_claimed(instance_index)
@@ -102,7 +105,7 @@ contains
         integer, intent(in) :: instance_index
         !! Index in `instance_array` of which to set the value equal to `val`
 
-        type(ErrorV), intent(in) :: val
+        type(ResultDP), intent(in) :: val
 
         call check_index_claimed(instance_index)
         instance_array(instance_index) = val
@@ -122,9 +125,9 @@ contains
             ! Use `ResultNone` which is a Result type
             ! that doesn't have a `data` attribute
             ! (i.e. if this succeeds, there is no data to check,
-            ! if it fails, the error_v attribute will be set).
+            ! if it fails, the result_dp attribute will be set).
             ! So the code would be something like
-            ! res = ResultNone(ErrorV(code=1, message="Index ", instance_index, " has not been claimed"))
+            ! res = ResultNone(ResultDP(code=1, message="Index ", instance_index, " has not been claimed"))
             print *, "Index ", instance_index, " has not been claimed"
             error stop 1
         end if
@@ -134,9 +137,9 @@ contains
             ! Use `ResultNone` which is a Result type
             ! that doesn't have a `data` attribute
             ! (i.e. if this succeeds, there is no data to check,
-            ! if it fails, the error_v attribute will be set).
+            ! if it fails, the result_dp attribute will be set).
             ! So the code would be something like
-            ! res = ResultNone(ErrorV(code=2, message="Requested index is ", instance_index, " which is less than 1"))
+            ! res = ResultNone(ResultDP(code=2, message="Requested index is ", instance_index, " which is less than 1"))
             print *, "Requested index is ", instance_index, " which is less than 1"
             error stop 1
         end if
@@ -156,7 +159,7 @@ contains
 
         integer, intent(in) :: n
 
-        type(ErrorV), dimension(:), allocatable :: tmp_instances
+        type(ResultDP), dimension(:), allocatable :: tmp_instances
         logical, dimension(:), allocatable :: tmp_available
 
         if (.not. allocated(instance_array)) then
@@ -182,4 +185,4 @@ contains
 
     end subroutine ensure_instance_array_size_is_at_least
 
-end module m_error_v_manager
+end module m_result_dp_manager

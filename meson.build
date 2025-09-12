@@ -54,7 +54,9 @@ if pyprojectwheelbuild_enabled
     'src/example_fgen_basic/error_v/creation_wrapper.f90',
     'src/example_fgen_basic/error_v/error_v_wrapper.f90',
     'src/example_fgen_basic/error_v/passing_wrapper.f90',
+    'src/example_fgen_basic/get_square_root_wrapper.f90',
     'src/example_fgen_basic/get_wavelength_wrapper.f90',
+    'src/example_fgen_basic/result/result_dp_wrapper.f90',
   )
 
   # Specify all the other source Fortran files (original files and managers)
@@ -66,11 +68,15 @@ if pyprojectwheelbuild_enabled
     'src/example_fgen_basic/error_v/passing.f90',
     'src/example_fgen_basic/fpyfgen/base_finalisable.f90',
     'src/example_fgen_basic/fpyfgen/derived_type_manager_helpers.f90',
+    'src/example_fgen_basic/get_square_root.f90',
     'src/example_fgen_basic/get_wavelength.f90',
     'src/example_fgen_basic/kind_parameters.f90',
     'src/example_fgen_basic/result/result.f90',
-    'src/example_fgen_basic/result/result0D_int.f90',
+    'src/example_fgen_basic/result/result_dp.f90',
+    'src/example_fgen_basic/result/result_dp_manager.f90',
     'src/example_fgen_basic/result/result_int.f90',
+    'src/example_fgen_basic/result/result_int1D.f90',
+    'src/example_fgen_basic/result/result_none.f90',
   )
 
   # All Python files (wrappers and otherwise)
@@ -82,9 +88,12 @@ if pyprojectwheelbuild_enabled
     'src/example_fgen_basic/error_v/error_v.py',
     'src/example_fgen_basic/error_v/passing.py',
     'src/example_fgen_basic/exceptions.py',
+    'src/example_fgen_basic/get_square_root.py',
     'src/example_fgen_basic/get_wavelength.py',
     'src/example_fgen_basic/pyfgen_runtime/__init__.py',
     'src/example_fgen_basic/pyfgen_runtime/exceptions.py',
+    'src/example_fgen_basic/result/__init__.py',
+    'src/example_fgen_basic/result/result_dp.py',
     'src/example_fgen_basic/typing.py',
   )
 
