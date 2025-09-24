@@ -4,6 +4,7 @@
 !> https://github.com/samharrison7/fortran-error-handler
 module m_result_int
 
+    use kind_parameters, only: i8
     use m_error_v, only: ErrorV
     use m_result, only: ResultBase
     use m_result_none, only: ResultNone
@@ -14,7 +15,7 @@ module m_result_int
     type, extends(ResultBase), public :: ResultInt
     !! Result type that holds integer values
 
-        integer, allocatable :: data_v
+        integer(kind=i8), allocatable :: data_v
         !! Data i.e. the result (if no error occurs)
 
         ! Note: the error_v attribute comes from ResultBase
@@ -42,7 +43,7 @@ contains
         type(ResultInt) :: self
         ! Hopefully can leave without docstring (like Python)
 
-        integer, intent(in), optional :: data_v
+        integer(kind=i8), intent(in), optional :: data_v
         !! Data
 
         class(ErrorV), intent(in), optional :: error_v
@@ -73,7 +74,7 @@ contains
         class(ResultInt), intent(out) :: self
         ! Hopefully can leave without docstring (like Python)
 
-        integer, intent(in), optional :: data_v_in
+        integer(kind=i8), intent(in), optional :: data_v_in
         !! Data
 
         class(ErrorV), intent(in), optional :: error_v_in

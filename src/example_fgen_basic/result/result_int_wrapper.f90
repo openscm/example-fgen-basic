@@ -1,8 +1,7 @@
-!> Wrapper for interfacing `m_result_dp` with Python
-module m_result_dp_w
+!> Wrapper for interfacing `m_result_int` with Python
+module m_result_int_w
 
     use m_error_v, only: ErrorV
-    use m_result_dp, only: ResultDP
     use m_result_int, only: ResultInt
 
     ! The manager module, which makes this all work
@@ -12,12 +11,12 @@ module m_result_dp_w
         error_v_manager_get_available_instance_index => get_available_instance_index, &
         error_v_manager_set_instance_index_to => set_instance_index_to
 
-    use m_result_dp_manager, only: &
-        result_dp_manager_build_instance => build_instance, &
-        result_dp_manager_finalise_instance => finalise_instance, &
-        result_dp_manager_get_instance => get_instance, &
-        result_dp_manager_ensure_instance_array_size_is_at_least => ensure_instance_array_size_is_at_least
-
+    use m_result_int_manager, only: &
+        result_int_manager_build_instance => build_instance, &
+        result_int_manager_finalise_instance => finalise_instance, &
+        result_int_manager_get_instance => get_instance, &
+        result_int_manager_ensure_instance_array_size_is_at_least => ensure_instance_array_size_is_at_least
+        !MZ: Set instance?
     implicit none(type, external)
     private
 
@@ -27,21 +26,20 @@ module m_result_dp_w
 
 contains
 
-    subroutine build_instance(data_v, error_v_instance_index, res_available_instance_index)
+    subroutine build_instance(data_v, error_v_instance_index, instance_index)
         !! Build an instance
 
         ! Annoying that this has to be injected everywhere,
         ! but ok it can be automated.
-        integer, parameter :: dp = selected_real_kind(15, 307)
+        integer, parameter :: i8 = selected_int_kind(18)
 
-        real(kind=dp), intent(in), optional :: data_v
+        integer(kind=i8), intent(in), optional :: data_v
         !! Data
 
         integer, intent(in), optional :: error_v_instance_index
         !! Error
 
-        ! integer, intent(out) :: instance_index
-        type(ResultInt), intent(out) :: res_available_instance_index
+        integer, intent(out) :: instance_index
         !! Instance index of the built instance
         !
         ! This is the major trick for wrapping.
@@ -53,7 +51,7 @@ contains
 
         error_v = error_v_manager_get_instance(error_v_instance_index)
 
-        res_available_instance_index = result_dp_manager_build_instance(data_v, error_v)
+        instance_index = result_int_manager_build_instance(data_v, error_v)
 
     end subroutine build_instance
 
@@ -72,7 +70,7 @@ contains
         ! This is the major trick for wrapping.
         ! We pass instance indexes (integers) to Python rather than the instance itself.
 
-        call result_dp_manager_finalise_instance(instance_index)
+        call result_int_manager_finalise_instance(instance_index)
 
     end subroutine finalise_instance
 
@@ -88,17 +86,17 @@ contains
         integer :: i
 
         do i = 1, size(instance_indexes)
-            call result_dp_manager_finalise_instance(instance_indexes(i))
+            call result_int_manager_finalise_instance(instance_indexes(i))
         end do
 
     end subroutine finalise_instances
 
     subroutine ensure_at_least_n_instances_can_be_passed_simultaneously(n)
-        !! Ensure that at least `n` instances of `ResultDP` can be passed via the manager simultaneously
+        !! Ensure that at least `n` instances of `ResultInt` can be passed via the manager simultaneously
 
         integer, intent(in) :: n
 
-        call result_dp_manager_ensure_instance_array_size_is_at_least(n)
+        call result_int_manager_ensure_instance_array_size_is_at_least(n)
 
     end subroutine ensure_at_least_n_instances_can_be_passed_simultaneously
 
@@ -117,9 +115,9 @@ contains
 
         logical, intent(out) :: res
 
-        type(ResultDP)  :: instance
+        type(ResultInt)  :: instance
 
-        instance = result_dp_manager_get_instance(instance_index)
+        instance = result_int_manager_get_instance(instance_index)
 
         res = allocated(instance % data_v)
 
@@ -132,15 +130,15 @@ contains
 
         ! Annoying that this has to be injected everywhere,
         ! but ok it can be automated.
-        integer, parameter :: dp = selected_real_kind(15, 307)
+        integer, parameter :: i8 = selected_int_kind(18)
 
         integer, intent(in) :: instance_index
 
-        real(kind=dp), intent(out) :: data_v
+        integer(kind=i8), intent(out) :: data_v
 
-        type(ResultDP)  :: instance
+        type(ResultInt)  :: instance
 
-        instance = result_dp_manager_get_instance(instance_index)
+        instance = result_int_manager_get_instance(instance_index)
 
         data_v = instance % data_v
 
@@ -155,9 +153,9 @@ contains
 
         logical, intent(out) :: res
 
-        type(ResultDP)  :: instance
+        type(ResultInt)  :: instance
 
-        instance = result_dp_manager_get_instance(instance_index)
+        instance = result_int_manager_get_instance(instance_index)
 
         res = allocated(instance % error_v)
 
@@ -174,10 +172,10 @@ contains
         ! Build on the python side
         integer, intent(out) :: error_v_instance_index
 
-        type(ResultDP)  :: instance
+        type(ResultInt)  :: instance
         type(ErrorV)  :: error_v
 
-        instance = result_dp_manager_get_instance(instance_index)
+        instance = result_int_manager_get_instance(instance_index)
 
         error_v = instance % error_v
 
@@ -187,4 +185,4 @@ contains
 
     end subroutine get_error_v
 
-end module m_result_dp_w
+end module m_result_int_w

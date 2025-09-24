@@ -1,16 +1,15 @@
-!> Manager of `ResultDP` (TODO: xref) across the Fortran-Python interface
-module m_result_dp_manager
+!> Manager of `ResultInt` (TODO: xref) across the Fortran-Python interface
+module m_result_int_manager
 
-    use kind_parameters, only: dp
+    use kind_parameters, only: i8
     use m_error_v, only: ErrorV
-    use m_result_dp, only: ResultDP
     use m_result_int, only: ResultInt
     use m_result_none, only: ResultNone
 
     implicit none(type, external)
     private
 
-    type(ResultDP), dimension(:), allocatable :: instance_array
+    type(ResultInt), dimension(:), allocatable :: instance_array
     logical, dimension(:), allocatable :: instance_available
 
     ! TODO: think about ordering here, alphabetical probably easiest
@@ -19,28 +18,24 @@ module m_result_dp_manager
 
 contains
 
-    function build_instance(data_v_in, error_v_in) result(res_available_instance_index)
+    function build_instance(data_v_in, error_v_in) result(instance_index)
         !! Build an instance
 
-        real(kind=dp), intent(in), optional :: data_v_in
+        integer(kind=i8), intent(in), optional :: data_v_in
         !! Data
 
         class(ErrorV), intent(in), optional :: error_v_in
         !! Error message
 
-        type(ResultInt) :: res_available_instance_index
+        integer :: instance_index
         !! Index of the built instance
 
         type(ResultNone) :: res_build
 
         call ensure_instance_array_size_is_at_least(1)
-        call get_available_instance_index(res_available_instance_index)
-        ! MZ check for errors ?
-        ! MZ function with side effect: good idea??
-        ! MZ why res_build is ResultNone??
-        res_build = instance_array(res_available_instance_index%data_v) % &
-                                  build(data_v_in=data_v_in, error_v_in=error_v_in)
-
+        call get_available_instance_index(instance_index)
+        res_build = instance_array(instance_index) % build(data_v_in=data_v_in, error_v_in=error_v_in)
+        ! MZ: Is the line above correct??
         ! TODO: check build has no error
 
     end function build_instance
@@ -51,27 +46,25 @@ contains
         integer, intent(in) :: instance_index
         !! Index of the instance to finalise
 
-        type(ResultNone) :: res_check_index_claimed
-
-        res_check_index_claimed = check_index_claimed(instance_index)
-        if(res_check_index_claimed%is_error()) return
+        call check_index_claimed(instance_index)
 
         call instance_array(instance_index) % finalise()
         instance_available(instance_index) = .true.
 
     end subroutine finalise_instance
 
-    subroutine get_available_instance_index(res_available_instance_index)
+    subroutine get_available_instance_index(available_instance_index)
         !! Get a free instance index
 
         ! TODO: think through whether race conditions are possible
         ! e.g. while returning a free index number to one Python call
         ! a different one can be looking up a free instance index at the same time
         ! and something goes wrong (maybe we need a lock)
-
-        type(ResultInt), intent(out) :: res_available_instance_index
-        ! integer, intent(out) :: available_instance_index
+        ! MZ: I think this is of order O(N) that for large arrays can be very slow
+        ! maybe use something like linked lists?? /
+        integer, intent(out) :: available_instance_index
         !! Available instance index
+
         integer :: i
 
         do i = 1, size(instance_array)
@@ -79,9 +72,9 @@ contains
             if (instance_available(i)) then
 
                 instance_available(i) = .false.
-                ! available_instance_index = i
+                available_instance_index = i
                 ! TODO: switch to returning a Result type
-                res_available_instance_index = ResultInt(data_v=i)
+                ! res = ResultInt(data=i)
                 return
 
             end if
@@ -89,8 +82,9 @@ contains
         end do
 
         ! TODO: switch to returning a Result type with an error set
-        res_available_instance_index = ResultInt(error_v=ErrorV(code=1, message="No available instances"))
-        ! error stop 1
+        ! res = ResultInt(ResultInt(code=1, message="No available instances"))
+        error stop 1
+
     end subroutine get_available_instance_index
 
     ! Change to pure function when we update check_index_claimed to be pure
@@ -99,17 +93,11 @@ contains
         integer, intent(in) :: instance_index
         !! Index in `instance_array` of which to set the value equal to `val`
 
-        type(ResultDP) :: inst
+        type(ResultInt) :: inst
         !! Instance at `instance_array(instance_index)`
 
-        type(ResultNone) :: res_check_index_claimed
-
-        res_check_index_claimed = check_index_claimed(instance_index)
-        if(res_check_index_claimed%is_error()) then
-          inst = ResultDP(error_v=res_check_index_claimed%error_v)
-        else
-          inst = instance_array(instance_index)
-        end if
+        call check_index_claimed(instance_index)
+        inst = instance_array(instance_index)
 
     end function get_instance
 
@@ -118,23 +106,21 @@ contains
         integer, intent(in) :: instance_index
         !! Index in `instance_array` of which to set the value equal to `val`
 
-        type(ResultDP), intent(in) :: val
-        type(ResultNone) :: res_check_index_claimed
+        type(ResultInt), intent(in) :: val
 
-        res_check_index_claimed = check_index_claimed(instance_index)
-        if(res_check_index_claimed%is_error()) instance_array(instance_index) = val
+        call check_index_claimed(instance_index)
+        instance_array(instance_index) = val
+        ! MZ: Shouldn't be instance_available be set to .false.?
 
     end subroutine set_instance_index_to
 
-    function check_index_claimed(instance_index) result(res_check_index_claimed)
+    subroutine check_index_claimed(instance_index)
         !! Check that an index has already been claimed
         !!
         !! Stops execution if the index has not been claimed.
 
         integer, intent(in) :: instance_index
         !! Instance index to check
-        type(ResultNone) :: res_check_index_claimed
-        character(len=:), allocatable :: msg
 
         if (instance_available(instance_index)) then
             ! TODO: Switch to using Result here
@@ -143,13 +129,9 @@ contains
             ! (i.e. if this succeeds, there is no data to check,
             ! if it fails, the result_dp attribute will be set).
             ! So the code would be something like
-            ! res = ResultNone(ResultDP(code=1, message="Index ", instance_index, " has not been claimed"))
-            ! print *, "Index ", instance_index, " has not been claimed"
-            ! error stop 1
-            ! MZ Weird thing allocatable message
-            msg = ""
-            write(msg,fmt="(A, I0, A)") "Index ", instance_index," has not been claimed"
-            res_check_index_claimed = ResultNone(error_v=ErrorV(code=1, message=msg))
+            ! res = ResultNone(ResultInt(code=1, message="Index ", instance_index, " has not been claimed"))
+            print *, "Index ", instance_index, " has not been claimed"
+            error stop 1
         end if
 
         if (instance_index < 1) then
@@ -159,11 +141,9 @@ contains
             ! (i.e. if this succeeds, there is no data to check,
             ! if it fails, the result_dp attribute will be set).
             ! So the code would be something like
-            ! res = ResultNone(ResultDP(code=2, message="Requested index is ", instance_index, " which is less than 1"))
-            ! print *, "Requested index is ", instance_index, " which is less than 1"
-            ! error stop 1
-            write(msg,fmt="(A, I0, A)") "Requested index is ", instance_index, " which is less than 1"
-            res_check_index_claimed = ResultNone(error_v=ErrorV(code=2, message=msg))
+            ! res = ResultNone(ResultInt(code=2, message="Requested index is ", instance_index, " which is less than 1"))
+            print *, "Requested index is ", instance_index, " which is less than 1"
+            error stop 1
         end if
 
         ! ! Here, result becomes
@@ -173,16 +153,15 @@ contains
         ! ! We will no longer have subroutines that return nothing
         ! ! (like this one currently does).
         ! res = ResultNone()
-        res_check_index_claimed = ResultNone()
 
-    end function check_index_claimed
+    end subroutine check_index_claimed
 
     subroutine ensure_instance_array_size_is_at_least(n)
         !! Ensure that `instance_array` and `instance_available` have at least `n` slots
-
+        ! MZ: shouldn't this check the available slots as well?
         integer, intent(in) :: n
 
-        type(ResultDP), dimension(:), allocatable :: tmp_instances
+        type(ResultInt), dimension(:), allocatable :: tmp_instances
         logical, dimension(:), allocatable :: tmp_available
 
         if (.not. allocated(instance_array)) then
@@ -208,4 +187,4 @@ contains
 
     end subroutine ensure_instance_array_size_is_at_least
 
-end module m_result_dp_manager
+end module m_result_int_manager
