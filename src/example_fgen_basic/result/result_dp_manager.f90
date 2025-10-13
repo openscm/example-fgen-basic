@@ -19,7 +19,7 @@ module m_result_dp_manager
 
 contains
 
-    subroutine build_instance(data_v_in, error_v_in, instance_index)
+    subroutine build_instance(data_v_in, error_v_in, res)
         !! Build an instance
 
         real(kind=dp), intent(in), optional :: data_v_in
@@ -28,22 +28,22 @@ contains
         class(ErrorV), intent(in), optional :: error_v_in
         !! Error message
 
-        type(ResultInt) , intent(out) :: instance_index
-        !! Index of the built instance
+        type(ResultInt) , intent(out) :: res
+        !! Result i.e. index of the built instance (within a result type)
 
         type(ResultNone) :: res_build
 
         call ensure_instance_array_size_is_at_least(1)
         ! ! TODO: switch to
         ! instance_index = get_available_instance_index()
-        call get_available_instance_index(instance_index)
+        call get_available_instance_index(res)
 
-        if (instance_index % is_error()) then
+        if (res % is_error()) then
             ! Already hit an error, quick return
             return
         end if
 
-        call instance_array(instance_index%data_v) % build( &
+        call instance_array(res%data_v) % build( &
             data_v_in=data_v_in, error_v_in=error_v_in, res=res_build &
         )
 
@@ -55,7 +55,7 @@ contains
         ! Error occured
         !
         ! Free the slot again
-        instance_available(instance_index % data_v) = .true.
+        instance_available(res % data_v) = .true.
 
         ! Bubble the error up.
         ! This is a good example of where stacking errors would be nice.
@@ -65,7 +65,7 @@ contains
         ! the following error occured...".
         ! (Stacking error messages like this
         ! would even let us do stack traces in a way...)
-        instance_index = ResultInt(error_v=res_build%error_v)
+        res = ResultInt(error_v=res_build%error_v)
 
     end subroutine build_instance
 

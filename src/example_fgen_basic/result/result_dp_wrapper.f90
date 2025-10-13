@@ -48,6 +48,7 @@ contains
         ! We pass instance indexes (integers) back to Python rather than the instance itself.
 
         type(ResultInt) :: res_build
+        type(ResultInt) :: res_int_get_available_instance_index
 
         ! This is the major trick for wrapping derived types with other derived types as attributes.
         ! We use the manager layer to initialise the attributes before passing on.
@@ -58,7 +59,7 @@ contains
             if (present(data_v)) then
                 call result_dp_manager_build_instance( &
                     data_v_in=data_v, &
-                    res_build &
+                    res=res_build &
                 )
 
             else
@@ -66,12 +67,10 @@ contains
                 error_v = error_v_manager_get_instance(error_v_instance_index)
                 call result_dp_manager_build_instance( &
                     error_v_in=error_v, &
-                    res_build &
+                    res=res_build &
                 )
 
             end if
-
-            return
 
         else
 
@@ -98,11 +97,40 @@ contains
         end if
 
         ! Get the instance index to return to Python
-        call result_dp_manager_get_available_instance_index(res_build_instance_index)
+        call result_int_manager_get_available_instance_index(res_int_get_available_instance_index)
 
-        ! Set the derived type value in the manager's array,
-        ! ready for its attributes to be retrieved from Python.
-        call result_dp_manager_set_instance_index_to(res_instance_index, res_build)
+        if (.not. (res_int_get_available_instance_index % is_error())) then
+            ! Set the derived type value in the manager's array,
+            ! ready for its attributes to be retrieved from Python.
+            call result_dp_manager_set_instance_index_to( &
+                res_int_get_available_instance_index % data_v, &
+                res_build &
+            )
+
+            return
+
+        end if
+
+        ! Logic here is trickier.
+        ! If you can't create a result type to return to Python,
+        ! then you also can't return errors so you're stuck.
+        ! As an escape hatch
+        call result_int_manager_ensure_instance_array_size_is_at_least(1)
+        ! Just use the first instance and write a message that the program
+        ! is fully broken.
+        res_build = ResultInt( &
+            error_v = ErrorV( &
+                code=1, &
+                message=( &
+                    "I wanted to return an error, " &
+                    // "but I couldn't even get an available instance to do so. " &
+                    // "I have forced a return, but your program is probably fully broken. " &
+                    // "Please be very careful." &
+                ) &
+            ) &
+        )
+
+        call result_dp_manager_set_instance_index_to(int(1, kind=8), res_build)
 
     end subroutine build_instance
 

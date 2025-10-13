@@ -2,6 +2,7 @@
 module m_get_square_root_w
 
     use m_result_dp, only: ResultDP
+    use m_result_int, only: ResultInt
     use m_get_square_root, only: o_get_square_root => get_square_root
 
     ! The manager module, which makes this all work
@@ -30,13 +31,18 @@ contains
         !! Instance index of the result type
 
         type(ResultDP) :: res
+        type(ResultInt) :: res_get_available_instance_index
 
         res = o_get_square_root(inv)
 
         call result_dp_manager_ensure_instance_array_size_is_at_least(1)
 
         ! Get the instance index to return to Python
-        call result_dp_manager_get_available_instance_index(res_instance_index)
+        call result_dp_manager_get_available_instance_index(res_get_available_instance_index)
+
+        ! Logic here is trickier.
+        ! If you can't create a result type to return to Python,
+        ! then you also can't return errors so you're a bit cooked.
 
         ! Set the derived type value in the manager's array,
         ! ready for its attributes to be retrieved from Python.
