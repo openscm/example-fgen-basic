@@ -22,7 +22,7 @@ except (ModuleNotFoundError, ImportError) as exc:  # pragma: no cover
 @define
 class ResultInt:
     """
-    Result type that can hold double precision real values
+    Result type that can hold (8 bit) integer values
     """
 
     # TODO: add validation that one of data_v and error_v is provided but not both

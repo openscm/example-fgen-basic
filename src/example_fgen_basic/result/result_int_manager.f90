@@ -34,8 +34,7 @@ contains
 
         call ensure_instance_array_size_is_at_least(1)
         call get_available_instance_index(instance_index)
-        res_build = instance_array(instance_index) % build(data_v_in=data_v_in, error_v_in=error_v_in)
-        ! MZ: Is the line above correct??
+        call instance_array(instance_index) % build(data_v_in=data_v_in, error_v_in=error_v_in, res=res_build)
         ! TODO: check build has no error
 
     end function build_instance

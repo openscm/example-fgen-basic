@@ -51,7 +51,7 @@ contains
 
         type(ResultNone) :: build_res
 
-        build_res = self % build(data_v_in=data_v, error_v_in=error_v)
+        call self % build(data_v_in=data_v, error_v_in=error_v, res=build_res)
 
         if (build_res % is_error()) then
 
@@ -68,7 +68,7 @@ contains
 
     end function constructor
 
-    function build(self, data_v_in, error_v_in) result(res)
+    subroutine build(self, data_v_in, error_v_in, res)
         !! Build instance
 
         class(ResultDP), intent(out) :: self
@@ -80,7 +80,7 @@ contains
         class(ErrorV), intent(in), optional :: error_v_in
         !! Error message
 
-        type(ResultNone) :: res
+        type(ResultNone), intent(out) :: res
         !! Result
 
         if (present(data_v_in) .and. present(error_v_in)) then
@@ -99,7 +99,7 @@ contains
 
         end if
 
-    end function build
+    end subroutine build
 
     subroutine finalise(self)
         !! Finalise the instance (i.e. free/deallocate)

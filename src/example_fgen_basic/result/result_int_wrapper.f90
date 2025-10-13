@@ -16,7 +16,7 @@ module m_result_int_w
         result_int_manager_finalise_instance => finalise_instance, &
         result_int_manager_get_instance => get_instance, &
         result_int_manager_ensure_instance_array_size_is_at_least => ensure_instance_array_size_is_at_least
-        !MZ: Set instance?
+
     implicit none(type, external)
     private
 
@@ -24,14 +24,14 @@ module m_result_int_w
               ensure_at_least_n_instances_can_be_passed_simultaneously, &
               data_v_is_set, get_data_v, error_v_is_set, get_error_v
 
+    ! Annoying that this has to be injected everywhere,
+    ! but ok it can be automated.
+    integer, parameter :: i8 = selected_int_kind(18)
+
 contains
 
     subroutine build_instance(data_v, error_v_instance_index, instance_index)
         !! Build an instance
-
-        ! Annoying that this has to be injected everywhere,
-        ! but ok it can be automated.
-        integer, parameter :: i8 = selected_int_kind(18)
 
         integer(kind=i8), intent(in), optional :: data_v
         !! Data
@@ -127,10 +127,6 @@ contains
         instance_index, &
         data_v &
         )
-
-        ! Annoying that this has to be injected everywhere,
-        ! but ok it can be automated.
-        integer, parameter :: i8 = selected_int_kind(18)
 
         integer, intent(in) :: instance_index
 

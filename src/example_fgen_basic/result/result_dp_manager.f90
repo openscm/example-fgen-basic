@@ -1,25 +1,25 @@
-!> Manager of `ResultDP` (TODO: xref) across the Fortran-Python interface
+!> manager of `resultdp` (todo: xref) across the fortran-python interface
 module m_result_dp_manager
 
     use kind_parameters, only: dp
-    use m_error_v, only: ErrorV
-    use m_result_dp, only: ResultDP
-    use m_result_int, only: ResultInt
-    use m_result_none, only: ResultNone
+    use m_error_v, only: errorv
+    use m_result_dp, only: resultdp
+    use m_result_int, only: resultint
+    use m_result_none, only: resultnone
 
     implicit none(type, external)
     private
 
-    type(ResultDP), dimension(:), allocatable :: instance_array
+    type(resultdp), dimension(:), allocatable :: instance_array
     logical, dimension(:), allocatable :: instance_available
 
-    ! TODO: think about ordering here, alphabetical probably easiest
+    ! todo: think about ordering here, alphabetical probably easiest
     public :: build_instance, finalise_instance, get_available_instance_index, get_instance, set_instance_index_to, &
               ensure_instance_array_size_is_at_least
 
 contains
 
-    function build_instance(data_v_in, error_v_in) result(res_available_instance_index)
+    subroutine build_instance(data_v_in, error_v_in, res_available_instance_index)
         !! Build an instance
 
         real(kind=dp), intent(in), optional :: data_v_in
@@ -28,22 +28,28 @@ contains
         class(ErrorV), intent(in), optional :: error_v_in
         !! Error message
 
-        type(ResultInt) :: res_available_instance_index
+        type(ResultInt) , intent(out) :: res_available_instance_index
         !! Index of the built instance
 
         type(ResultNone) :: res_build
 
         call ensure_instance_array_size_is_at_least(1)
         call get_available_instance_index(res_available_instance_index)
-        ! MZ check for errors ?
-        ! MZ function with side effect: good idea??
-        ! MZ why res_build is ResultNone??
-        res_build = instance_array(res_available_instance_index%data_v) % &
-                                  build(data_v_in=data_v_in, error_v_in=error_v_in)
 
-        ! TODO: check build has no error
+        if (res_available_instance_index % is_error()) return
 
-    end function build_instance
+        call instance_array(res_available_instance_index%data_v) % &
+                      build(data_v_in=data_v_in, error_v_in=error_v_in, res=res_build)
+
+        ! Check if build failed
+        if (res_build % is_error()) then
+          ! free slot again
+          instance_available(res_available_instance_index%data_v) = .true.
+          ! bubble the error up as ResultInt
+          res_available_instance_index = ResultInt(error_v=res_build%error_v)
+        end if
+
+    end subroutine build_instance
 
     subroutine finalise_instance(instance_index)
         !! Finalise an instance
@@ -89,8 +95,9 @@ contains
         end do
 
         ! TODO: switch to returning a Result type with an error set
-        res_available_instance_index = ResultInt(error_v=ErrorV(code=1, message="No available instances"))
         ! error stop 1
+        res_available_instance_index = ResultInt(error_v=ErrorV(code=1, message="No available instances"))
+
     end subroutine get_available_instance_index
 
     ! Change to pure function when we update check_index_claimed to be pure
@@ -135,6 +142,8 @@ contains
         !! Instance index to check
         type(ResultNone) :: res_check_index_claimed
         character(len=:), allocatable :: msg
+        ! msg initialisation to avoid compiler warning
+        msg = ""
 
         if (instance_available(instance_index)) then
             ! TODO: Switch to using Result here
@@ -146,8 +155,6 @@ contains
             ! res = ResultNone(ResultDP(code=1, message="Index ", instance_index, " has not been claimed"))
             ! print *, "Index ", instance_index, " has not been claimed"
             ! error stop 1
-            ! MZ Weird thing allocatable message
-            msg = ""
             write(msg,fmt="(A, I0, A)") "Index ", instance_index," has not been claimed"
             res_check_index_claimed = ResultNone(error_v=ErrorV(code=1, message=msg))
         end if

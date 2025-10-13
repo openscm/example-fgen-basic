@@ -1,9 +1,10 @@
 !> Wrapper for interfacing `m_result_dp` with Python
 module m_result_dp_w
 
-    use m_error_v, only: ErrorV
+    use m_error_v, only: ErrorV, NO_ERROR_CODE
     use m_result_dp, only: ResultDP
     use m_result_int, only: ResultInt
+    use m_result_none, only: ResultNone
 
     ! The manager module, which makes this all work
     use m_error_v_manager, only: &
@@ -25,14 +26,14 @@ module m_result_dp_w
               ensure_at_least_n_instances_can_be_passed_simultaneously, &
               data_v_is_set, get_data_v, error_v_is_set, get_error_v
 
+   ! Annoying that this has to be injected everywhere,
+   ! but ok it can be automated.
+   integer, parameter :: dp = selected_real_kind(15, 307)
+
 contains
 
     subroutine build_instance(data_v, error_v_instance_index, res_available_instance_index)
         !! Build an instance
-
-        ! Annoying that this has to be injected everywhere,
-        ! but ok it can be automated.
-        integer, parameter :: dp = selected_real_kind(15, 307)
 
         real(kind=dp), intent(in), optional :: data_v
         !! Data
@@ -40,7 +41,6 @@ contains
         integer, intent(in), optional :: error_v_instance_index
         !! Error
 
-        ! integer, intent(out) :: instance_index
         type(ResultInt), intent(out) :: res_available_instance_index
         !! Instance index of the built instance
         !
@@ -51,9 +51,15 @@ contains
         ! We use the manager layer to initialise the attributes before passing on.
         type(ErrorV) :: error_v
 
-        error_v = error_v_manager_get_instance(error_v_instance_index)
+        if (present(error_v_instance_index)) then
+            error_v = error_v_manager_get_instance(error_v_instance_index)
+        else
+            ! No error provided: initialize empty error
+            error_v%code = NO_ERROR_CODE
+            error_v%message = ""
+        end if
 
-        res_available_instance_index = result_dp_manager_build_instance(data_v, error_v)
+        call result_dp_manager_build_instance(data_v, error_v, res_available_instance_index)
 
     end subroutine build_instance
 
@@ -129,10 +135,6 @@ contains
         instance_index, &
         data_v &
         )
-
-        ! Annoying that this has to be injected everywhere,
-        ! but ok it can be automated.
-        integer, parameter :: dp = selected_real_kind(15, 307)
 
         integer, intent(in) :: instance_index
 
