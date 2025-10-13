@@ -32,7 +32,7 @@ module m_result_dp_w
 
 contains
 
-    subroutine build_instance(data_v, error_v_instance_index, res_available_instance_index)
+    subroutine build_instance(data_v, error_v_instance_index, res_build_instance_index)
         !! Build an instance
 
         real(kind=dp), intent(in), optional :: data_v
@@ -41,25 +41,68 @@ contains
         integer, intent(in), optional :: error_v_instance_index
         !! Error
 
-        type(ResultInt), intent(out) :: res_available_instance_index
-        !! Instance index of the built instance
+        integer, intent(out) :: res_build_instance_index
+        !! Instance index of the result of trying to build the instance
         !
         ! This is the major trick for wrapping.
-        ! We pass instance indexes (integers) to Python rather than the instance itself.
+        ! We pass instance indexes (integers) back to Python rather than the instance itself.
+
+        type(ResultInt) :: res_build
 
         ! This is the major trick for wrapping derived types with other derived types as attributes.
         ! We use the manager layer to initialise the attributes before passing on.
         type(ErrorV) :: error_v
 
-        if (present(error_v_instance_index)) then
-            error_v = error_v_manager_get_instance(error_v_instance_index)
+        if (xor(present(data_v), present(error_v_instance_index))) then
+
+            if (present(data_v)) then
+                call result_dp_manager_build_instance( &
+                    data_v_in=data_v, &
+                    res_build &
+                )
+
+            else
+
+                error_v = error_v_manager_get_instance(error_v_instance_index)
+                call result_dp_manager_build_instance( &
+                    error_v_in=error_v, &
+                    res_build &
+                )
+
+            end if
+
+            return
+
         else
-            ! No error provided: initialize empty error
-            error_v%code = NO_ERROR_CODE
-            error_v%message = ""
+
+            ! User didn't pass data_v or error_v_instance_index.
+            ! Give back an error
+            if (present(error_v_instance_index)) then
+                res_build = ResultInt( &
+                    error_v = ErrorV( &
+                        code=1, &
+                        message="Both data_v and error_v_instance_index provided" &
+                    ) &
+                )
+
+            else
+                res_build = ResultInt( &
+                    error_v = ErrorV( &
+                        code=1, &
+                        message="Neither data_v or error_v_instance_index provided" &
+                    ) &
+                )
+
+            end if
+
         end if
 
-        call result_dp_manager_build_instance(data_v, error_v, res_available_instance_index)
+        ! Get the instance index to return to Python
+        call result_dp_manager_get_available_instance_index(res_build_instance_index)
+
+        ! Set the derived type value in the manager's array,
+        ! ready for its attributes to be retrieved from Python.
+        call result_dp_manager_set_instance_index_to(res_instance_index, res_build)
 
     end subroutine build_instance
 

@@ -19,7 +19,7 @@ module m_result_dp_manager
 
 contains
 
-    subroutine build_instance(data_v_in, error_v_in, res_available_instance_index)
+    subroutine build_instance(data_v_in, error_v_in, instance_index)
         !! Build an instance
 
         real(kind=dp), intent(in), optional :: data_v_in
@@ -28,26 +28,44 @@ contains
         class(ErrorV), intent(in), optional :: error_v_in
         !! Error message
 
-        type(ResultInt) , intent(out) :: res_available_instance_index
+        type(ResultInt) , intent(out) :: instance_index
         !! Index of the built instance
 
         type(ResultNone) :: res_build
 
         call ensure_instance_array_size_is_at_least(1)
-        call get_available_instance_index(res_available_instance_index)
+        ! ! TODO: switch to
+        ! instance_index = get_available_instance_index()
+        call get_available_instance_index(instance_index)
 
-        if (res_available_instance_index % is_error()) return
-
-        call instance_array(res_available_instance_index%data_v) % &
-                      build(data_v_in=data_v_in, error_v_in=error_v_in, res=res_build)
-
-        ! Check if build failed
-        if (res_build % is_error()) then
-          ! free slot again
-          instance_available(res_available_instance_index%data_v) = .true.
-          ! bubble the error up as ResultInt
-          res_available_instance_index = ResultInt(error_v=res_build%error_v)
+        if (instance_index % is_error()) then
+            ! Already hit an error, quick return
+            return
         end if
+
+        call instance_array(instance_index%data_v) % build( &
+            data_v_in=data_v_in, error_v_in=error_v_in, res=res_build &
+        )
+
+        if (.not. (res_build % is_error())) then
+            ! All happy
+            return
+        end if
+
+        ! Error occured
+        !
+        ! Free the slot again
+        instance_available(instance_index % data_v) = .true.
+
+        ! Bubble the error up.
+        ! This is a good example of where stacking errors would be nice.
+        ! It would be great to be able to say,
+        ! "We got an instance index,
+        ! but when we tried to build the instance,
+        ! the following error occured...".
+        ! (Stacking error messages like this
+        ! would even let us do stack traces in a way...)
+        instance_index = ResultInt(error_v=res_build%error_v)
 
     end subroutine build_instance
 
@@ -76,8 +94,7 @@ contains
         ! and something goes wrong (maybe we need a lock)
 
         type(ResultInt), intent(out) :: res_available_instance_index
-        ! integer, intent(out) :: available_instance_index
-        !! Available instance index
+
         integer :: i
 
         do i = 1, size(instance_array)
@@ -85,8 +102,6 @@ contains
             if (instance_available(i)) then
 
                 instance_available(i) = .false.
-                ! available_instance_index = i
-                ! TODO: switch to returning a Result type
                 res_available_instance_index = ResultInt(data_v=i)
                 return
 
@@ -94,8 +109,6 @@ contains
 
         end do
 
-        ! TODO: switch to returning a Result type with an error set
-        ! error stop 1
         res_available_instance_index = ResultInt(error_v=ErrorV(code=1, message="No available instances"))
 
     end subroutine get_available_instance_index
