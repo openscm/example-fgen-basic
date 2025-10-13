@@ -7,7 +7,7 @@ module m_result_none
     use m_error_v, only: ErrorV
     use m_result, only: ResultBase
 
-    implicit none (type, external)
+    implicit none
     private
 
     type, extends(ResultBase), public :: ResultNone

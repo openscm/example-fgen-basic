@@ -17,7 +17,7 @@ module m_result_int_w
         result_int_manager_get_instance => get_instance, &
         result_int_manager_ensure_instance_array_size_is_at_least => ensure_instance_array_size_is_at_least
 
-    implicit none(type, external)
+    implicit none
     private
 
     public :: build_instance, finalise_instance, finalise_instances, &

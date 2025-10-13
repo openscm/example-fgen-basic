@@ -7,7 +7,7 @@ module m_result_dp_manager
     use m_result_int, only: resultint
     use m_result_none, only: resultnone
 
-    implicit none(type, external)
+    implicit none
     private
 
     type(resultdp), dimension(:), allocatable :: instance_array

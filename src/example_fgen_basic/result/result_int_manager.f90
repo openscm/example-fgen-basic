@@ -6,7 +6,7 @@ module m_result_int_manager
     use m_result_int, only: ResultInt
     use m_result_none, only: ResultNone
 
-    implicit none(type, external)
+    implicit none
     private
 
     type(ResultInt), dimension(:), allocatable :: instance_array

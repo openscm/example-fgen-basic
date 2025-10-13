@@ -9,7 +9,7 @@
 !> indicates no error (i.e. is our equivalent of a null value).
 module m_error_v
 
-    implicit none(type, external)
+    implicit none
     private
 
     integer, parameter, public :: NO_ERROR_CODE = 0

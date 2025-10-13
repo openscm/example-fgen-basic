@@ -6,7 +6,7 @@ module m_error_v_manager
 
     use m_error_v, only: ErrorV
 
-    implicit none(type, external)
+    implicit none
     private
 
     type(ErrorV), dimension(:), allocatable :: instance_array

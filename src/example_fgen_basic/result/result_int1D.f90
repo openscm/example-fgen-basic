@@ -8,7 +8,7 @@ module m_result_int1d
     use m_result, only: ResultBase
     use m_result_none, only: ResultNone
 
-    implicit none (type, external)
+    implicit none
     private
 
     type, extends(ResultBase), public :: ResultInt1D
