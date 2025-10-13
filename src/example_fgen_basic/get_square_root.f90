@@ -5,7 +5,7 @@ module m_get_square_root
     use m_error_v, only: ErrorV
     use m_result_dp, only: ResultDP
 
-    implicit none(type, external)
+    implicit none
     private
 
     public :: get_square_root

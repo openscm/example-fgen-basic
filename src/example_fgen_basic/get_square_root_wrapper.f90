@@ -10,7 +10,7 @@ module m_get_square_root_w
         result_dp_manager_set_instance_index_to => set_instance_index_to, &
         result_dp_manager_ensure_instance_array_size_is_at_least => ensure_instance_array_size_is_at_least
 
-    implicit none(type, external)
+    implicit none
     private
 
     public :: get_square_root
