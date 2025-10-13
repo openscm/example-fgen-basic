@@ -45,13 +45,18 @@ contains
         ! This is the major trick for wrapping.
         ! We pass instance indexes (integers) to Python rather than the instance itself.
 
+        type(ResultInt) :: res_instance_index
+
         ! This is the major trick for wrapping derived types with other derived types as attributes.
         ! We use the manager layer to initialise the attributes before passing on.
         type(ErrorV) :: error_v
 
         error_v = error_v_manager_get_instance(error_v_instance_index)
 
-        instance_index = result_int_manager_build_instance(data_v, error_v)
+        res_instance_index = result_int_manager_build_instance(data_v, error_v)
+
+        ! TODO: add all the error handling
+        instance_index = res_instance_index % data_v
 
     end subroutine build_instance
 

@@ -13,12 +13,14 @@ module m_result_int_manager
     logical, dimension(:), allocatable :: instance_available
 
     ! TODO: think about ordering here, alphabetical probably easiest
-    public :: build_instance, finalise_instance, get_available_instance_index, get_instance, set_instance_index_to, &
+    public :: build_instance, finalise_instance, &
+              get_available_instance_index, force_claim_instance_index, &
+              get_instance, set_instance_index_to, &
               ensure_instance_array_size_is_at_least
 
 contains
 
-    function build_instance(data_v_in, error_v_in) result(instance_index)
+    function build_instance(data_v_in, error_v_in) result(res_instance_index)
         !! Build an instance
 
         integer(kind=i8), intent(in), optional :: data_v_in
@@ -27,15 +29,44 @@ contains
         class(ErrorV), intent(in), optional :: error_v_in
         !! Error message
 
-        integer :: instance_index
-        !! Index of the built instance
+        type(ResultInt) :: res_instance_index
+        !! Result i.e. index of the built instance (within a result type)
 
         type(ResultNone) :: res_build
 
         call ensure_instance_array_size_is_at_least(1)
-        call get_available_instance_index(instance_index)
-        call instance_array(instance_index) % build(data_v_in=data_v_in, error_v_in=error_v_in, res=res_build)
-        ! TODO: check build has no error
+        ! ! TODO: switch to
+        ! instance_index = get_available_instance_index()
+        call get_available_instance_index(res_instance_index)
+
+        if (res_instance_index % is_error()) then
+            ! Already hit an error, quick return
+            return
+        end if
+
+        call instance_array(res_instance_index%data_v) % build( &
+            data_v_in=data_v_in, error_v_in=error_v_in, res=res_build &
+        )
+
+        if (.not. (res_build % is_error())) then
+            ! All happy
+            return
+        end if
+
+        ! Error occured
+        !
+        ! Free the slot again
+        instance_available(res_instance_index % data_v) = .true.
+
+        ! Bubble the error up.
+        ! This is a good example of where stacking errors would be nice.
+        ! It would be great to be able to say,
+        ! "We got an instance index,
+        ! but when we tried to build the instance,
+        ! the following error occured...".
+        ! (Stacking error messages like this
+        ! would even let us do stack traces in a way...)
+        res_instance_index = ResultInt(error_v=res_build%error_v)
 
     end function build_instance
 
@@ -52,7 +83,7 @@ contains
 
     end subroutine finalise_instance
 
-    subroutine get_available_instance_index(available_instance_index)
+    subroutine get_available_instance_index(res_available_instance_index)
         !! Get a free instance index
 
         ! TODO: think through whether race conditions are possible
@@ -61,30 +92,59 @@ contains
         ! and something goes wrong (maybe we need a lock)
         ! MZ: I think this is of order O(N) that for large arrays can be very slow
         ! maybe use something like linked lists?? /
-        integer, intent(out) :: available_instance_index
+
+        type(ResultInt), intent(out) :: res_available_instance_index
         !! Available instance index
 
         integer :: i
+
+        if (.not. allocated(instance_array)) then
+
+            res_available_instance_index = ResultInt( &
+                error_v=ErrorV( &
+                    code=1, &
+                    message="instance_array has not been allocated yet" &
+                ) &
+            )
+            return
+
+        end if
 
         do i = 1, size(instance_array)
 
             if (instance_available(i)) then
 
                 instance_available(i) = .false.
-                available_instance_index = i
-                ! TODO: switch to returning a Result type
-                ! res = ResultInt(data=i)
+                res_available_instance_index = ResultInt(data_v=i)
                 return
 
             end if
 
         end do
 
-        ! TODO: switch to returning a Result type with an error set
-        ! res = ResultInt(ResultInt(code=1, message="No available instances"))
-        error stop 1
+        res_available_instance_index = ResultInt( &
+            error_v=ErrorV( &
+                code=1, &
+                message="No available instances" &
+                ! TODO: add total number of instances to the error message
+                ! as that is useful information when debugging
+                ! (requires a int_to_str function first)
+            ) &
+        )
 
     end subroutine get_available_instance_index
+
+    subroutine force_claim_instance_index(instance_index)
+
+        integer, intent(in) :: instance_index
+        !! Instnace index of which to force claim
+        !!
+        !! Whether it has already been claimed or not,
+        !! the instance at this index will be set as being claimed.
+
+        instance_available(instance_index) = .false.
+
+    end subroutine force_claim_instance_index
 
     ! Change to pure function when we update check_index_claimed to be pure
     function get_instance(instance_index) result(inst)
@@ -100,14 +160,27 @@ contains
 
     end function get_instance
 
-    subroutine set_instance_index_to(instance_index, val)
+    subroutine set_instance_index_to(instance_index, val, check_claimed)
 
         integer, intent(in) :: instance_index
         !! Index in `instance_array` of which to set the value equal to `val`
 
         type(ResultInt), intent(in) :: val
 
-        call check_index_claimed(instance_index)
+        logical, intent(in), optional :: check_claimed
+
+        logical :: a_check_claimed
+
+        if (present(check_claimed)) then
+            a_check_claimed = check_claimed
+        else
+            a_check_claimed = .true.
+        end if
+
+        if (a_check_claimed) then
+            call check_index_claimed(instance_index)
+        end if
+
         instance_array(instance_index) = val
         ! MZ: Shouldn't be instance_available be set to .false.?
 
