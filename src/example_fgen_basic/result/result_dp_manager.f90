@@ -94,6 +94,7 @@ contains
         ! and something goes wrong (maybe we need a lock)
 
         type(ResultInt), intent(out) :: res_available_instance_index
+        !! Available instance index
 
         integer :: i
 
@@ -109,7 +110,15 @@ contains
 
         end do
 
-        res_available_instance_index = ResultInt(error_v=ErrorV(code=1, message="No available instances"))
+        res_available_instance_index = ResultInt( &
+            error_v=ErrorV( &
+                code=1, &
+                message="No available instances" &
+                ! TODO: add total number of instances to the error message
+                ! as that is useful information when debugging
+                ! (requires a int_to_str function first)
+            ) &
+        )
 
     end subroutine get_available_instance_index
 

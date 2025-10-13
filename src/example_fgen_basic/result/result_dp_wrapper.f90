@@ -19,6 +19,12 @@ module m_result_dp_w
         result_dp_manager_get_instance => get_instance, &
         result_dp_manager_ensure_instance_array_size_is_at_least => ensure_instance_array_size_is_at_least
 
+    use m_result_int_manager, only: &
+        result_int_manager_ensure_instance_array_size_is_at_least => ensure_instance_array_size_is_at_least, &
+        result_int_manager_get_available_instance_index => get_available_instance_index, &
+        result_int_manager_set_instance_index_to => set_instance_index_to, &
+        result_int_manager_force_claim_instance_index => force_claim_instance_index
+
     implicit none
     private
 
@@ -35,10 +41,12 @@ contains
     subroutine build_instance(data_v, error_v_instance_index, res_build_instance_index)
         !! Build an instance
 
-        real(kind=dp), intent(in), optional :: data_v
+        ! Optional in wrappers a bad idea as f2py does something funny.
+        ! Have to use some 'not supplied' equivalent instead.
+        real(kind=dp), intent(in) :: data_v
         !! Data
 
-        integer, intent(in), optional :: error_v_instance_index
+        integer, intent(in) :: error_v_instance_index
         !! Error
 
         integer, intent(out) :: res_build_instance_index
@@ -54,45 +62,22 @@ contains
         ! We use the manager layer to initialise the attributes before passing on.
         type(ErrorV) :: error_v
 
-        if (xor(present(data_v), present(error_v_instance_index))) then
-
-            if (present(data_v)) then
-                call result_dp_manager_build_instance( &
-                    data_v_in=data_v, &
-                    res=res_build &
-                )
-
-            else
-
-                error_v = error_v_manager_get_instance(error_v_instance_index)
-                call result_dp_manager_build_instance( &
-                    error_v_in=error_v, &
-                    res=res_build &
-                )
-
-            end if
+        ! In wrapper layer, something always gets passed by f2py.
+        ! Assume that any error_v_instance_index greater than 0 indicates that the error is what we want
+        ! (check this first as there is no `None` in Fortran/f2py we can use to check data instead).
+        if (error_v_instance_index > 0) then
+            error_v = error_v_manager_get_instance(error_v_instance_index)
+            call result_dp_manager_build_instance( &
+                error_v_in=error_v, &
+                res=res_build &
+            )
 
         else
-
-            ! User didn't pass data_v or error_v_instance_index.
-            ! Give back an error
-            if (present(error_v_instance_index)) then
-                res_build = ResultInt( &
-                    error_v = ErrorV( &
-                        code=1, &
-                        message="Both data_v and error_v_instance_index provided" &
-                    ) &
-                )
-
-            else
-                res_build = ResultInt( &
-                    error_v = ErrorV( &
-                        code=1, &
-                        message="Neither data_v or error_v_instance_index provided" &
-                    ) &
-                )
-
-            end if
+            ! Assume no error
+            call result_dp_manager_build_instance( &
+                data_v_in=data_v, &
+                res=res_build &
+            )
 
         end if
 
@@ -100,10 +85,13 @@ contains
         call result_int_manager_get_available_instance_index(res_int_get_available_instance_index)
 
         if (.not. (res_int_get_available_instance_index % is_error())) then
+            ! Could  allocate a result type to handle the return to Python.
+            !
             ! Set the derived type value in the manager's array,
             ! ready for its attributes to be retrieved from Python.
-            call result_dp_manager_set_instance_index_to( &
-                res_int_get_available_instance_index % data_v, &
+            call result_int_manager_set_instance_index_to( &
+            ! Hmm ok downcasting maybe not so smart
+                int(res_int_get_available_instance_index % data_v, kind=4), &
                 res_build &
             )
 
@@ -111,11 +99,15 @@ contains
 
         end if
 
+        ! Could not allocate a result type to handle the return to Python.
+        !
         ! Logic here is trickier.
         ! If you can't create a result type to return to Python,
         ! then you also can't return errors so you're stuck.
         ! As an escape hatch
         call result_int_manager_ensure_instance_array_size_is_at_least(1)
+        res_build_instance_index = 1
+
         ! Just use the first instance and write a message that the program
         ! is fully broken.
         res_build = ResultInt( &
@@ -130,7 +122,8 @@ contains
             ) &
         )
 
-        call result_dp_manager_set_instance_index_to(int(1, kind=8), res_build)
+        call result_int_manager_force_claim_instance_index(res_build_instance_index)
+        call result_int_manager_set_instance_index_to(res_build_instance_index, res_build)
 
     end subroutine build_instance
 
