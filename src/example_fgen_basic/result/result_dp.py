@@ -50,7 +50,6 @@ class ResultDP:
             Initialised index
         """
         # Different wrapping strategies are needed
-
         # Float is very simple
         if m_result_dp_w.data_v_is_set(instance_index):
             data_v: float | None = m_result_dp_w.get_data_v(instance_index)
@@ -62,7 +61,6 @@ class ResultDP:
         # Error type requires derived type handling
         if m_result_dp_w.error_v_is_set(instance_index):
             error_v_instance_index: int = m_result_dp_w.get_error_v(instance_index)
-
             # Initialise the result from the received index
             error_v = ErrorV.from_instance_index(error_v_instance_index)
 

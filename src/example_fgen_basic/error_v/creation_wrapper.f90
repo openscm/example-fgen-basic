@@ -39,7 +39,7 @@ contains
         ! This is the major trick for wrapping.
         ! We return instance indexes (integers) to Python rather than the instance itself.
 
-        type(ErrorV) :: res
+        type(ErrorV) :: res, err
 
         ! Do the Fortran call
         res = o_create_error(inv)
@@ -51,7 +51,8 @@ contains
 
         ! Set the derived type value in the manager's array,
         ! ready for its attributes to be retrieved from Python.
-        call error_v_manager_set_instance_index_to(res_instance_index, res)
+        err = error_v_manager_set_instance_index_to(res_instance_index, res)
+        !MZ: check for errors ?
 
     end function create_error
 
@@ -72,7 +73,7 @@ contains
         !
         ! This is the major trick for wrapping.
         ! We return instance indexes (integers) to Python rather than the instance itself.
-
+        type(ErrorV) :: err
         type(ErrorV), dimension(n) :: res
 
         integer :: i, tmp
@@ -91,7 +92,8 @@ contains
             call error_v_manager_get_available_instance_index(tmp)
             ! Set the derived type value in the manager's array,
             ! ready for its attributes to be retrieved from Python.
-            call error_v_manager_set_instance_index_to(tmp, res(i))
+            err = error_v_manager_set_instance_index_to(tmp, res(i))
+            !MZ: check for errors ?
             ! Set the result in the output array
             res_instance_indexes(i) = tmp
 

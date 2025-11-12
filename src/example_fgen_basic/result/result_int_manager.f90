@@ -13,12 +13,13 @@ module m_result_int_manager
     logical, dimension(:), allocatable :: instance_available
 
     ! TODO: think about ordering here, alphabetical probably easiest
-    public :: build_instance, finalise_instance, get_available_instance_index, get_instance, set_instance_index_to, &
-              ensure_instance_array_size_is_at_least
+    public :: build_instance, ensure_instance_array_size_is_at_least, force_claim_instance_index, finalise_instance, &
+            get_available_instance_index, get_instance, set_instance_index_to
+
 
 contains
 
-    function build_instance(data_v_in, error_v_in) result(instance_index)
+    subroutine build_instance(data_v_in, error_v_in, res)
         !! Build an instance
 
         integer(kind=i8), intent(in), optional :: data_v_in
@@ -27,17 +28,42 @@ contains
         class(ErrorV), intent(in), optional :: error_v_in
         !! Error message
 
-        integer :: instance_index
-        !! Index of the built instance
+        type(ResultInt), intent(out) :: res
+        !! Result i.e. index of the built instance (within a result type)
 
         type(ResultNone) :: res_build
 
         call ensure_instance_array_size_is_at_least(1)
-        call get_available_instance_index(instance_index)
-        call instance_array(instance_index) % build(data_v_in=data_v_in, error_v_in=error_v_in, res=res_build)
-        ! TODO: check build has no error
+        ! Get the available index to return
+        call get_available_instance_index(res)
 
-    end function build_instance
+        if (res % is_error()) then
+          return
+        end if
+
+        call instance_array(res % data_v) % &
+          build(data_v_in = data_v_in, error_v_in=error_v_in, res=res_build)
+
+        if (.not. res_build % is_error()) then
+          return
+        end if
+
+        ! Error occured
+        !
+        ! Free the slot again
+        instance_available(res % data_v) = .true.
+
+        ! Bubble the error up.
+        ! This is a good example of where stacking errors would be nice.
+        ! It would be great to be able to say,
+        ! "We got an instance index,
+        ! but when we tried to build the instance,
+        ! the following error occured...".
+        ! (Stacking error messages like this
+        ! would even let us do stack traces in a way...)
+        res = ResultInt(error_v=res_build%error_v)
+
+    end subroutine build_instance
 
     subroutine finalise_instance(instance_index)
         !! Finalise an instance
@@ -52,7 +78,7 @@ contains
 
     end subroutine finalise_instance
 
-    subroutine get_available_instance_index(available_instance_index)
+    subroutine get_available_instance_index(res_available_instance_index)
         !! Get a free instance index
 
         ! TODO: think through whether race conditions are possible
@@ -61,7 +87,7 @@ contains
         ! and something goes wrong (maybe we need a lock)
         ! MZ: I think this is of order O(N) that for large arrays can be very slow
         ! maybe use something like linked lists?? /
-        integer, intent(out) :: available_instance_index
+        type(ResultInt), intent(out) :: res_available_instance_index
         !! Available instance index
 
         integer :: i
@@ -69,20 +95,24 @@ contains
         do i = 1, size(instance_array)
 
             if (instance_available(i)) then
-
+                !MZ: design choice -> getting an index sets its availabilty(?) (similar to malloc)
                 instance_available(i) = .false.
-                available_instance_index = i
-                ! TODO: switch to returning a Result type
-                ! res = ResultInt(data=i)
+                res_available_instance_index % data_v = i
                 return
 
             end if
 
         end do
 
-        ! TODO: switch to returning a Result type with an error set
-        ! res = ResultInt(ResultInt(code=1, message="No available instances"))
-        error stop 1
+        res_available_instance_index = ResultInt( &
+             error_v=ErrorV( &
+                 code=1, &
+                 message="No available instances" &
+                 ! TODO: add total number of instances to the error message
+                 ! as that is useful information when debugging
+                 ! (requires a int_to_str function first)
+             ) &
+         )
 
     end subroutine get_available_instance_index
 
@@ -100,6 +130,18 @@ contains
 
     end function get_instance
 
+    subroutine force_claim_instance_index(instance_index)
+
+        integer, intent(in) :: instance_index
+        !! Instanace index of which to force claim
+        !!
+        !! Whether it has already been claimed or not,
+        !! the instance at this index will be set as being claimed.
+
+        instance_available(instance_index) = .false.
+
+    end subroutine force_claim_instance_index
+
     subroutine set_instance_index_to(instance_index, val)
 
         integer, intent(in) :: instance_index
@@ -109,7 +151,6 @@ contains
 
         call check_index_claimed(instance_index)
         instance_array(instance_index) = val
-        ! MZ: Shouldn't be instance_available be set to .false.?
 
     end subroutine set_instance_index_to
 

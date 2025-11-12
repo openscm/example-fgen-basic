@@ -13,9 +13,12 @@ module m_result_int_w
 
     use m_result_int_manager, only: &
         result_int_manager_build_instance => build_instance, &
+        result_int_manager_ensure_instance_array_size_is_at_least => ensure_instance_array_size_is_at_least,&
         result_int_manager_finalise_instance => finalise_instance, &
+        result_int_manager_force_claim_instance_index => force_claim_instance_index, &
+        result_int_manager_get_available_instance_index => get_available_instance_index, &
         result_int_manager_get_instance => get_instance, &
-        result_int_manager_ensure_instance_array_size_is_at_least => ensure_instance_array_size_is_at_least
+        result_int_manager_set_instance_index_to => set_instance_index_to
 
     implicit none
     private
@@ -30,7 +33,7 @@ module m_result_int_w
 
 contains
 
-    subroutine build_instance(data_v, error_v_instance_index, instance_index)
+    subroutine build_instance(data_v, error_v_instance_index, res_build_instance_index)
         !! Build an instance
 
         integer(kind=i8), intent(in), optional :: data_v
@@ -39,7 +42,7 @@ contains
         integer, intent(in), optional :: error_v_instance_index
         !! Error
 
-        integer, intent(out) :: instance_index
+        integer, intent(out) :: res_build_instance_index
         !! Instance index of the built instance
         !
         ! This is the major trick for wrapping.
@@ -48,10 +51,70 @@ contains
         ! This is the major trick for wrapping derived types with other derived types as attributes.
         ! We use the manager layer to initialise the attributes before passing on.
         type(ErrorV) :: error_v
+        type(ResultInt) :: res_build
+        type(ResultInt) :: res_int_get_available_instance_index
 
-        error_v = error_v_manager_get_instance(error_v_instance_index)
+        if (error_v_instance_index > 0) then
 
-        instance_index = result_int_manager_build_instance(data_v, error_v)
+          error_v = error_v_manager_get_instance(error_v_instance_index)
+
+          call result_int_manager_build_instance( &
+            error_v_in=error_v, &
+            res=res_build &
+            )
+
+        else
+
+          call result_int_manager_build_instance( &
+            data_v_in=data_v, &
+            res=res_build &
+            )
+
+        end if
+
+        call result_int_manager_get_available_instance_index(res_int_get_available_instance_index)
+
+        if (.not. res_int_get_available_instance_index% is_error()) then
+           ! Could  allocate a result type to handle the return to Python.
+           !
+           ! Set the derived type value in the manager's array,
+           ! ready for its attributes to be retrieved from Python.
+           call result_int_manager_set_instance_index_to( &
+           ! Hmm ok downcasting maybe not so smart
+                int(res_int_get_available_instance_index % data_v, kind=4), &
+                res_build &
+            )
+
+          res_build_instance_index = int(res_int_get_available_instance_index % data_v, kind=4)
+          return
+
+        end if
+
+        ! Could not allocate a result type to handle the return to Python.
+        !
+        ! Logic here is trickier.
+        ! If you can't create a result type to return to Python,
+        ! then you also can't return errors so you're stuck.
+        ! As an escape hatch
+        call result_int_manager_ensure_instance_array_size_is_at_least(1)
+        res_build_instance_index = 1
+
+        ! Just use the first instance and write a message that the program
+        ! is fully broken.
+        res_build = ResultInt( &
+            error_v = ErrorV( &
+                code=1, &
+                message=( &
+                    "I wanted to return an error, " &
+                    // "but I couldn't even get an available instance to do so. " &
+                    // "I have forced a return, but your program is probably fully broken. " &
+                    // "Please be very careful." &
+                ) &
+            ) &
+        )
+
+        call result_int_manager_force_claim_instance_index(res_build_instance_index)
+        call result_int_manager_set_instance_index_to(res_build_instance_index, res_build)
 
     end subroutine build_instance
 
@@ -169,7 +232,7 @@ contains
         integer, intent(out) :: error_v_instance_index
 
         type(ResultInt)  :: instance
-        type(ErrorV)  :: error_v
+        type(ErrorV)  :: error_v,err
 
         instance = result_int_manager_get_instance(instance_index)
 
@@ -177,8 +240,9 @@ contains
 
         call error_v_manager_ensure_instance_array_size_is_at_least(1)
         call error_v_manager_get_available_instance_index(error_v_instance_index)
-        call error_v_manager_set_instance_index_to(error_v_instance_index, error_v)
 
+        err = error_v_manager_set_instance_index_to(error_v_instance_index, error_v)
+        !MZ: check for errors ?
     end subroutine get_error_v
 
 end module m_result_int_w

@@ -15,10 +15,10 @@ module m_result_dp
     type, extends(ResultBase), public :: ResultDP
     !! Result type that holds integer values
 
-        real(kind=dp), allocatable :: data_v
-        !! Data i.e. the result (if no error occurs)
+    real(kind=dp), allocatable :: data_v
+    !! Data i.e. the result (if no error occurs)
 
-        ! Note: the error_v attribute comes from ResultBase
+    ! Note: the error_v attribute comes from ResultBase
 
     contains
 
@@ -46,7 +46,7 @@ contains
         real(kind=dp), intent(in), optional :: data_v
         !! Data
 
-        class(ErrorV), intent(in), optional :: error_v
+        type(ErrorV), intent(in), optional :: error_v
         !! Error
 
         type(ResultNone) :: build_res
@@ -54,7 +54,6 @@ contains
         call self % build(data_v_in=data_v, error_v_in=error_v, res=build_res)
 
         if (build_res % is_error()) then
-
             ! This interface has to return the initialised object,
             ! it cannot return a Result type,
             ! so we have no choice but to raise a fatal error here.
