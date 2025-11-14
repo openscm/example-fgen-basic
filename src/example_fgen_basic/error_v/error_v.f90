@@ -22,6 +22,7 @@ module m_error_v
         !! Error code
 
         character(len=:), allocatable :: message
+
         !! Error message
         ! TODO: think about making the message allocatable to handle long messages
 

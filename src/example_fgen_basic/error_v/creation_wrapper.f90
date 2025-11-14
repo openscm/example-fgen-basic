@@ -74,7 +74,7 @@ contains
         ! This is the major trick for wrapping.
         ! We return instance indexes (integers) to Python rather than the instance itself.
         type(ErrorV) :: err
-        type(ErrorV), dimension(n) :: res
+        type(ErrorV), allocatable, dimension(:) :: res
 
         integer :: i, tmp
 
@@ -83,7 +83,13 @@ contains
         ! Just do something stupid for now to see the pattern.
         call error_v_manager_ensure_instance_array_size_is_at_least(n)
 
+        allocate(res(n))
         ! Do the Fortran call
+        ! MZ: somenthing funny happens wheb res is an automatic array and
+        ! not an allocatable one. LLMs and internet resorces I found are not
+        ! completely clear to me. What seems to happen is that returning an array of derived types with allocatable
+        ! components may generate hidden temporary arrays whose allocatable components
+        ! become undefined (or the heap address gets corrupted) after the function returns.
         res = o_create_errors(invs, n)
 
         do i = 1, n

@@ -118,13 +118,19 @@ contains
         integer, intent(in) :: instance_index
 
         ! TODO: make this variable length
+        ! MZ attempts to put allocatable lead to segfault
         character(len=128), intent(out) :: message
 
         type(ErrorV)  :: instance
 
         instance = error_v_manager_get_instance(instance_index)
 
-        message = instance % message
+        if (allocated(instance%message)) then
+            message = instance % message
+!        else !MZ what to do??
+!!            message = "Invalid query: message not allocated"
+!            message = ""
+        end if
 
     end subroutine get_message
 

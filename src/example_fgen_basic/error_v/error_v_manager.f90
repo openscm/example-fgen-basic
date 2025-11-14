@@ -103,7 +103,9 @@ contains
         err_check_index_claimed = check_index_claimed(instance_index)
 
         if (err_check_index_claimed % code == 0) then
+
             err_inst = instance_array(instance_index)
+
         else
             write(idx_str, "(I0)") instance_index
             msg = "Error at get_instance -> " // trim(adjustl(idx_str))
@@ -130,8 +132,6 @@ contains
 
         err_check_index_claimed = check_index_claimed(instance_index)
 
-        instance_array(instance_index) = val
-
         if(err_check_index_claimed%code /= NO_ERROR_CODE) then
             ! MZ: here we do not set if the index has not been claimed.
             ! Must be harmonised with Results type
@@ -149,6 +149,7 @@ contains
             ! But calling finalise(): guarantees immediate release, handles non-allocatable resources,
             ! avoids temporary double memory
             call instance_array(instance_index)%finalise()
+
             ! Reassigning the slot
             call instance_array(instance_index)%build(code=val%code, message=val%message, cause=val%cause)
 

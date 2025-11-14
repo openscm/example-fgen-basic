@@ -187,7 +187,7 @@ contains
     function get_data_v(instance_index) result(data_v)
 
         integer, intent(in) :: instance_index
-
+        integer, parameter :: dp = selected_real_kind(15, 307)
         real(kind=dp) :: data_v
 
         type(ResultDP)  :: instance
