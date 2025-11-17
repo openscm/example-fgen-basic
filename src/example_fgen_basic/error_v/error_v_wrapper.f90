@@ -14,7 +14,7 @@ module m_error_v_w
         error_v_manager_get_instance => get_instance, &
         error_v_manager_ensure_instance_array_size_is_at_least => ensure_instance_array_size_is_at_least
 
-    implicit none (type, external)
+    implicit none
     private
 
     public :: build_instance, finalise_instance, finalise_instances, &
@@ -118,13 +118,20 @@ contains
         integer, intent(in) :: instance_index
 
         ! TODO: make this variable length
-        character(len=128), intent(out) :: message
+        ! MZ attempts to put allocatable lead to segfault
+        ! it seems to be really trick. F2PY does not like allocatable
+        ! and assumed-lenght does not work well with long sentences.
+        character(len=1000), intent(out) :: message
 
         type(ErrorV)  :: instance
 
         instance = error_v_manager_get_instance(instance_index)
 
-        message = instance % message
+        if (allocated(instance%message)) then
+            message = adjustl(trim(instance % message))
+!        else !MZ what to do??
+!!            message = "Invalid query: message not allocated"
+        end if
 
     end subroutine get_message
 

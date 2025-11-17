@@ -93,6 +93,7 @@ def main():
             meson_variable, sorted(src_paths), REPO_ROOT
         )
 
+        # TODO: something wrong in here
         meson_build_out = re.sub(pattern, substitution, meson_build_out)
 
     with open(REPO_ROOT / "meson.build", "w") as fh:

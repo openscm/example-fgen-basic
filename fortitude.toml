@@ -1,5 +1,9 @@
 [check]
-# TODO: think about adding other rules
-select = [ "C", "E", "S" ]
-ignore = [ ]
+# Fortitude rules (https://fortitude.readthedocs.io/en/stable/rules/):
+# Error (E), Correctness (C), Obsolescent (OB), Modernisation (MOD),
+# Style (S), Portability (PORT), Fortitude (FORT)
+select = [ "C", "E", "S", "PORT" ]
+#Ignoring:
+# C003:	'implicit none' missing 'external'  [f2py does not recognize the syntax implicit none(type, external)]
+ignore = ["C003"]
 line-length = 120

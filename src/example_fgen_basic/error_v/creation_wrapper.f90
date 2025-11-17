@@ -17,7 +17,7 @@ module m_error_v_creation_w
         error_v_manager_set_instance_index_to => set_instance_index_to, &
         error_v_manager_ensure_instance_array_size_is_at_least => ensure_instance_array_size_is_at_least
 
-    implicit none (type, external)
+    implicit none
     private
 
     public :: create_error, create_errors
@@ -39,7 +39,7 @@ contains
         ! This is the major trick for wrapping.
         ! We return instance indexes (integers) to Python rather than the instance itself.
 
-        type(ErrorV) :: res
+        type(ErrorV) :: res, err
 
         ! Do the Fortran call
         res = o_create_error(inv)
@@ -51,7 +51,8 @@ contains
 
         ! Set the derived type value in the manager's array,
         ! ready for its attributes to be retrieved from Python.
-        call error_v_manager_set_instance_index_to(res_instance_index, res)
+        err = error_v_manager_set_instance_index_to(res_instance_index, res)
+        !MZ: check for errors ?
 
     end function create_error
 
@@ -72,8 +73,8 @@ contains
         !
         ! This is the major trick for wrapping.
         ! We return instance indexes (integers) to Python rather than the instance itself.
-
-        type(ErrorV), dimension(n) :: res
+        type(ErrorV) :: err
+        type(ErrorV), allocatable, dimension(:) :: res
 
         integer :: i, tmp
 
@@ -82,7 +83,13 @@ contains
         ! Just do something stupid for now to see the pattern.
         call error_v_manager_ensure_instance_array_size_is_at_least(n)
 
+        allocate(res(n))
         ! Do the Fortran call
+        ! MZ: somenthing funny happens wheb res is an automatic array and
+        ! not an allocatable one. LLMs and internet resorces I found are not
+        ! completely clear to me. What seems to happen is that returning an array of derived types with allocatable
+        ! components may generate hidden temporary arrays whose allocatable components
+        ! become undefined (or the heap address gets corrupted) after the function returns.
         res = o_create_errors(invs, n)
 
         do i = 1, n
@@ -91,7 +98,8 @@ contains
             call error_v_manager_get_available_instance_index(tmp)
             ! Set the derived type value in the manager's array,
             ! ready for its attributes to be retrieved from Python.
-            call error_v_manager_set_instance_index_to(tmp, res(i))
+            err = error_v_manager_set_instance_index_to(tmp, res(i))
+            !MZ: check for errors ?
             ! Set the result in the output array
             res_instance_indexes(i) = tmp
 

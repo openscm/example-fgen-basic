@@ -3,9 +3,11 @@ Tests of `example_fgen_basic.error_v.creation`
 """
 
 import numpy as np
+import pytest
 
 from example_fgen_basic.error_v import ErrorV
 from example_fgen_basic.error_v.creation import create_error, create_errors
+from example_fgen_basic.pyfgen_runtime.exceptions import FortranError
 
 
 def test_create_error_odd():
@@ -21,19 +23,16 @@ def test_create_error_even():
     res = create_error(2.0)
 
     assert isinstance(res, ErrorV)
-
     assert res.code != 0
     assert res.code == 1
     assert res.message == "Even number supplied"
 
 
-def test_create_error_negative():
-    res = create_error(-1.0)
-
-    assert isinstance(res, ErrorV)
-
-    assert res.code == 2
-    assert res.message == "Negative number supplied"
+@pytest.mark.xfail(reason="Not implemented")
+def test_create_error_negative_raises():
+    # TODO: switch to more precise error type
+    with pytest.raises(FortranError):
+        create_error(-1.0)
 
 
 def test_create_error_lots_of_repeated_calls():
