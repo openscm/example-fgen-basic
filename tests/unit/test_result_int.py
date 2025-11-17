@@ -6,7 +6,7 @@ def test_build_no_argument_supplied():
     res_instance_index: int = m_result_int_w.build_instance(
         data_v=5, error_v_instance_index=0
     )
-    res: int = ResultInt(res_instance_index)
+    res: int = ResultInt.from_instance_index(res_instance_index)
 
     assert res.has_error
     assert res.error_v.message == (

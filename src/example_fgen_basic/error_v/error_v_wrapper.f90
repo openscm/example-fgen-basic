@@ -119,17 +119,18 @@ contains
 
         ! TODO: make this variable length
         ! MZ attempts to put allocatable lead to segfault
-        character(len=128), intent(out) :: message
+        ! it seems to be really trick. F2PY does not like allocatable
+        ! and assumed-lenght does not work well with long sentences.
+        character(len=1000), intent(out) :: message
 
         type(ErrorV)  :: instance
 
         instance = error_v_manager_get_instance(instance_index)
 
         if (allocated(instance%message)) then
-            message = instance % message
+            message = adjustl(trim(instance % message))
 !        else !MZ what to do??
 !!            message = "Invalid query: message not allocated"
-!            message = ""
         end if
 
     end subroutine get_message

@@ -102,7 +102,7 @@ contains
 
         err_check_index_claimed = check_index_claimed(instance_index)
 
-        if (err_check_index_claimed % code == 0) then
+        if (err_check_index_claimed % code == NO_ERROR_CODE) then
 
             err_inst = instance_array(instance_index)
 

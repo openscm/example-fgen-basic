@@ -109,7 +109,7 @@ contains
     subroutine build(self, code, message, cause)
         !! Build instance
 
-        class(ErrorV), intent(inout) :: self
+        class(ErrorV), intent(out) :: self
         ! Hopefully can leave without docstring (like Python)
 
         integer, intent(in) :: code
@@ -129,14 +129,14 @@ contains
 !            call self%cause%build(cause%code, cause%message, cause%cause)
 !            self%cause = cause
             if (present(message)) then
-                self % message = trim(message) // " --> Cause: " // cause % message
+                self % message = adjustl(trim(message)) // " --> Cause: " // cause % message
             else
                 self % message = " --> Cause: " // cause % message
             end if
 
         else
             if (present(message)) then
-                self % message = trim(message)
+                self % message = adjustl(trim(message))
             end if
         end if
 
@@ -153,10 +153,7 @@ contains
         if (allocated(self%message)) deallocate(self%message)
         ! MZ when the object is finalized or goes out of scope, its pointer components are destroyed.
         ! Hopefully no shared ownership??
-        if (associated(self%cause))then
-            deallocate(self%cause)
-            nullify(self%cause)
-        end if
+        if (associated(self%cause)) nullify(self%cause)
 
     end subroutine finalise
 

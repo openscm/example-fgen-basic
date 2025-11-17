@@ -51,6 +51,7 @@ def get_square_root(inv: float) -> float:
 
     if result.error_v is not None:
         # TODO: be more specific
+        m_result_dp_w.finalise_instance(result_instance_index)
         raise FortranError(result.error_v.message)
         # raise LessThanZeroError(result.error_v.message)
 

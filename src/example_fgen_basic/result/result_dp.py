@@ -61,8 +61,17 @@ class ResultDP:
         # Error type requires derived type handling
         if m_result_dp_w.error_v_is_set(instance_index):
             error_v_instance_index: int = m_result_dp_w.get_error_v(instance_index)
+            try:
+                # Initialise the result from the received index
+                error_v = ErrorV.from_instance_index(error_v_instance_index)
+            finally:
+                # make sure the Fortran-side error_v slot is released
+                # (otherwise the manager slot stays claimed and leaks previous messages)
+                from example_fgen_basic._lib import m_error_v_w
+
+                m_error_v_w.finalise_instance(error_v_instance_index)
             # Initialise the result from the received index
-            error_v = ErrorV.from_instance_index(error_v_instance_index)
+            # error_v = ErrorV.from_instance_index(error_v_instance_index)
 
         else:
             error_v = None

@@ -79,8 +79,7 @@ contains
 
         res_check_index_claimed = check_index_claimed(instance_index)
         ! MZ how do we handle unsuccefull finalisation?
-        if(res_check_index_claimed%is_error()) return
-
+!        if(res_check_index_claimed%is_error()) return
         call instance_array(instance_index) % finalise()
         instance_available(instance_index) = .true.
 
@@ -96,7 +95,7 @@ contains
         type(ResultInt) :: res_available_instance_index
         !! Available instance index
         character(len=:), allocatable :: msg
-        character(len=20), allocatable :: str_size_array
+        character(len=20) :: str_size_array
         integer :: i
 
         if(allocated(instance_array)) then

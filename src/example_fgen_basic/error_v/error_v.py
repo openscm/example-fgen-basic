@@ -55,7 +55,6 @@ class ErrorV:
         code = m_error_v_w.get_code(instance_index)
         # String requires decode
         message = m_error_v_w.get_message(instance_index).decode()
-
         res = cls(code=code, message=message)
 
         return res
