@@ -24,8 +24,8 @@ module m_result_w
   private
 
   public :: build_instance_int, build_instance_dp, build_instance_err,&
-
-           finalise_instance, finalise_instances
+            get_instance_tag, get_data_int, get_data_dp, &
+            finalise_instance, finalise_instances
 
 contains
 

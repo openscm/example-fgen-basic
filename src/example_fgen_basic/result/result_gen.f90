@@ -37,9 +37,10 @@ contains
     type(ResultGen) :: self
     type(ResultGen) :: res_check
 
-    type(ErrorV), intent(in), optional :: error_v
-    real(kind=dp), intent(in), optional :: data_dp
-    integer(kind=i8), intent(in), optional :: data_int
+    integer(kind=i8), optional, intent(in) :: data_int
+    real(kind=dp), optional, intent(in) :: data_dp
+    type(ErrorV), optional, intent(in) :: error_v
+
     integer, intent(in) :: tag
 
     call self % build (tag = tag, data_int = data_int, data_dp = data_dp,&
@@ -65,7 +66,9 @@ contains
 
     self % tag = tag
 
-    if (present(data_int) .and. tag == T_INT) then
+    if (tag == T_CLAIM) then
+      return
+    else if (present(data_int) .and. tag == T_INT) then
       self % data_int = data_int
     else if (present(data_dp) .and. tag == T_DP)then
       self % data_dp = data_dp

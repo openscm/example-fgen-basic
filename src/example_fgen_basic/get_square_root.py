@@ -47,6 +47,7 @@ def get_square_root(inv: float) -> float:
         TODO: use a more specific error
     """
     result_instance_index: int = m_get_square_root_w.get_square_root(inv)
+
     result = ResultGen.from_instance_index(result_instance_index)
 
     if result.error_v is not None:

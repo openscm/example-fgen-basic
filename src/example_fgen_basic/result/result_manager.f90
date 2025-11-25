@@ -10,7 +10,7 @@ module m_result_manager
   type(ResultGen), allocatable, dimension(:) :: instance_array
 
   public :: build_instance, finalise_instance,&
-            set_instance_index_to, get_available_instance_index,get_instance,&
+            set_instance_index_to, get_available_instance_index, get_instance,&
             force_claim_instance_index, check_index_claimed, &
             ensure_instance_array_size_is_at_least, deallocate_instance_array
 
@@ -191,7 +191,7 @@ contains
       if (.not. allocated(instance_array)) then
 
           msg = "instance_available in NOT allocated"
-          res_check_index_claimed = ResultGen(tag=T_ERR,error_v=ErrorV(code=3, message=msg))
+          call res_check_index_claimed % build(tag=T_ERR,error_v=ErrorV(code=3, message=msg))
 
           return
       end if
@@ -200,7 +200,7 @@ contains
 
       if (instance_index < 1 .or. instance_index > size(instance_array)) then
           msg = "Requested index is: " // trim(adjustl(idx_str)) // " ==> out of boundary"
-          res_check_index_claimed = ResultGen(tag=T_ERR,error_v=ErrorV(code=3, message=msg))
+          call res_check_index_claimed % build(tag=T_ERR,error_v=ErrorV(code=3, message=msg))
 
           return
       end if
@@ -208,12 +208,12 @@ contains
       if (instance_array(instance_index)%tag==T_NONE) then
 
           msg = "Index " // trim(adjustl(idx_str)) // " has not been claimed"
-          res_check_index_claimed = ResultGen(tag=T_ERR,error_v=ErrorV(code=3, message=msg))
+          call res_check_index_claimed % build(tag=T_ERR,error_v=ErrorV(code=3, message=msg))
 
           return
       end if
 
-      res_check_index_claimed = ResultGen(tag=T_CLAIM)
+      call res_check_index_claimed % build(tag=T_CLAIM)
 
   end function check_index_claimed
 
