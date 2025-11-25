@@ -114,7 +114,7 @@ test-fortran: build-fortran  ## run the Fortran tests
 
 .PHONY: install-fortran
 install-fortran: build-fortran  ## install the Fortran (including the extension module)
-	uv run meson install -C build -v
+	uv run meson install -C build # -v
 	# # Can also do this to see where things go without making a mess
 	# uv run meson install -C build --destdir ../install-example
 

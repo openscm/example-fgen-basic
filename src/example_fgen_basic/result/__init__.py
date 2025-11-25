@@ -2,7 +2,6 @@
 Definition of result values
 """
 
-from example_fgen_basic.result.result_dp import ResultDP
-from example_fgen_basic.result.result_int import ResultInt
+from example_fgen_basic.result.result_gen import ResultGen
 
-__all__ = ["ResultDP", "ResultInt"]
+__all__ = ["ResultGen"]

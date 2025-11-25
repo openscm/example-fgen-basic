@@ -8,7 +8,9 @@ from example_fgen_basic.pyfgen_runtime.exceptions import (
     CompiledExtensionNotFoundError,
     FortranError,
 )
-from example_fgen_basic.result import ResultDP
+
+# from example_fgen_basic.result import ResultDP
+from example_fgen_basic.result import ResultGen
 
 try:
     from example_fgen_basic._lib import m_get_square_root_w  # type: ignore
@@ -18,11 +20,9 @@ except (ModuleNotFoundError, ImportError) as exc:  # pragma: no cover
     ) from exc
 
 try:
-    from example_fgen_basic._lib import m_result_dp_w
+    from example_fgen_basic._lib import m_result_w
 except (ModuleNotFoundError, ImportError) as exc:  # pragma: no cover
-    raise CompiledExtensionNotFoundError(
-        "example_fgen_basic._lib.m_result_dp_w"
-    ) from exc
+    raise CompiledExtensionNotFoundError("example_fgen_basic._lib.m_result_w") from exc
 
 
 def get_square_root(inv: float) -> float:
@@ -47,11 +47,11 @@ def get_square_root(inv: float) -> float:
         TODO: use a more specific error
     """
     result_instance_index: int = m_get_square_root_w.get_square_root(inv)
-    result = ResultDP.from_instance_index(result_instance_index)
+    result = ResultGen.from_instance_index(result_instance_index)
 
     if result.error_v is not None:
         # TODO: be more specific
-        m_result_dp_w.finalise_instance(result_instance_index)
+        m_result_w.finalise_instance(result_instance_index)
         raise FortranError(result.error_v.message)
         # raise LessThanZeroError(result.error_v.message)
 
@@ -68,6 +68,6 @@ def get_square_root(inv: float) -> float:
     # I like the safety of finalising in `from_instance_index`.
     # if not finalised(result_instance_index):
     #     finalise(result_instance_index)
-    m_result_dp_w.finalise_instance(result_instance_index)
+    m_result_w.finalise_instance(result_instance_index)
 
     return res
