@@ -17,6 +17,8 @@ contains
 
         real(kind=dp), intent(in) :: inv
         !! Frequency
+        character(len=:), allocatable :: msg
+        character(len=10) :: input_char
 
         type(ResultGen) :: res
         !! Result
@@ -25,10 +27,12 @@ contains
         !! Error otherwise.
 
         if (inv >= 0) then
-            res = ResultGen(tag=T_DP,data_dp=sqrt(inv))
+            call res % build(tag=T_DP,data_dp=sqrt(inv))
         else
-            ! TODO: include input value in the message
-            res = ResultGen(tag=T_ERR,error_v=ErrorV(code=1, message="Input value was negative"))
+            write(input_char, "(F9.3)") inv
+            msg = adjustl(trim("Error: Negative Input -> "// adjustl(trim(input_char))))
+
+            call res % build(tag=T_ERR,error_v=ErrorV(code=1, message=msg))
         end if
 
     end function get_square_root

@@ -16,7 +16,7 @@ module m_result_manager
 
 contains
 
-  subroutine build_instance(tag, data_int, data_dp, error_v, instance_index,res_check)
+  subroutine build_instance(tag, data_int, data_dp, error_v, instance_index, res_check)
 
     integer, intent(in) :: tag
     integer(kind=i8),optional, intent(in) :: data_int

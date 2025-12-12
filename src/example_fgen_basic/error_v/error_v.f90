@@ -30,8 +30,8 @@ module m_error_v
         ! (means you can stop but also unwind errors and traceback along the way)
 
         ! TODO: think about adding trace (might be simpler than compiling with traceback)
-!         class(ErrorV), allocatable :: cause
-        type(ErrorV), pointer :: cause => null()
+!        class(ErrorV), allocatable :: cause
+         type(ErrorV), pointer :: cause => null()
 
     contains
 
@@ -141,6 +141,41 @@ contains
         end if
 
     end subroutine build
+!    subroutine build(self, code, message, cause)
+!        !! Build instance
+!
+!        class(ErrorV), intent(out) :: self
+!        ! Hopefully can leave without docstring (like Python)
+!
+!        integer, intent(in) :: code
+!        !! Error code
+!        !!
+!        !! Use [TODO: figure out xref] `NO_ERROR_CODE` if there is no error
+!
+!        character(len=*), optional, intent(in) :: message
+!        !! Error message
+!        type(ErrorV), target, optional, intent(in) :: cause
+!
+!        self % code = code
+!
+!        if (present(cause)) then
+! !            self % cause => cause
+! !            allocate(self % cause)
+! !            call self%cause%build(cause%code, cause%message, cause%cause)
+! !            self%cause = cause
+!            if (present(message)) then
+!                self % message = adjustl(trim(message)) // " --> Cause: " // cause % message
+!            else
+!                self % message = " --> Cause: " // cause % message
+!            end if
+!
+!        else
+!            if (present(message)) then
+!                self % message = adjustl(trim(message))
+!            end if
+!        end if
+!
+!    end subroutine build
 
     subroutine finalise(self)
         !! Finalise the instance (i.e. free/deallocate)
@@ -153,7 +188,8 @@ contains
         if (allocated(self%message)) deallocate(self%message)
         ! MZ when the object is finalized or goes out of scope, its pointer components are destroyed.
         ! Hopefully no shared ownership??
-        if (associated(self%cause)) nullify(self%cause)
+         if (associated(self%cause)) nullify(self%cause)
+!        if (allocated(self%cause)) deallocate(self%cause)
 
     end subroutine finalise
 

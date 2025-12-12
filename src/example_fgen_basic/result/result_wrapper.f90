@@ -24,8 +24,10 @@ module m_result_w
   private
 
   public :: build_instance_int, build_instance_dp, build_instance_err,&
-            get_instance_tag, get_data_int, get_data_dp, &
-            finalise_instance, finalise_instances
+            finalise_instance, finalise_instances, &
+            get_instance_tag, get_data_int, get_data_dp, get_error
+
+  integer, parameter, public :: s_claimed=T_CLAIM, s_none=T_NONE, s_int=T_INT, s_dp=T_DP, s_err=T_ERR
 
 contains
 
@@ -94,6 +96,9 @@ contains
 
     type(ErrorV) :: error_v
     type(ResultGen) :: res_check
+!    integer :: code
+!    character(len=10) :: int2char
+!    character(len=:), allocatable :: message
 
     if (error_v_instance_index > 0) then
 
@@ -109,8 +114,13 @@ contains
 
     else
 
-      ! maybe generate an error
-      print *, "Provided code does NOT match any ERROR type"
+      call error_v % build(code = 1, message = "Provided code does NOT match any ERROR type")
+      call result_manager_build_instance(&
+        tag = T_ERR, &
+        error_v = error_v, &
+        instance_index= instance_index,&
+        res_check = res_check &
+        )
 
     end if
 
@@ -150,12 +160,6 @@ contains
 
     res_stored = result_manager_get_instance(instance_index)
 
-    if(res_stored % tag /= T_INT) then
-      ! ERROR in a smarter way
-      print *, "TAG type does not match the expected type"
-      return
-    end if
-
     data_int = res_stored % data_int
 
   end function get_data_int
@@ -170,14 +174,7 @@ contains
 
     res_stored = result_manager_get_instance(instance_index)
 
-    ! Think if it is worth checking
-    if(res_stored % tag /= T_DP) then
-      ! ERROR in a smarter way
-      print *, "TAG type does not match the expected type"
-      return
-    end if
-
-    data_dp = res_stored% data_dp
+    data_dp = res_stored % data_dp
 
   end function get_data_dp
 
@@ -186,15 +183,21 @@ contains
 
     integer, intent(in) :: instance_index
     integer, intent(out) :: code
-    character(len=*), intent(out) :: message
+    ! MZ: How to avoid long fixed length??
+    character(len=1000), intent(out) :: message
+    character(len=10) :: int2char
     type(ResultGen) :: res_stored
 
     res_stored = result_manager_get_instance(instance_index)
 
-    ! Think if it is worth checking
+    ! Think if it is worth checking as the Python side should already deal with it. Should be built an error?
     if(res_stored % tag /= T_ERR) then
-      ! ERROR in a smarter way
-      print *, "TAG type does not match the expected type"
+      ! ERROR in a smarter way?
+      code = 1
+      write(int2char,"(I0)") instance_index
+      message = "TAG mismatch! Expected -> ERROR but index: " // adjustl(trim(int2char))
+      write(int2char,"(I0)") res_stored % tag
+      message = adjustl(trim(message)) // " has TAG = " // adjustl(trim(int2char))
       return
     end if
 

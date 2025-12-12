@@ -5,13 +5,20 @@ Tests of `example_fgen_basic.get_square_root`
 import pytest
 
 from example_fgen_basic.get_square_root import get_square_root
+from example_fgen_basic.pyfgen_runtime.exceptions import (
+    FortranError,
+)
 
 
 @pytest.mark.parametrize(
     "inv, exp, exp_error",
     [
         (4.0, 2.0, None),
-        # (-4.0, None, pytest.raises(FortranError, match="Input value was negative")),
+        (
+            -4.0,
+            None,
+            pytest.raises(FortranError, match="Error: Negative Input -> -4.000"),
+        ),
     ],
 )
 def test_basic(inv, exp, exp_error):

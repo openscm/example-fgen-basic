@@ -1,7 +1,7 @@
 !> Wrapper for interfacing `m_get_square_root` with python
 module m_get_square_root_w
 
-    use m_result_gen, only: ResultGen
+    use m_result_gen, only: ResultGen,T_ERR
 
     use m_get_square_root, only: o_get_square_root => get_square_root
 
@@ -50,6 +50,12 @@ contains
         ! ready for its attributes to be retrieved from Python.
         ! MZ it would be probably good to check "res_chk" for errors
         ! res_chk = result_dp_manager_set_instance_index_to(res_instance_index, res)
+        if (res%tag == T_ERR) then
+            call result_manager_set_instance_index_to(instance_index=res_instance_index,&
+                 error_v=res%error_v, res_check = res_chk)
+            return
+        end if
+
         call result_manager_set_instance_index_to(instance_index=res_instance_index,&
                  data_dp=res%data_dp, res_check = res_chk)
 
