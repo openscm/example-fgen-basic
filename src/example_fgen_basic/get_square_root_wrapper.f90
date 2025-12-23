@@ -9,7 +9,7 @@ module m_get_square_root_w
     use m_result_manager, only: &
         result_manager_get_available_instance_index => get_available_instance_index, &
         result_manager_set_instance_index_to => set_instance_index_to, &
-        result_manager_ensure_instance_array_size_is_at_least => ensure_instance_array_size_is_at_least
+        result_manager_ensure_array_capacity_for_instances => ensure_array_capacity_for_instances
 
     implicit none
     private
@@ -36,7 +36,7 @@ contains
 
         res = o_get_square_root(inv)
 
-        call result_manager_ensure_instance_array_size_is_at_least(1)
+        call result_manager_ensure_array_capacity_for_instances(1)
 
         ! Get the instance index to return to Python
         ! res_get_available_instance_index = result_dp_manager_get_available_instance_index()

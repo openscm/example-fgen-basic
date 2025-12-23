@@ -15,7 +15,7 @@ module m_error_v_creation_w
     use m_error_v_manager, only: &
         error_v_manager_get_available_instance_index => get_available_instance_index, &
         error_v_manager_set_instance_index_to => set_instance_index_to, &
-        error_v_manager_ensure_instance_array_size_is_at_least => ensure_instance_array_size_is_at_least
+        error_v_manager_ensure_array_capacity_for_instances => ensure_array_capacity_for_instances
 
     implicit none
     private
@@ -44,7 +44,7 @@ contains
         ! Do the Fortran call
         res = o_create_error(inv)
 
-        call error_v_manager_ensure_instance_array_size_is_at_least(1)
+        call error_v_manager_ensure_array_capacity_for_instances(1)
 
         ! Get the instance index to return to Python
         call error_v_manager_get_available_instance_index(res_instance_index)
@@ -81,11 +81,11 @@ contains
         ! Lots of ways resizing could work.
         ! Optimising could be very tricky.
         ! Just do something stupid for now to see the pattern.
-        call error_v_manager_ensure_instance_array_size_is_at_least(n)
+        call error_v_manager_ensure_array_capacity_for_instances(n)
 
         allocate(res(n))
         ! Do the Fortran call
-        ! MZ: somenthing funny happens wheb res is an automatic array and
+        ! MZ: somenthing funny happens when res is an automatic array and
         ! not an allocatable one. LLMs and internet resorces I found are not
         ! completely clear to me. What seems to happen is that returning an array of derived types with allocatable
         ! components may generate hidden temporary arrays whose allocatable components

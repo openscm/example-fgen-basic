@@ -8,8 +8,6 @@ from example_fgen_basic.pyfgen_runtime.exceptions import (
     CompiledExtensionNotFoundError,
     FortranError,
 )
-
-# from example_fgen_basic.result import ResultDP
 from example_fgen_basic.result import ResultGen
 
 try:
@@ -52,7 +50,7 @@ def get_square_root(inv: float) -> float:
     if result.error_v is not None:
         # TODO: be more specific
         # m_result_w.finalise_instance(result_instance_index)
-        raise FortranError(result.error_v.message)
+        raise FortranError(result.error_v.code, result.error_v.message)
         # raise LessThanZeroError(result.error_v.message)
 
     if result.data_v is None:

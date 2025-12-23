@@ -6,5 +6,5 @@ select = [ "C", "E", "S", "PORT" ]
 #Ignoring:
 # C003:	'implicit none' missing 'external'  [f2py does not recognize the syntax implicit none(type, external)]
 # ignore = ["C003","C072","S221"]
-ignore = ["C003"]
+ignore = ["C003","S221"]
 line-length = 120

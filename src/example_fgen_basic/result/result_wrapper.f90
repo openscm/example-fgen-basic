@@ -7,31 +7,35 @@ module m_result_w
   ! The manager module, which makes this all work
   use m_error_v_manager, only: &
       error_v_manager_get_instance => get_instance, &
-      error_v_manager_ensure_instance_array_size_is_at_least => ensure_instance_array_size_is_at_least, &
       error_v_manager_get_available_instance_index => get_available_instance_index, &
-      error_v_manager_set_instance_index_to => set_instance_index_to
+      error_v_manager_get_error_message => get_error_message, &
+      error_v_manager_set_instance_index_to => set_instance_index_to, &
+      error_v_manager_deallocate_instance_arrays => deallocate_instance_arrays
 
   use m_result_manager, only: &
       result_manager_build_instance => build_instance, &
       result_manager_finalise_instance => finalise_instance, &
       result_manager_get_instance => get_instance, &
-      result_manager_ensure_instance_array_size_is_at_least => ensure_instance_array_size_is_at_least, &
+      result_manager_probe_instance => probe_instance, &
+      result_manager_ensure_array_capacity_for_instances => ensure_array_capacity_for_instances, &
       result_manager_force_claim_instance_index => force_claim_instance_index, &
       result_manager_set_instance_index_to => set_instance_index_to, &
-      result_manager_check_index_claimed => check_index_claimed
+      result_manager_check_index_claimed => check_index_claimed, &
+      result_manager_deallocate_instance_array => deallocate_instance_array
 
   implicit none
   private
 
   public :: build_instance_int, build_instance_dp, build_instance_err,&
-            finalise_instance, finalise_instances, &
-            get_instance_tag, get_data_int, get_data_dp, get_error
+            finalise_instance, finalise_instances, free_resources,&
+            get_instance_tag, get_data_int, get_data_dp, get_error, &
+            probe_instance
 
   integer, parameter, public :: s_claimed=T_CLAIM, s_none=T_NONE, s_int=T_INT, s_dp=T_DP, s_err=T_ERR
 
 contains
 
-! ---------------- Setters/builders ---------------------
+! ---------------- Builders ---------------------
   function build_instance_int(data_int) result(instance_index)
 
     integer, parameter :: i8 = selected_int_kind(18)
@@ -88,21 +92,19 @@ contains
 
   end function build_instance_dp
 
-  function build_instance_err(error_v_instance_index) result(instance_index)
+  function build_instance_err(code,message) result(instance_index)
 
-    integer, intent(in) :: error_v_instance_index
+    integer, intent(in) :: code
+    character(len=*), intent(in) :: message
 
     integer :: instance_index
 
     type(ErrorV) :: error_v
     type(ResultGen) :: res_check
-!    integer :: code
-!    character(len=10) :: int2char
-!    character(len=:), allocatable :: message
+    if (code > 0) then
 
-    if (error_v_instance_index > 0) then
-
-      error_v = error_v_manager_get_instance(error_v_instance_index)
+!      error_v = error_v_manager_get_instance(error_v_instance_index)
+      call error_v % build(code=code, message=message)
 
       ! Setting Result with error
       call result_manager_build_instance(&
@@ -124,7 +126,7 @@ contains
 
     end if
 
-    if (res_check % is_error()) then
+    if (res_check % is_error() .and. instance_index==-1) then
       ! FAILED build
       !
       ! Could not allocate a result type to handle the return to Python.
@@ -136,6 +138,15 @@ contains
   end function build_instance_err
 
 ! ---------------- Getters ---------------------
+  function probe_instance(instance_index) result(err_index)
+
+    integer, intent(in) :: instance_index
+    integer :: err_index
+
+    err_index = result_manager_probe_instance(instance_index)
+
+  end function probe_instance
+
   ! pure function get_instance_tag(instance_index) result(tag)
   function get_instance_tag(instance_index) result(tag)
 
@@ -202,7 +213,7 @@ contains
     end if
 
     code = res_stored % error_v % code
-    message = res_stored % error_v % message
+    message = error_v_manager_get_error_message(res_stored%error_v)
 
   end subroutine get_error
 
@@ -233,6 +244,11 @@ contains
 
   end subroutine finalise_instances
 
+  subroutine free_resources()
+    call result_manager_deallocate_instance_array()
+    call error_v_manager_deallocate_instance_arrays()
+  end subroutine free_resources
+
 ! ---------------- Auxiliar ---------------------
   subroutine escape_hatch(instance_index)
 
@@ -244,7 +260,7 @@ contains
     ! If you can't create a result type to return to Python,
     ! then you also can't return errors so you're stuck.
     ! As an escape hatch
-    call result_manager_ensure_instance_array_size_is_at_least(1)
+    call result_manager_ensure_array_capacity_for_instances(1)
     instance_index = 1
 
     ! Just use the first instance and write a message that the program

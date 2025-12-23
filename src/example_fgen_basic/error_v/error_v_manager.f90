@@ -10,15 +10,16 @@ module m_error_v_manager
     private
 
     type(ErrorV), dimension(:), allocatable :: instance_array
+    ! MZ : Do we really need instance_available?
     logical, dimension(:), allocatable :: instance_available
 
     ! TODO: think about ordering here, alphabetical probably easiest
-    public :: build_instance, finalise_instance, get_available_instance_index, get_instance, set_instance_index_to, &
-              ensure_instance_array_size_is_at_least
+    public :: build_instance, finalise_instance, get_available_instance_index, get_instance, get_error_message, &
+            set_instance_index_to, ensure_array_capacity_for_instances,deallocate_instance_arrays
 
 contains
 
-    function build_instance(code, message) result(instance_index)
+    function build_instance(code, message, cause) result(instance_index)
         !! Build an instance
 
         integer, intent(in) :: code
@@ -27,12 +28,14 @@ contains
         character(len=*), optional, intent(in) :: message
         !! Error message
 
+        integer, optional, intent(in) :: cause
+
         integer :: instance_index
         !! Index of the built instance
 
-        call ensure_instance_array_size_is_at_least(1)
+        call ensure_array_capacity_for_instances(1)
         call get_available_instance_index(instance_index)
-        call instance_array(instance_index) % build(code=code, message=message)
+        call instance_array(instance_index) % build(code=code, message=message, cause=cause)
 
     end function build_instance
 
@@ -82,7 +85,7 @@ contains
 
         ! TODO: switch to returning a Result type with an error set
         ! res = ResultInt(ErrorV(code=1, message="No available instances"))
-        print *, "print"
+        print *, "print dioooo"
         error stop 1
 
     end subroutine get_available_instance_index
@@ -97,6 +100,8 @@ contains
         !! Instance at `instance_array(instance_index)`
 
         type(ErrorV) :: err_check_index_claimed
+
+        integer :: cause
         character(len=20) :: idx_str
         character(len=:), allocatable :: msg
 
@@ -107,39 +112,46 @@ contains
             err_inst = instance_array(instance_index)
 
         else
+
             write(idx_str, "(I0)") instance_index
             msg = "Error at get_instance -> " // trim(adjustl(idx_str))
 
-            err_inst = ErrorV( &
+            cause = build_instance(code=err_check_index_claimed % code, message=err_check_index_claimed % message)
+
+            call err_inst % build( &
                     code= err_check_index_claimed%code,&
                     message = msg, &
-                    cause = err_check_index_claimed &
+                    cause = cause &
                     )
         end if
 
     end function get_instance
 
-    function set_instance_index_to(instance_index, val) result(err)
+    function set_instance_index_to(instance_index, val) result(err_inst)
 
         integer, intent(in) :: instance_index
         !! Index in `instance_array` of which to set the value equal to `val`
 
         type(ErrorV), intent(in) :: val
-        type(ErrorV) :: err
+        type(ErrorV) :: err_inst
 
         type(ErrorV) :: err_check_index_claimed
+        integer :: cause
         character(len=:), allocatable :: msg
 
         err_check_index_claimed = check_index_claimed(instance_index)
 
-        if(err_check_index_claimed%code /= NO_ERROR_CODE) then
+        if (err_check_index_claimed%code /= NO_ERROR_CODE) then
             ! MZ: here we do not set if the index has not been claimed.
             ! Must be harmonised with Results type
             msg ="Setting Instance Error: "
-            err = ErrorV ( &
-                    code = err_check_index_claimed% code, &
+
+            cause = build_instance(code=err_check_index_claimed % code, message=err_check_index_claimed % message)
+
+            call err_inst % build( &
+                    code= err_check_index_claimed%code,&
                     message = msg, &
-                    cause = err_check_index_claimed &
+                    cause = cause &
                     )
 
         else
@@ -153,7 +165,7 @@ contains
             ! Reassigning the slot
             call instance_array(instance_index)%build(code=val%code, message=val%message, cause=val%cause)
 
-            err = ErrorV(code=NO_ERROR_CODE)
+            call err_inst % build(code= NO_ERROR_CODE)
 
         end if
 
@@ -192,8 +204,7 @@ contains
             ! print *, "Index ", instance_index, " has not been claimed"
             ! error stop 1
             msg = "Index " // trim(adjustl(idx_str)) // " has not been claimed"
-
-            err_check_index_claimed = ErrorV(code=1, message=msg)
+            call err_check_index_claimed % build(code=1, message=msg)
 
             return
         end if
@@ -209,41 +220,123 @@ contains
             ! print *, "Requested index is ", instance_index, " which is less than 1"
             ! error stop 1
             msg = "Requested index is: " // trim(adjustl(idx_str)) // " ==> out of boundary"
-            err_check_index_claimed = ErrorV(code=2, message=msg)
+            call err_check_index_claimed % build(code=2, message=msg)
 
             return
         end if
 
-        err_check_index_claimed = ErrorV(code=NO_ERROR_CODE)
+        call err_check_index_claimed % build(code=NO_ERROR_CODE)
 
     end function check_index_claimed
 
-    subroutine ensure_instance_array_size_is_at_least(n)
-        !! Ensure that `instance_array` and `instance_available` have at least `n` slots
+!   subroutine ensure_instance_array_size_is_at_least(n)
+!        !! Ensure that `instance_array` and `instance_available` have at least `n` slots
+!
+!        integer, intent(in) :: n
+!
+!        type(ErrorV), dimension(:), allocatable :: tmp_instances
+!        logical, dimension(:), allocatable :: tmp_available
+!
+!        if (.not. allocated(instance_array)) then
+!            allocate (instance_array(n))
+!
+!            allocate (instance_available(n))
+!            ! Race conditions ?
+!            instance_available = .true.
+!
+!        else if (size(instance_available) < n) then
+!            allocate (tmp_instances(n))
+!            tmp_instances(1:size(instance_array)) = instance_array
+!            call move_alloc(tmp_instances, instance_array)
+!
+!            allocate (tmp_available(n))
+!            tmp_available(1:size(instance_available)) = instance_available
+!            tmp_available(size(instance_available) + 1:size(tmp_available)) = .true.
+!            call move_alloc(tmp_available, instance_available)
+!
+!        end if
+!    end subroutine ensure_instance_array_size_is_at_least
 
-        integer, intent(in) :: n
+  subroutine ensure_array_capacity_for_instances(n)
+  !! Ensure that `instance_array` has at least `n` slots
 
-        type(ErrorV), dimension(:), allocatable :: tmp_instances
-        logical, dimension(:), allocatable :: tmp_available
+    integer, intent(in) :: n
+    type(ErrorV), dimension(:), allocatable :: tmp_instances
+    logical, dimension(:), allocatable :: tmp_available
 
-        if (.not. allocated(instance_array)) then
-            allocate (instance_array(n))
+    integer :: free_count
 
-            allocate (instance_available(n))
-            ! Race conditions ?
-            instance_available = .true.
+    if (.not. allocated(instance_array)) then
 
-        else if (size(instance_available) < n) then
-            allocate (tmp_instances(n))
-            tmp_instances(1:size(instance_array)) = instance_array
-            call move_alloc(tmp_instances, instance_array)
+        allocate (instance_array(n),instance_available(n))
+        ! Race conditions ?
+        instance_available = .true.
 
-            allocate (tmp_available(n))
-            tmp_available(1:size(instance_available)) = instance_available
-            tmp_available(size(instance_available) + 1:size(tmp_available)) = .true.
-            call move_alloc(tmp_available, instance_available)
+    else if (size(instance_array) < n) then
+      ! MZ: in this case we just add n spaces on top
 
+        allocate(tmp_instances(n+size(instance_array)), &
+                  tmp_available(n+size(instance_available))  &
+                )
+
+        tmp_instances(1:size(instance_array)) = instance_array
+        tmp_available = .true.
+        tmp_available(1:size(instance_available)) = instance_available
+
+        call move_alloc(tmp_instances, instance_array)
+        call move_alloc(tmp_available, instance_available)
+
+    else
+
+      free_count = count(instance_available)
+
+      if (free_count < n) then
+        ! MZ: doubling the size might be more efficient in the long run??
+        allocate(tmp_instances(size(instance_array)*2),&
+                  tmp_available(size(instance_available)*2) &
+                )
+
+        tmp_instances(1:size(instance_array)) = instance_array
+        tmp_available = .true.
+        tmp_available(1:size(instance_available)) = instance_available
+
+        call move_alloc(tmp_instances, instance_array)
+        call move_alloc(tmp_available, instance_available)
+
+      end if
+
+    end if
+
+  end subroutine ensure_array_capacity_for_instances
+
+    pure recursive function get_error_message(err) result(full_msg)
+
+        type(ErrorV), intent(in) :: err
+
+        character(len=:), allocatable :: full_msg
+        character(len=:), allocatable :: cause_msg
+
+        full_msg = err%message
+
+        if (err%cause/=0) then
+            !MZ : free slot while passing by?
+            cause_msg = get_error_message(instance_array(err%cause))
+            full_msg = trim(full_msg) // NEW_LINE("A") // " Previous error --> "  // trim(cause_msg)
         end if
-    end subroutine ensure_instance_array_size_is_at_least
+
+    end function get_error_message
+
+    subroutine deallocate_instance_arrays()
+        !! Finalise an instance
+
+        if (allocated(instance_available).and.allocated(instance_array)) then
+            deallocate(instance_available,instance_array)
+        else if(allocated(instance_available))then
+            deallocate(instance_available)
+        else if(allocated(instance_array)) then
+            deallocate(instance_array)
+        end if
+
+    end subroutine deallocate_instance_arrays
 
 end module m_error_v_manager

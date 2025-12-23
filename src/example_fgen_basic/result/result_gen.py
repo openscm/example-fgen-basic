@@ -39,7 +39,7 @@ class ResultGen:
     @classmethod
     def from_instance_index(cls, instance_index: int) -> ResultGen:
         """
-        Initialise from an instance index received from Fortran
+        Get from an instance index received from Fortran
 
         Parameters
         ----------
@@ -49,8 +49,13 @@ class ResultGen:
         Returns
         -------
         :
-           Initalised index
+           Initialised index
         """
+        valid_instance = m_result_w.probe_instance(instance_index)
+
+        if valid_instance != instance_index:
+            instance_index = valid_instance
+
         tag = m_result_w.get_instance_tag(instance_index)
 
         if tag == cls.__fs_int:
@@ -74,3 +79,46 @@ class ResultGen:
         res = cls(data_v=data_v, error_v=error_v)
 
         return res
+
+    @classmethod
+    def free_fortran_memory(cls) -> None:
+        """
+        Initialise from an instance index received from Fortran
+
+        Parameters
+        ----------
+        instance_index
+           None
+
+        Returns
+        -------
+        :
+           None: It just frees memory
+        """
+        m_result_w.free_resources()
+
+    def build_fortran_instance(self) -> int:
+        """
+        Build an instance equivalent to `self` on the Fortran side
+
+        Intended for use mainly by wrapping functions.
+        Most users should not need to use this method directly.
+
+        Returns
+        -------
+        :
+            Instance index of the object which has been created on the Fortran side
+        """
+        if (self.data_v is None) & (self.error_v is not None):
+            instance_index: int = m_result_w.build_instance_err(
+                self.error_v.code, self.error_v.message
+            )
+        elif isinstance(self.data_v, int):
+            instance_index: int = m_result_w.build_instance_int(self.data_v)
+        elif isinstance(self.data_v, float):
+            instance_index: int = m_result_w.build_instance_dp(self.data_v)
+        else:
+            msg = f"data_v={self.data_v}, error_v={self.error_v}"
+            raise KeyError(msg)
+
+        return instance_index

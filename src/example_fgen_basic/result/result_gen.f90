@@ -75,6 +75,8 @@ contains
     else if (present(error_v) .and. tag == T_ERR)then
       allocate(self % error_v, source = error_v)
     else
+      ! MZ is it really needed?
+      res % error_v % code = 11
       res % error_v % message = "Build Error: TAG / INPUT mismatch"
     end if
 
