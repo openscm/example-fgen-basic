@@ -37,7 +37,7 @@ def test_create_error_result():
 
     result_instance_index = result_in.build_fortran_instance()
     result_out = ResultGen.from_instance_index(result_instance_index)
-    result_out.error_v.message = result_out.error_v.message.decode("utf-8")
+    result_out.error_v.message = result_out.error_v.message
 
     assert result_in.data_v == result_out.data_v
     assert result_in.error_v == result_out.error_v
@@ -57,7 +57,7 @@ def test_create_mix_results():
         result_out = ResultGen.from_instance_index(result_instance_index)
 
         if result_out.error_v:
-            result_out.error_v.message = result_out.error_v.message.decode("utf-8")
+            result_out.error_v.message = result_out.error_v.message
 
         assert res.data_v == result_out.data_v
         assert res.error_v == result_out.error_v
@@ -71,7 +71,7 @@ def test_out_of_alloc_and_bound_error():
     result_out = ResultGen.from_instance_index(1)
 
     if result_out.error_v:
-        result_out.error_v.message = result_out.error_v.message.decode("utf-8")
+        result_out.error_v.message = result_out.error_v.message
 
     assert (
         result_out.error_v.message
@@ -82,7 +82,7 @@ def test_out_of_alloc_and_bound_error():
     result_out = ResultGen.from_instance_index(result_instance_index + 10)
 
     if result_out.error_v:
-        result_out.error_v.message = result_out.error_v.message.decode("utf-8")
+        result_out.error_v.message = result_out.error_v.message
 
     assert (
         result_out.error_v.message

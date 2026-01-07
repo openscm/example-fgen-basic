@@ -70,7 +70,16 @@ def get_square_root(inv: float) -> float:
 
     if state != 0:
         error = ResultGen.from_instance_index(state)
-        message = error.error_v.message.decode("utf-8")
+
+        if error.error_v is None:
+            msg = (
+                f"Finalisation of index {result_instance_index} failed with "
+                f"state {state} but returned no error details."
+            )
+            raise AssertionError(msg)
+
+        message = error.error_v.message
+
         raise FortranError(error.error_v.code, message)
 
     return res

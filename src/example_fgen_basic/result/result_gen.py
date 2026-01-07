@@ -70,7 +70,8 @@ class ResultGen:
             code, message = m_result_w.get_error(instance_index)
             # if code is None or message is None:
             # raise ValueError("Fortran returned incomplete error information")
-            error_v = ErrorV(code=code, message=message)
+            clean_msg = message.decode("utf-8").strip()
+            error_v = ErrorV(code=code, message=clean_msg)
 
             res = cls(data_v=data_v_err, error_v=error_v)
         else:
