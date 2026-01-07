@@ -71,20 +71,37 @@ contains
 
   end subroutine build_instance
 
-  subroutine finalise_instance(instance_index)
+  function finalise_instance(instance_index) result(state_index)
       !! Finalise an instance
 
       integer, intent(in) :: instance_index
       !! Index of the instance to finalise
 
-      type(ResultGen) :: res_check_index_claimed
+      type(ResultGen) :: res_check
+      integer :: cause, state_index
 
-      res_check_index_claimed = check_index_claimed(instance_index)
+      res_check = check_index_claimed(instance_index)
+
       ! MZ how do we handle unsuccefull finalisation?
-       ! if(res_check_index_claimed%is_error()) return
+      if((res_check%is_error()) .and. (&
+          res_check%error_v%code /= 33)) then
+
+          cause = error_v_manager_build_instance(code = res_check % error_v % code, &
+                                                message = res_check % error_v % message)
+
+          call build_instance (tag = T_ERR,&
+                               error_v = ErrorV(code=1,message="Finalise Instance error : ",cause=cause),&
+                               instance_index = state_index, &
+                               res_check=res_check &
+                              )
+
+          return
+      end if
+
+      state_index = 0
       call instance_array(instance_index) % finalise()
 
-  end subroutine finalise_instance
+  end function finalise_instance
 
   subroutine set_instance_index_to(instance_index, data_int, data_dp, error_v, res_check)
 
@@ -102,12 +119,12 @@ contains
     if (input_check == 0) then
 
       call res_check % build (tag = T_ERR,&
-        error_v = ErrorV(code=1,message="Setting instance ERROR: Empty Input"))
+                          error_v = ErrorV(code=1,message="Setting instance ERROR: Empty Input"))
 
     else if (input_check > 1) then
 
       call res_check % build (tag = T_ERR,&
-        error_v = ErrorV(code=1,message="Setting instance ERROR: Multiple Input"))
+                          error_v = ErrorV(code=1,message="Setting instance ERROR: Multiple Input"))
 
     else
 
@@ -150,7 +167,7 @@ contains
 
     end if
 
-    res_instance_index = instance_index
+    res_instance_index = 0
 
   end function probe_instance
 
@@ -241,9 +258,9 @@ contains
       if (instance_array(instance_index)%tag==T_NONE) then
 
           msg = "Index " // trim(adjustl(idx_str)) // " has not been claimed"
-          call res_check_index_claimed % build(tag=T_ERR,error_v=ErrorV(code=3, message=msg))
-
+          call res_check_index_claimed % build(tag=T_ERR,error_v=ErrorV(code=33, message=msg))
           return
+
       end if
 
       call res_check_index_claimed % build(tag=T_CLAIM)
@@ -297,8 +314,6 @@ contains
 
     if (allocated (instance_array))then
       deallocate(instance_array)
-    else
-      print *, "instance_array NOT allocated"
     end if
 
   end subroutine deallocate_instance_array

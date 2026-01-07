@@ -29,9 +29,6 @@ class ResultGen:
     error_v: ErrorV | None
     """Error"""
 
-    """
-    Parameters:
-    """
     __fs_int = m_result_w.s_int
     __fs_dp = m_result_w.s_dp
     __fs_err = m_result_w.s_err
@@ -44,56 +41,48 @@ class ResultGen:
         Parameters
         ----------
         instance_index
-           Instance index received form Fortran
+            Instance index received form Fortran
 
         Returns
         -------
         :
-           Initialised index
+            Initialised index
         """
         valid_instance = m_result_w.probe_instance(instance_index)
 
-        if valid_instance != instance_index:
+        if valid_instance != 0:
             instance_index = valid_instance
 
         tag = m_result_w.get_instance_tag(instance_index)
 
         if tag == cls.__fs_int:
-            data_v: int | None = m_result_w.get_data_int(instance_index)
+            data_v_int: int | None = m_result_w.get_data_int(instance_index)
             error_v = None
+            res = cls(data_v=data_v_int, error_v=error_v)
 
         elif tag == cls.__fs_dp:
-            data_v: float | None = m_result_w.get_data_dp(instance_index)
+            data_v_float: float | None = m_result_w.get_data_dp(instance_index)
             error_v = None
+            res = cls(data_v=data_v_float, error_v=error_v)
 
         elif tag == cls.__fs_err:
-            data_v = None
-            error_tuple: tuple[int | None, str | None] = m_result_w.get_error(
-                instance_index
-            )
-            code, message = error_tuple
+            data_v_err = None
+            code, message = m_result_w.get_error(instance_index)
+            # if code is None or message is None:
+            # raise ValueError("Fortran returned incomplete error information")
             error_v = ErrorV(code=code, message=message)
-        else:
-            print("ERRRORRR")
 
-        res = cls(data_v=data_v, error_v=error_v)
+            res = cls(data_v=data_v_err, error_v=error_v)
+        else:
+            msg = f"Undefinded tag: {tag}"
+            raise ValueError(msg)
 
         return res
 
     @classmethod
     def free_fortran_memory(cls) -> None:
         """
-        Initialise from an instance index received from Fortran
-
-        Parameters
-        ----------
-        instance_index
-           None
-
-        Returns
-        -------
-        :
-           None: It just frees memory
+        Free memory on the Fortran side.
         """
         m_result_w.free_resources()
 
@@ -109,14 +98,16 @@ class ResultGen:
         :
             Instance index of the object which has been created on the Fortran side
         """
-        if (self.data_v is None) & (self.error_v is not None):
-            instance_index: int = m_result_w.build_instance_err(
+        instance_index: int
+
+        if self.data_v is None and self.error_v is not None:
+            instance_index = m_result_w.build_instance_err(
                 self.error_v.code, self.error_v.message
             )
         elif isinstance(self.data_v, int):
-            instance_index: int = m_result_w.build_instance_int(self.data_v)
+            instance_index = m_result_w.build_instance_int(self.data_v)
         elif isinstance(self.data_v, float):
-            instance_index: int = m_result_w.build_instance_dp(self.data_v)
+            instance_index = m_result_w.build_instance_dp(self.data_v)
         else:
             msg = f"data_v={self.data_v}, error_v={self.error_v}"
             raise KeyError(msg)

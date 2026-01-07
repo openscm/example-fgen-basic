@@ -31,7 +31,7 @@ contains
         !! Instance index of the result type
 
         type(ResultGen) :: res
-        type(ResultGen) :: res_get_available_instance_index
+!        type(ResultGen) :: res_get_available_instance_index
         type(ResultGen) :: res_chk
 
         res = o_get_square_root(inv)

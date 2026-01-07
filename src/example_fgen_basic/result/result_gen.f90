@@ -2,6 +2,7 @@ module m_result_gen
 
   use kind_parameters, only: dp,i8
   use m_error_v, only: ErrorV
+  use m_error_v_manager, only: error_v_manager_build_instance => build_instance
 
   implicit none
   private
@@ -42,13 +43,25 @@ contains
     type(ErrorV), optional, intent(in) :: error_v
 
     integer, intent(in) :: tag
+    integer :: cause
 
     call self % build (tag = tag, data_int = data_int, data_dp = data_dp,&
       error_v = error_v, res=res_check)
 
     if (res_check % is_error()) then
-      print *, res_check % error_v % message
-      error stop
+
+      cause = error_v_manager_build_instance( &
+                      code = res_check % error_v % code, &
+                      message = res_check % error_v % message &
+                      )
+
+      call self % build(tag = T_ERR, &
+                         error_v = ErrorV( &
+                                        code=1, &
+                                        message=("Build Instance error : "), &
+                                        cause=cause &
+                                      )&
+                        )
     end if
 
   end function constructor

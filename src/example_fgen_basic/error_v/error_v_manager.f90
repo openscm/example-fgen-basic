@@ -309,34 +309,36 @@ contains
 
   end subroutine ensure_array_capacity_for_instances
 
-    pure recursive function get_error_message(err) result(full_msg)
+!  pure recursive function get_error_message(err) result(full_msg)
+  recursive function get_error_message(err) result(full_msg)
+      type(ErrorV), intent(in) :: err
+      character(len=:), allocatable :: full_msg
+      character(len=:), allocatable :: cause_msg
 
-        type(ErrorV), intent(in) :: err
+      full_msg = err%message
 
-        character(len=:), allocatable :: full_msg
-        character(len=:), allocatable :: cause_msg
+      if (err%cause/=0) then
 
-        full_msg = err%message
+          cause_msg = get_error_message(instance_array(err%cause))
+          full_msg = trim(full_msg) // NEW_LINE("A") // " Previous error --> "  // trim(cause_msg)
+          !MZ : free slot while passing by? If yes we loose the function "purity"
+          instance_available(err%cause) = .true.
 
-        if (err%cause/=0) then
-            !MZ : free slot while passing by?
-            cause_msg = get_error_message(instance_array(err%cause))
-            full_msg = trim(full_msg) // NEW_LINE("A") // " Previous error --> "  // trim(cause_msg)
-        end if
+      end if
 
-    end function get_error_message
+  end function get_error_message
 
-    subroutine deallocate_instance_arrays()
-        !! Finalise an instance
+  subroutine deallocate_instance_arrays()
+      !! Finalise an instance
 
-        if (allocated(instance_available).and.allocated(instance_array)) then
-            deallocate(instance_available,instance_array)
-        else if(allocated(instance_available))then
-            deallocate(instance_available)
-        else if(allocated(instance_array)) then
-            deallocate(instance_array)
-        end if
+      if (allocated(instance_available).and.allocated(instance_array)) then
+          deallocate(instance_available,instance_array)
+      else if(allocated(instance_available))then
+          deallocate(instance_available)
+      else if(allocated(instance_array)) then
+          deallocate(instance_array)
+      end if
 
-    end subroutine deallocate_instance_arrays
+  end subroutine deallocate_instance_arrays
 
 end module m_error_v_manager

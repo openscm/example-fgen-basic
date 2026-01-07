@@ -138,12 +138,12 @@ contains
   end function build_instance_err
 
 ! ---------------- Getters ---------------------
-  function probe_instance(instance_index) result(err_index)
+  function probe_instance(instance_index) result(state_index)
 
     integer, intent(in) :: instance_index
-    integer :: err_index
+    integer :: state_index
 
-    err_index = result_manager_probe_instance(instance_index)
+    state_index = result_manager_probe_instance(instance_index)
 
   end function probe_instance
 
@@ -218,31 +218,33 @@ contains
   end subroutine get_error
 
 ! ---------------- Destructor ---------------------
-  subroutine finalise_instance(instance_index)
+  function finalise_instance(instance_index) result(state_index)
       !! Finalise an instance
 
       integer, intent(in) :: instance_index
       !! Instance index
       !
+      integer :: state_index
       ! This is the major trick for wrapping.
       ! We pass instance indexes (integers) to Python rather than the instance itself.
 
-      call result_manager_finalise_instance(instance_index)
+      state_index = result_manager_finalise_instance(instance_index)
 
-  end subroutine finalise_instance
+  end function finalise_instance
 
-  subroutine finalise_instances(instance_indexes)
+  function finalise_instances(instance_indexes) result(state_index)
       !! Finalise an instance
 
       integer, dimension(:), intent(in) :: instance_indexes
       !! Instance indexes to finalise
-      integer :: i
+      integer :: i, state_index
 
-      do i = 1, size(instance_indexes)
-          call result_manager_finalise_instance(instance_indexes(i))
-      end do
+      finalise_loop: do i = 1, size(instance_indexes)
+          state_index = result_manager_finalise_instance(instance_indexes(i))
+          if (state_index /= 0) exit finalise_loop
+      end do finalise_loop
 
-  end subroutine finalise_instances
+  end function finalise_instances
 
   subroutine free_resources()
     call result_manager_deallocate_instance_array()
@@ -254,6 +256,7 @@ contains
 
     integer, intent(out) :: instance_index
 
+    type(ErrorV) :: error_v
     type(ResultGen) :: res_check
 
     ! Logic here is trickier.
@@ -265,20 +268,18 @@ contains
 
     ! Just use the first instance and write a message that the program
     ! is fully broken.
-    res_check = ResultGen(tag=T_ERR,&
-        error_v = ErrorV( &
-            code=1, &
-            message=( &
-                "I wanted to return an error, " &
-                // "but I couldn't even get an available instance to do so. " &
-                // "I have forced a return, but your program is probably fully broken. " &
-                // "Please be very careful." &
-            ) &
-        ) &
-    )
+    error_v = ErrorV( &
+                     code=1, &
+                     message=( &
+                             "I wanted to return an error, " &
+                          // "but I couldn't even get an available instance to do so. " &
+                          // "I have forced a return, but your program is probably fully broken. " &
+                          // "Please be very careful." &
+                     ) &
+              )
 
     call result_manager_force_claim_instance_index(instance_index)
-    call result_manager_set_instance_index_to(instance_index=instance_index,res_check=res_check)
+    call result_manager_set_instance_index_to(instance_index=instance_index,error_v=error_v,res_check=res_check)
 
   end subroutine escape_hatch
 

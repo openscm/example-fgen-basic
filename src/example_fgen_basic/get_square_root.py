@@ -66,6 +66,11 @@ def get_square_root(inv: float) -> float:
     # I like the safety of finalising in `from_instance_index`.
     # if not finalised(result_instance_index):
     #     finalise(result_instance_index)
-    m_result_w.finalise_instance(result_instance_index)
+    state = m_result_w.finalise_instance(result_instance_index)
+
+    if state != 0:
+        error = ResultGen.from_instance_index(state)
+        message = error.error_v.message.decode("utf-8")
+        raise FortranError(error.error_v.code, message)
 
     return res
