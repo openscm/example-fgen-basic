@@ -12,14 +12,16 @@ module m_error_v_w
         error_v_manager_build_instance => build_instance, &
         error_v_manager_finalise_instance => finalise_instance, &
         error_v_manager_get_instance => get_instance, &
-        error_v_manager_ensure_instance_array_size_is_at_least => ensure_instance_array_size_is_at_least
+        error_v_manager_get_error_message => get_error_message, &
+        error_v_manager_deallocate_instance_arrays => deallocate_instance_arrays, &
+        error_v_manager_ensure_array_capacity_for_instances => ensure_array_capacity_for_instances
 
-    implicit none (type, external)
+    implicit none
     private
 
     public :: build_instance, finalise_instance, finalise_instances, &
               ensure_at_least_n_instances_can_be_passed_simultaneously, &
-              get_code, get_message
+              get_code, get_message, free_memory
 
 contains
 
@@ -85,7 +87,7 @@ contains
 
         integer, intent(in) :: n
 
-        call error_v_manager_ensure_instance_array_size_is_at_least(n)
+        call error_v_manager_ensure_array_capacity_for_instances(n)
 
     end subroutine ensure_at_least_n_instances_can_be_passed_simultaneously
 
@@ -118,14 +120,30 @@ contains
         integer, intent(in) :: instance_index
 
         ! TODO: make this variable length
-        character(len=128), intent(out) :: message
+        ! MZ attempts to put allocatable lead to segfault
+        ! it seems to be really trick. F2PY does not like allocatable
+        ! and assumed-lenght does not work well with long sentences.
+        character(len=1000), intent(out) :: message
 
         type(ErrorV)  :: instance
 
         instance = error_v_manager_get_instance(instance_index)
 
-        message = instance % message
+        if (allocated(instance%message)) then
+
+            if(instance % cause == 0) then
+                message = adjustl(trim(instance % message))
+            else
+                message = adjustl(trim(error_v_manager_get_error_message(instance)))
+            end if
+!        else !MZ what to do??
+!!            message = "Invalid query: message not allocated"
+        end if
 
     end subroutine get_message
+
+    subroutine free_memory()
+        call error_v_manager_deallocate_instance_arrays()
+    end subroutine free_memory
 
 end module m_error_v_w

@@ -52,7 +52,8 @@ test:  ## run the tests (re-installs the package every time so you might want to
 	uv run --no-sync python scripts/inject-srcs-into-meson-build.py
 	uv run --no-sync python -c 'from pathlib import Path; import example_fgen_basic' || ( echo "Run make virtual-environment first" && false )
 	COV_DIR=$$(uv run --no-sync python -c 'from pathlib import Path; import example_fgen_basic; print(Path(example_fgen_basic.__file__).parent)'); \
-		uv run --no-editable --reinstall-package example-fgen-basic pytest -r a -v tests src --doctest-modules --doctest-report ndiff --cov=$$COV_DIR
+		uv run --no-editable --reinstall-package example-fgen-basic pytest -s -r a -v tests src --doctest-modules --doctest-report ndiff --cov=$$COV_DIR
+	# uv run --no-editable --reinstall-package example-fgen-basic pytest -s -r a -v tests/unit/test_get_square_root.py src --doctest-modules --doctest-report ndiff --cov=$$COV_DIR
 
 # Note on code coverage and testing:
 # You must specify cov=src.
@@ -113,7 +114,7 @@ test-fortran: build-fortran  ## run the Fortran tests
 
 .PHONY: install-fortran
 install-fortran: build-fortran  ## install the Fortran (including the extension module)
-	uv run meson install -C build -v
+	uv run meson install -C build # -v
 	# # Can also do this to see where things go without making a mess
 	# uv run meson install -C build --destdir ../install-example
 

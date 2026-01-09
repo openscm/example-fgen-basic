@@ -27,7 +27,7 @@ contains
 
     subroutine test_error_v_creation_basic(error)
         use m_error_v, only: ErrorV
-        use m_error_v_passing, only: create_error
+        use m_error_v_creation, only: create_error
 
         type(error_type), allocatable, intent(out) :: error
 
@@ -46,7 +46,7 @@ contains
 
     subroutine test_error_v_creation_edge(error)
         use m_error_v, only: ErrorV
-        use m_error_v_passing, only: create_error
+        use m_error_v_creation, only: create_error
 
         type(error_type), allocatable, intent(out) :: error
 

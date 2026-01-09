@@ -6,7 +6,7 @@ module m_error_v_creation
 
     use m_error_v, only: ErrorV, NO_ERROR_CODE
 
-    implicit none (type, external)
+    implicit none
     private
 
     public :: create_error, create_errors
@@ -31,7 +31,7 @@ contains
             return
         end if
 
-        if (mod(inv, 2) .eq. 0) then
+        if (mod(inv, 2) == 0) then
             err = ErrorV(code=1, message="Even number supplied")
         else
             err = ErrorV(code=NO_ERROR_CODE)
