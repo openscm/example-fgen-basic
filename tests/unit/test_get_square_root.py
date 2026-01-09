@@ -62,16 +62,19 @@ def test_fortran_finalization_failure(
     mock_f_get_sqrt.get_square_root.return_value = 1
 
     # Setup the ResultGen factory mock
-    mock_result_inst = MagicMock()
-    if code is None:
-        mock_result_inst.error_v = None
-        mock_result_inst.data_v = 25.0
-    else:
-        mock_result_inst.error_v.code = code
-        mock_result_inst.error_v.message = msg
-        mock_result_inst.data_v = None
+    mock_success = MagicMock()
+    mock_success.error_v = None
+    mock_success.data_v = 25.0
 
-    mock_result_gen_class.from_instance_index.return_value = mock_result_inst
+    mock_error = MagicMock()
+    if code is None:
+        mock_error.error_v = None
+    else:
+        mock_error.error_v.code = code
+        mock_error.error_v.message = msg
+        mock_error.data_v = None
+
+    mock_result_gen_class.from_instance_index.side_effect = [mock_success, mock_error]
 
     # Setup the failure on the module mock
     mock_f_result_module.finalise_instance.return_value = 1
