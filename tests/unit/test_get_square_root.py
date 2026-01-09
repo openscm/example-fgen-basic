@@ -2,12 +2,15 @@
 Tests of `example_fgen_basic.get_square_root`
 """
 
+from unittest.mock import MagicMock, patch
+
 import pytest
 
 from example_fgen_basic.get_square_root import get_square_root
 from example_fgen_basic.pyfgen_runtime.exceptions import (
     FortranError,
 )
+from example_fgen_basic.result import ResultGen
 
 
 @pytest.mark.parametrize(
@@ -22,6 +25,7 @@ from example_fgen_basic.pyfgen_runtime.exceptions import (
     ],
 )
 def test_basic(inv, exp, exp_error):
+    ResultGen.free_fortran_memory()
     if exp is not None:
         assert get_square_root(inv) == exp
 
@@ -31,3 +35,46 @@ def test_basic(inv, exp, exp_error):
 
         with exp_error:
             get_square_root(inv)
+
+
+@pytest.mark.parametrize(
+    "code, msg, expected_exception, expected_match",
+    [
+        (None, None, AssertionError, "Finalisation of index"),
+        (1, "Failed finalisation!", FortranError, "Failed finalisation!"),
+    ],
+)
+# This replaces 'm_result_w' with a MagicMock entirely.
+@patch("example_fgen_basic.get_square_root.m_result_w")
+@patch("example_fgen_basic.get_square_root.m_get_square_root_w")
+@patch("example_fgen_basic.get_square_root.ResultGen")
+# ruff: noqa: PLR0913
+def test_fortran_finalization_failure(
+    mock_result_gen_class,
+    mock_f_get_sqrt,
+    mock_f_result_module,
+    code,
+    msg,
+    expected_exception,
+    expected_match,
+):
+    # Setup the mock for the main Fortran call
+    mock_f_get_sqrt.get_square_root.return_value = 1
+
+    # Setup the ResultGen factory mock
+    mock_result_inst = MagicMock()
+    if code is None:
+        mock_result_inst.error_v = None
+        mock_result_inst.data_v = 25.0
+    else:
+        mock_result_inst.error_v.code = code
+        mock_result_inst.error_v.message = msg
+        mock_result_inst.data_v = None
+
+    mock_result_gen_class.from_instance_index.return_value = mock_result_inst
+
+    # Setup the failure on the module mock
+    mock_f_result_module.finalise_instance.return_value = 1
+
+    with pytest.raises(expected_exception, match=expected_match):
+        get_square_root(625.0)
