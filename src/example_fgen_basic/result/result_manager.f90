@@ -3,7 +3,7 @@ module m_result_manager
   use kind_parameters, only: dp,i8
   use m_error_v, only: ErrorV
   use m_error_v_manager, only: error_v_manager_build_instance => build_instance
-  use m_result_gen, only: ResultGen, T_CLAIM, T_NONE, T_INT, T_DP, T_ERR
+  use m_result_gen, only: ResultGen, T_CLAIM, T_NONE, T_INT, T_DP, T_ARR_INT, T_ERR
 
   implicit none
   private
@@ -17,15 +17,16 @@ module m_result_manager
 
 contains
 
-  subroutine build_instance(tag, data_int, data_dp, error_v, instance_index, res_check)
+  subroutine build_instance(tag, data_int, data_dp, data_arr_int, error_v, instance_index, res_check)
 
     integer, intent(in) :: tag
     integer(kind=i8), optional, intent(in) :: data_int
     real(kind=dp), optional, intent(in) :: data_dp
+    integer(kind=i8), optional, intent(in) :: data_arr_int(..)
     type(ErrorV), optional, intent(in) :: error_v
 
     integer, intent(out) :: instance_index
-    type(ResultGen),optional, intent(out) :: res_check
+    type(ResultGen), optional, intent(out) :: res_check
     integer :: cause
 
     call ensure_array_capacity_for_instances(1)
@@ -39,7 +40,7 @@ contains
 
     ! CHECK whether the instance_array(instance_index) % tag = T_CLAIM ?
     call instance_array(instance_index) % &
-                  build(tag=tag,data_int=data_int,data_dp=data_dp,&
+                  build(tag=tag,data_int=data_int,data_dp=data_dp,data_arr_int=data_arr_int,&
                         error_v=error_v,res=res_check)
 
     if (.not. res_check % is_error()) then
@@ -104,18 +105,20 @@ contains
 
   end function finalise_instance
 
-  subroutine set_instance_index_to(instance_index, data_int, data_dp, error_v, res_check)
+  subroutine set_instance_index_to(instance_index, data_int, data_dp, data_arr_int, error_v, res_check)
 
     integer, intent(in) :: instance_index
     integer(kind=i8),optional, intent(in) :: data_int
     real(kind=dp),optional, intent(in) :: data_dp
+    integer(kind=i8), optional, intent(in) :: data_arr_int(..)
     type(ErrorV),optional, intent(in) :: error_v
 
     type(ResultGen), intent(out) :: res_check
 
     integer :: input_check
 
-    input_check = merge(1,0,present(data_int)) + merge(1,0,present(data_dp)) + merge(1,0,present(error_v))
+    input_check = merge(1,0,present(data_int)) + merge(1,0,present(data_dp)) + &
+                  merge(1,0,present(data_arr_int)) + merge(1,0,present(error_v))
 
     if (input_check == 0) then
 
@@ -133,6 +136,8 @@ contains
         call instance_array(instance_index) % build (tag = T_INT,data_int=data_int)
       else if(present(data_dp)) then
         call instance_array(instance_index) % build (tag = T_DP,data_dp=data_dp)
+      else if(present(data_arr_int)) then
+        call instance_array(instance_index) % build (tag = T_ARR_INT,data_arr_int=data_arr_int)
       else if(present(error_v)) then
         call instance_array(instance_index) % build (tag = T_ERR,error_v = error_v)
       end if

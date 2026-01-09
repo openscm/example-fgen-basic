@@ -4,7 +4,9 @@ Python equivalent of the Fortran `ResultGen` class
 
 from __future__ import annotations
 
+import numpy as np
 from attrs import define
+from numpy.typing import NDArray
 
 from example_fgen_basic.error_v import ErrorV
 from example_fgen_basic.pyfgen_runtime.exceptions import CompiledExtensionNotFoundError
@@ -23,7 +25,7 @@ class ResultGen:
     Result type that can hold values
     """
 
-    data_v: int | float | None
+    data_v: int | float | NDArray[np.int_] | None
     """ Data"""
 
     error_v: ErrorV | None
@@ -31,6 +33,7 @@ class ResultGen:
 
     __fs_int = m_result_w.s_int
     __fs_dp = m_result_w.s_dp
+    __farr_int = m_result_w.arr_int
     __fs_err = m_result_w.s_err
 
     @classmethod
@@ -64,6 +67,33 @@ class ResultGen:
             data_v_float: float | None = m_result_w.get_data_dp(instance_index)
             error_v = None
             res = cls(data_v=data_v_float, error_v=error_v)
+
+        elif tag == cls.__farr_int:
+            data_v_arr_int: NDArray[np.int_]
+            data_shape: NDArray[np.int_] = m_result_w.get_data_dims(instance_index)
+            ndims = (data_shape > 0).sum()
+
+            DIM1D = 1
+            if ndims == DIM1D:
+                data_v_arr_int = m_result_w.get_data_arr_int_1d(
+                    instance_index, d1=data_shape[0]
+                )
+                error_v = None
+            elif ndims == DIM1D + 1:
+                data_v_arr_int = m_result_w.get_data_arr_int_2d(
+                    instance_index, d1=data_shape[0], d2=data_shape[1]
+                )
+                error_v = None
+            elif ndims == DIM1D + 2:
+                data_v_arr_int = m_result_w.get_data_arr_int_3d(
+                    instance_index, d1=data_shape[0], d2=data_shape[1], d3=data_shape[2]
+                )
+                error_v = None
+            else:
+                msg = "Getter ERROR: Null array dimensions"
+                raise ValueError(msg)
+
+            res = cls(data_v=data_v_arr_int, error_v=error_v)
 
         elif tag == cls.__fs_err:
             data_v_err = None
@@ -109,8 +139,24 @@ class ResultGen:
             instance_index = m_result_w.build_instance_int(self.data_v)
         elif isinstance(self.data_v, float):
             instance_index = m_result_w.build_instance_dp(self.data_v)
+        elif isinstance(self.data_v, np.ndarray) and np.issubdtype(
+            self.data_v.dtype, np.integer
+        ):
+            DIM1D = 1
+            ndarray = np.array(self.data_v)
+            if ndarray.ndim == DIM1D:
+                instance_index = m_result_w.build_instance_arr_int_1d(self.data_v)
+            elif ndarray.ndim == DIM1D + 1:
+                instance_index = m_result_w.build_instance_arr_int_2d(self.data_v)
+            elif ndarray.ndim == DIM1D + 2:
+                instance_index = m_result_w.build_instance_arr_int_3d(self.data_v)
         else:
-            msg = f"data_v={self.data_v}, error_v={self.error_v}"
-            raise KeyError(msg)
+            msg = f"Unexpected data_v={self.data_v}, error_v={self.error_v}"
+            if isinstance(self.data_v, np.ndarray) and not np.issubdtype(
+                self.data_v.dtype, np.integer
+            ):
+                msg = f"Unexpected data_v={self.data_v} does not contain all integers"
+
+            raise ValueError(msg)
 
         return instance_index

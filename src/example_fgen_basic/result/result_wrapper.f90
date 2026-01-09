@@ -2,7 +2,7 @@ module m_result_w
 
   ! use kind_parameters, only: dp, i8
   use m_error_v, only: ErrorV
-  use m_result_gen, only: ResultGen, T_CLAIM, T_NONE, T_INT, T_DP, T_ERR
+  use m_result_gen, only: ResultGen, T_CLAIM, T_NONE, T_INT, T_DP, T_ARR_INT, T_ERR
 
   ! The manager module, which makes this all work
   use m_error_v_manager, only: &
@@ -26,12 +26,19 @@ module m_result_w
   implicit none
   private
 
-  public :: build_instance_int, build_instance_dp, build_instance_err,&
+  public :: build_instance_int, build_instance_dp, &
+            build_instance_arr_int_1d, build_instance_arr_int_2d, build_instance_arr_int_3d, &
+            build_instance_err,&
             finalise_instance, finalise_instances, free_resources,&
-            get_instance_tag, get_data_int, get_data_dp, get_error, &
+            get_instance_tag, get_data_dims, get_data_int, get_data_dp, &
+            get_data_arr_int_1d, get_data_arr_int_2d, get_data_arr_int_3d, &
+            get_error, &
             probe_instance
 
-  integer, parameter, public :: s_claimed=T_CLAIM, s_none=T_NONE, s_int=T_INT, s_dp=T_DP, s_err=T_ERR
+  integer, parameter, public :: s_claimed=T_CLAIM, s_none=T_NONE, &
+                                s_int=T_INT, s_dp=T_DP, arr_int = T_ARR_INT, &
+                                s_err=T_ERR
+
 
 contains
 
@@ -91,6 +98,90 @@ contains
     end if
 
   end function build_instance_dp
+
+  function build_instance_arr_int_1d(data_arr_int) result(instance_index)
+
+    integer, parameter :: i8 = selected_int_kind(18)
+    integer(kind=i8), intent(in) :: data_arr_int(:)
+
+    integer :: instance_index
+
+    type(ResultGen) :: res_check
+
+    ! Setting Result with data
+    call result_manager_build_instance(&
+      tag = T_ARR_INT, &
+      data_arr_int = data_arr_int, &
+      instance_index= instance_index,&
+      res_check = res_check &
+    )
+
+    if (res_check % is_error()) then
+      ! FAILED build
+      !
+      ! Could not allocate a result type to handle the return to Python.
+      !
+      call escape_hatch(instance_index)
+
+    end if
+
+  end function build_instance_arr_int_1d
+
+  function build_instance_arr_int_2d(data_arr_int) result(instance_index)
+
+    integer, parameter :: i8 = selected_int_kind(18)
+    integer(kind=i8), intent(in) :: data_arr_int(:,:)
+
+    integer :: instance_index
+
+    type(ResultGen) :: res_check
+
+    ! Setting Result with data
+    call result_manager_build_instance(&
+      tag = T_ARR_INT, &
+      data_arr_int = data_arr_int, &
+      instance_index= instance_index,&
+      res_check = res_check &
+    )
+
+    if (res_check % is_error()) then
+      ! FAILED build
+      !
+      ! Could not allocate a result type to handle the return to Python.
+      !
+      call escape_hatch(instance_index)
+
+    end if
+
+  end function build_instance_arr_int_2d
+
+  function build_instance_arr_int_3d(data_arr_int) result(instance_index)
+
+    integer, parameter :: i8 = selected_int_kind(18)
+    integer(kind=i8), intent(in) :: data_arr_int(:,:,:)
+
+    integer :: instance_index
+
+    type(ResultGen) :: res_check
+
+    ! Setting Result with data
+    call result_manager_build_instance(&
+      tag = T_ARR_INT, &
+      data_arr_int = data_arr_int, &
+      instance_index= instance_index,&
+      res_check = res_check &
+    )
+
+    if (res_check % is_error()) then
+      ! FAILED build
+      !
+      ! Could not allocate a result type to handle the return to Python.
+      !
+      call escape_hatch(instance_index)
+
+    end if
+
+  end function build_instance_arr_int_3d
 
   function build_instance_err(code,message) result(instance_index)
 
@@ -188,6 +279,85 @@ contains
     data_dp = res_stored % data_dp
 
   end function get_data_dp
+
+  function get_data_dims(instance_index) result(dims)
+
+    integer, parameter :: i8 = selected_int_kind(18)
+    integer, intent(in) :: instance_index
+    integer(kind=i8) :: dims(3)
+
+    type(ResultGen) :: res_stored
+
+    dims = -1
+
+    res_stored = result_manager_get_instance(instance_index)
+
+    if (allocated(res_stored % data_array_int_1d)) then
+      dims = [size(res_stored % data_array_int_1d, dim=1), &
+              -1, &
+              -1]
+    else if (allocated(res_stored % data_array_int_2d)) then
+      dims = [size(res_stored % data_array_int_2d, dim=1), &
+              size(res_stored % data_array_int_2d, dim=2), &
+              -1]
+    else if (allocated(res_stored % data_array_int_3d)) then
+      dims = [size(res_stored % data_array_int_3d, dim=1), &
+              size(res_stored % data_array_int_3d, dim=2), &
+              size(res_stored % data_array_int_3d, dim=3)]
+    end if
+
+  end function get_data_dims
+
+  function get_data_arr_int_1d(instance_index,d1) result(data_arr_int_1d)
+
+    integer, parameter :: i8 = selected_int_kind(18)
+    integer, intent(in) :: instance_index
+    integer, intent(in) :: d1
+    integer(kind=i8) :: data_arr_int_1d(d1)
+
+    type(ResultGen) :: res_stored
+
+    res_stored = result_manager_get_instance(instance_index)
+
+    if (allocated(res_stored % data_array_int_1d)) then
+      data_arr_int_1d = res_stored % data_array_int_1d
+    end if
+
+  end function get_data_arr_int_1d
+
+  function get_data_arr_int_2d(instance_index,d1,d2) result(data_arr_int_2d)
+
+    integer, parameter :: i8 = selected_int_kind(18)
+    integer, intent(in) :: instance_index
+    integer, intent(in) :: d1, d2
+    integer(kind=i8) :: data_arr_int_2d(d1,d2)
+
+    type(ResultGen) :: res_stored
+
+    res_stored = result_manager_get_instance(instance_index)
+
+    if (allocated(res_stored % data_array_int_2d)) then
+      data_arr_int_2d = res_stored % data_array_int_2d
+    end if
+
+  end function get_data_arr_int_2d
+
+  function get_data_arr_int_3d(instance_index,d1,d2,d3) result(data_arr_int_3d)
+
+    integer, parameter :: i8 = selected_int_kind(18)
+    integer, intent(in) :: instance_index
+    integer, intent(in) :: d1, d2, d3
+    integer(kind=i8) :: data_arr_int_3d(d1,d2,d3)
+
+    type(ResultGen) :: res_stored
+
+    res_stored = result_manager_get_instance(instance_index)
+
+    if (allocated(res_stored % data_array_int_3d)) then
+      data_arr_int_3d = res_stored % data_array_int_3d
+    end if
+
+  end function get_data_arr_int_3d
 
   ! NOT entirely sure of what should happen here: discuss with Zeb
   subroutine get_error(instance_index,code,message)
