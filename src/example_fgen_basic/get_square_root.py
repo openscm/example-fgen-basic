@@ -56,7 +56,7 @@ def get_square_root(inv: float) -> float:
     if result.data_v is None:
         raise AssertionError
 
-    res = result.data_v
+    res: float = float(result.data_v)
 
     # TODO: think
     # I like the clarity of finalising result_instance_index here
